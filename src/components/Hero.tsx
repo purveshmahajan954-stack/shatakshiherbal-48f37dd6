@@ -28,6 +28,42 @@ export function Hero() {
               Explore Products
             </Link>
           </div>
+
+          <div className="mt-10 flex flex-wrap items-center gap-6 sm:gap-8">
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {[
+                  { l: "P", bg: "bg-primary" },
+                  { l: "R", bg: "bg-primary-light" },
+                  { l: "A", bg: "bg-dark-hero" },
+                  { l: "M", bg: "bg-primary-light/70" },
+                ].map((a, i) => (
+                  <div key={i} className={`w-9 h-9 rounded-full ${a.bg} text-cream text-xs font-bold flex items-center justify-center ring-2 ring-cream`}>
+                    {a.l}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold" />)}
+                  </div>
+                  <span className="text-sm font-bold text-foreground">4.9/5</span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">Trusted by 10,000+ customers</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-6 sm:gap-8 pl-2 sm:pl-4 sm:border-l border-primary/15">
+              <div>
+                <div className="font-display text-2xl font-bold text-primary leading-none">50+</div>
+                <div className="text-xs text-muted-foreground mt-1">Products</div>
+              </div>
+              <div>
+                <div className="font-display text-2xl font-bold text-primary leading-none">100%</div>
+                <div className="text-xs text-muted-foreground mt-1">Natural</div>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="relative">
