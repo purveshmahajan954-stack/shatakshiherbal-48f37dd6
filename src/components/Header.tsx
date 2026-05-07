@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, User, Sparkles, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -14,7 +15,8 @@ const navItems = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { count, total, items } = useCart();
+  const [cartOpen, setCartOpen] = useState(false);
+  const { count, total, items, remove, clear } = useCart();
 
   return (
     <>
@@ -50,10 +52,53 @@ export function Header() {
           </nav>
           <div className="flex items-center gap-2 sm:gap-4">
             <button aria-label="Search" onClick={() => toast("Search coming soon")} className="p-2 hover:text-primary transition-colors"><Search className="w-5 h-5" /></button>
-            <button aria-label="Cart" onClick={() => toast(count === 0 ? "Your cart is empty" : `${count} item${count>1?'s':''} • ₹${total}`, { description: items.map(i => `${i.name} × ${i.qty}`).join(', ') || undefined })} className="relative p-2 hover:text-primary transition-colors">
-              <ShoppingBag className="w-5 h-5" />
-              {count > 0 && <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{count}</span>}
-            </button>
+            <Sheet open={cartOpen} onOpenChange={setCartOpen}>
+              <SheetTrigger asChild>
+                <button aria-label="Cart" className="relative p-2 hover:text-primary transition-colors">
+                  <ShoppingBag className="w-5 h-5" />
+                  {count > 0 && <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{count}</span>}
+                </button>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:max-w-md flex flex-col">
+                <SheetHeader>
+                  <SheetTitle className="font-display text-2xl">Your Cart ({count})</SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto py-4">
+                  {items.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-12">
+                      <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p>Your cart is empty</p>
+                    </div>
+                  ) : (
+                    <ul className="space-y-3">
+                      {items.map((i) => (
+                        <li key={i.name} className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
+                          <div className="min-w-0">
+                            <div className="font-medium truncate">{i.name}</div>
+                            <div className="text-sm text-muted-foreground">₹{i.price} × {i.qty}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">₹{i.price * i.qty}</span>
+                            <button onClick={() => remove(i.name)} aria-label={`Remove ${i.name}`} className="p-1.5 text-muted-foreground hover:text-destructive">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {items.length > 0 && (
+                  <div className="border-t border-border pt-4 space-y-3">
+                    <div className="flex justify-between font-semibold text-lg">
+                      <span>Total</span><span>₹{total}</span>
+                    </div>
+                    <button onClick={() => { toast.success("Checkout coming soon"); }} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition">Checkout</button>
+                    <button onClick={clear} className="w-full text-sm text-muted-foreground hover:text-foreground">Clear cart</button>
+                  </div>
+                )}
+              </SheetContent>
+            </Sheet>
             <Link to="/sign-in" className="hidden sm:flex items-center gap-2 px-4 py-2 border-2 border-primary rounded-full text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
               <User className="w-4 h-4" />Sign In
             </Link>
