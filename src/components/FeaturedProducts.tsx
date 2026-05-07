@@ -1,5 +1,7 @@
 import heroImg from "@/assets/hero-product.jpg";
 import { ArrowRight, Plus, Star } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 const products = [
   { name: "Acidic Capsules", desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 1299, oldPrice: 1799, save: 500, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 28 },
