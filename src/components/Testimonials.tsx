@@ -1,4 +1,5 @@
 import { Quote, Star, MapPin, Heart, Sparkles, Award } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const stats = [
   { icon: Star, value: "4.9", label: "Average Rating", color: "text-gold" },
@@ -60,9 +61,9 @@ export function Testimonials() {
 
         <div className="text-center mt-16">
           <p className="text-cream/60 mb-5 text-sm">Join thousands of satisfied patients on their wellness journey</p>
-          <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition">
+          <Link to="/shop" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition">
             Start Your Journey →
-          </button>
+          </Link>
         </div>
       </div>
     </section>

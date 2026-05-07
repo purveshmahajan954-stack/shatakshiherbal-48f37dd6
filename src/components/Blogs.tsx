@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const blogs = [
   { tag: "DIGESTIVE HEALTH", icon: "🌿", title: "How Ayurvedic Herbs Help Manage Acidity Naturally", excerpt: "Discover the power of Amla, Mulethi and Ajwain in neutralising stomach acid and restoring digestive balance without side effects.", date: "Mar 12, 2024", read: "5 min read", color: "oklch(0.55 0.15 155)", chipBg: "oklch(0.92 0.05 145)" },
@@ -19,9 +20,9 @@ export function Blogs() {
             <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-4">Medicinal Blogs</h2>
             <p className="text-muted-foreground">Expert insights on Ayurvedic herbs, remedies and holistic wellness from our practitioners.</p>
           </div>
-          <button className="inline-flex items-center gap-2 border border-primary/40 px-6 py-3 rounded-full font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+          <Link to="/product-info" className="inline-flex items-center gap-2 border border-primary/40 px-6 py-3 rounded-full font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
             View All Articles <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogs.map((b) => (
@@ -47,9 +48,9 @@ export function Blogs() {
                     <div className="text-xs font-medium" style={{ color: b.color }}>{b.read}</div>
                   </div>
                 </div>
-                <a href="#" className="inline-flex items-center gap-1 mt-4 text-sm font-semibold" style={{ color: b.color }}>
+                <Link to="/product-info" className="inline-flex items-center gap-1 mt-4 text-sm font-semibold" style={{ color: b.color }}>
                   Read Article <ArrowRight className="w-4 h-4" />
-                </a>
+                </Link>
               </div>
             </article>
           ))}

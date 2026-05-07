@@ -1,6 +1,7 @@
 import heroImg from "@/assets/hero-product.jpg";
 import { ArrowRight, Leaf, Sparkles, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 
 export function Hero() {
   return (
@@ -20,12 +21,12 @@ export function Hero() {
             Ancient Ayurvedic wisdom, reimagined for today. Premium herbal formulations crafted from nature's finest ingredients — pure, potent, and proven.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <button className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition-all shadow-soft">
+            <Link to="/shop" className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition-all shadow-soft">
               Shop Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="inline-flex items-center gap-2 border border-primary/30 bg-accent/40 text-foreground px-8 py-4 rounded-md font-medium hover:bg-accent transition-all">
+            </Link>
+            <Link to="/product-info" className="inline-flex items-center gap-2 border border-primary/30 bg-accent/40 text-foreground px-8 py-4 rounded-md font-medium hover:bg-accent transition-all">
               Explore Products
-            </button>
+            </Link>
           </div>
         </motion.div>
 

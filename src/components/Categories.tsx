@@ -1,4 +1,5 @@
 import { ArrowRight, ChevronRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const categories = [
   { name: "Skin Care", desc: "Natural glow formulas", count: 12, icon: "✨", bg: "oklch(0.92 0.05 145)", chip: "oklch(0.78 0.13 50)" },
@@ -19,7 +20,7 @@ export function Categories() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
           {categories.map((c) => (
-            <div key={c.name} className="group rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer hover:-translate-y-1 transition-transform shadow-card"
+            <Link to="/shop" key={c.name} className="group rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer hover:-translate-y-1 transition-transform shadow-card"
               style={{ backgroundColor: c.bg }}>
               <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-2xl mb-4 shadow-sm">{c.icon}</div>
               <h3 className="font-display text-lg font-semibold text-foreground mb-1">{c.name}</h3>
@@ -27,13 +28,13 @@ export function Categories() {
               <div className="inline-flex items-center gap-1 bg-white/70 px-3 py-1.5 rounded-full text-xs font-semibold mt-auto" style={{ color: c.chip }}>
                 {c.count} Products <ChevronRight className="w-3 h-3" />
               </div>
-            </div>
+            </Link>
           ))}
         </div>
         <div className="text-center mt-14">
-          <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition-all shadow-soft">
+          <Link to="/shop" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition-all shadow-soft">
             Browse All Products <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       </div>
     </section>
