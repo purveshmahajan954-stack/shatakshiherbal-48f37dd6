@@ -34,7 +34,7 @@ export function FeaturedProducts() {
                 )}
                 <span className="absolute top-12 left-4 z-10 bg-gold text-white text-[10px] font-bold tracking-wider px-3 py-1.5 rounded">-{p.discount}%</span>
                 <img src={heroImg} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
-                <button className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
+                <button onClick={() => toast.success(`${p.name} added to cart`)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
               </div>
               <div className="p-5">
                 <div className="text-[10px] font-bold tracking-wider text-primary-light uppercase mb-2">Ayurvedic Tablets / Medicines</div>
@@ -55,7 +55,7 @@ export function FeaturedProducts() {
                     </div>
                     <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
                   </div>
-                  <button className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
+                  <button onClick={() => toast.success(`${p.name} added to cart`)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
                     <Plus className="w-5 h-5" />
                   </button>
                 </div>

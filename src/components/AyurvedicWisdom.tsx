@@ -1,5 +1,6 @@
 import heroImg from "@/assets/hero-product.jpg";
 import { Leaf, FlaskConical, Sprout, Trophy } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const stats = [
   { value: "5000+", label: "Years of Wisdom" },
@@ -41,8 +42,8 @@ export function AyurvedicWisdom() {
             ))}
           </div>
           <div className="mt-10 flex flex-wrap gap-4">
-            <button className="bg-cream text-foreground px-8 py-3.5 rounded-md font-medium hover:bg-white transition">Learn Our Story</button>
-            <button className="border border-cream/40 px-8 py-3.5 rounded-md font-medium hover:bg-white/5 transition">Shop Now</button>
+            <Link to="/about" className="bg-cream text-foreground px-8 py-3.5 rounded-md font-medium hover:bg-white transition">Learn Our Story</Link>
+            <Link to="/shop" className="border border-cream/40 px-8 py-3.5 rounded-md font-medium hover:bg-white/5 transition">Shop Now</Link>
           </div>
         </div>
 
