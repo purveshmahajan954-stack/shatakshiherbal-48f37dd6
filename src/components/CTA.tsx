@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 export function CTA() {
   return (
     <section className="py-24 bg-cream">
@@ -15,8 +17,8 @@ export function CTA() {
               ))}
             </div>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="bg-cream text-foreground px-8 py-4 rounded-md font-medium hover:bg-white transition">Explore All Products →</button>
-              <button className="border border-cream/30 px-8 py-4 rounded-md font-medium hover:bg-white/5 transition">👨‍⚕️ Talk to Doctor</button>
+              <Link to="/shop" className="bg-cream text-foreground px-8 py-4 rounded-md font-medium hover:bg-white transition">Explore All Products →</Link>
+              <Link to="/contact" className="border border-cream/30 px-8 py-4 rounded-md font-medium hover:bg-white/5 transition">👨‍⚕️ Talk to Doctor</Link>
             </div>
           </div>
         </div>
