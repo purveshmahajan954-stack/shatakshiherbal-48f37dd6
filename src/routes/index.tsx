@@ -1,26 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/Header";
+import { Hero } from "@/components/Hero";
+import { Categories } from "@/components/Categories";
+import { FeaturedProducts } from "@/components/FeaturedProducts";
+import { AyurvedicWisdom } from "@/components/AyurvedicWisdom";
+import { Blogs } from "@/components/Blogs";
+import { Testimonials } from "@/components/Testimonials";
+import { CTA } from "@/components/CTA";
+import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({
+    meta: [
+      { title: "Shatakshi Herbal — Pure Ayurvedic Healing for Modern Life" },
+      { name: "description", content: "Premium Ayurvedic formulations crafted from nature's finest ingredients. AYUSH certified, 100% natural herbal medicines." },
+    ],
+  }),
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-cream">
+      <Header />
+      <main>
+        <Hero />
+        <Categories />
+        <FeaturedProducts />
+        <AyurvedicWisdom />
+        <Blogs />
+        <Testimonials />
+        <CTA />
+      </main>
+      <Footer />
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }
