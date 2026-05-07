@@ -2,6 +2,7 @@ import heroImg from "@/assets/hero-product.jpg";
 import { ArrowRight, Plus, Star } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useCart } from "@/lib/cart";
 
 const products = [
   { name: "Acidic Capsules", desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 1299, oldPrice: 1799, save: 500, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 28 },
@@ -11,6 +12,11 @@ const products = [
 ];
 
 export function FeaturedProducts() {
+  const { add } = useCart();
+  const handleAdd = (name: string, price: number) => {
+    add(name, price);
+    toast.success(`${name} added to cart`);
+  };
   return (
     <section className="py-24 bg-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
