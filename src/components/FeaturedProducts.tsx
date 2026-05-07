@@ -20,9 +20,9 @@ export function FeaturedProducts() {
             <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-4">Featured Products</h2>
             <p className="text-muted-foreground">Our most loved Ayurvedic formulations — trusted by thousands of wellness seekers.</p>
           </div>
-          <button className="inline-flex items-center gap-2 border border-primary/40 px-6 py-3 rounded-full font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+          <Link to="/shop" className="inline-flex items-center gap-2 border border-primary/40 px-6 py-3 rounded-full font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
             View All Products <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
