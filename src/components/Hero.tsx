@@ -43,7 +43,7 @@ export function Hero() {
             </div>
           </motion.div>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 5, repeat: Infinity }}
-            className="absolute top-1/2 -right-2 lg:right-0 bg-white rounded-2xl shadow-soft px-5 py-3 flex items-center gap-3">
+            className="absolute top-[68%] -right-2 lg:right-0 bg-white rounded-2xl shadow-soft px-5 py-3 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-gold" />
             <div>
               <div className="text-[10px] font-bold text-gold tracking-wider">NEW ARRIVAL</div>
