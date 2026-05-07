@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Search, ShoppingBag, User, Sparkles, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCart } from "@/lib/cart";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -13,6 +14,7 @@ const navItems = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { count, total, items } = useCart();
 
   return (
     <>
@@ -48,7 +50,10 @@ export function Header() {
           </nav>
           <div className="flex items-center gap-2 sm:gap-4">
             <button aria-label="Search" onClick={() => toast("Search coming soon")} className="p-2 hover:text-primary transition-colors"><Search className="w-5 h-5" /></button>
-            <button aria-label="Cart" onClick={() => toast("Your cart is empty")} className="p-2 hover:text-primary transition-colors"><ShoppingBag className="w-5 h-5" /></button>
+            <button aria-label="Cart" onClick={() => toast(count === 0 ? "Your cart is empty" : `${count} item${count>1?'s':''} • ₹${total}`, { description: items.map(i => `${i.name} × ${i.qty}`).join(', ') || undefined })} className="relative p-2 hover:text-primary transition-colors">
+              <ShoppingBag className="w-5 h-5" />
+              {count > 0 && <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{count}</span>}
+            </button>
             <Link to="/sign-in" className="hidden sm:flex items-center gap-2 px-4 py-2 border-2 border-primary rounded-full text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
               <User className="w-4 h-4" />Sign In
             </Link>
