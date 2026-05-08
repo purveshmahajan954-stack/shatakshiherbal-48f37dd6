@@ -68,7 +68,7 @@ export function Hero() {
 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="relative">
           <div className="relative rounded-3xl overflow-hidden shadow-soft bg-white">
-            <img src={heroImg} alt="Shatakshi Herbal Acidic Capsules" className="w-full h-auto" width={1024} height={1024} />
+            <img src={heroImg} alt="Shatakshi Herbal Acidic Capsules" className="w-full h-auto" width={1024} height={1024} loading="eager" fetchPriority="high" decoding="async" />
           </div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity }}
             className="absolute top-8 -left-4 lg:left-8 bg-white rounded-2xl shadow-soft px-5 py-3 flex items-center gap-3">
