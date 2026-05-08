@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { Categories } from "@/components/Categories";
-import { FeaturedProducts } from "@/components/FeaturedProducts";
-import { AyurvedicWisdom } from "@/components/AyurvedicWisdom";
-import { Blogs } from "@/components/Blogs";
-import { Testimonials } from "@/components/Testimonials";
-import { CTA } from "@/components/CTA";
-import { Footer } from "@/components/Footer";
+
+const Categories = lazy(() => import("@/components/Categories").then(m => ({ default: m.Categories })));
+const FeaturedProducts = lazy(() => import("@/components/FeaturedProducts").then(m => ({ default: m.FeaturedProducts })));
+const AyurvedicWisdom = lazy(() => import("@/components/AyurvedicWisdom").then(m => ({ default: m.AyurvedicWisdom })));
+const Blogs = lazy(() => import("@/components/Blogs").then(m => ({ default: m.Blogs })));
+const Testimonials = lazy(() => import("@/components/Testimonials").then(m => ({ default: m.Testimonials })));
+const CTA = lazy(() => import("@/components/CTA").then(m => ({ default: m.CTA })));
+const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -25,14 +27,16 @@ function Index() {
       <Header />
       <main>
         <Hero />
-        <Categories />
-        <FeaturedProducts />
-        <AyurvedicWisdom />
-        <Blogs />
-        <Testimonials />
-        <CTA />
+        <Suspense fallback={<div className="h-32" />}>
+          <Categories />
+          <FeaturedProducts />
+          <AyurvedicWisdom />
+          <Blogs />
+          <Testimonials />
+          <CTA />
+        </Suspense>
       </main>
-      <Footer />
+      <Suspense fallback={null}><Footer /></Suspense>
     </div>
   );
 }
