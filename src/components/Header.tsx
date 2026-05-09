@@ -129,14 +129,10 @@ export function Header() {
                 <Shield className="w-3.5 h-3.5" />Admin
               </Link>
             )}
-            {user ? (
+            {user && (
               <button onClick={signOut} className="hidden sm:flex items-center gap-2 px-4 py-2 border-2 border-primary rounded-full text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
                 <LogOut className="w-4 h-4" />Sign Out
               </button>
-            ) : (
-              <Link to="/login" className="hidden sm:flex items-center gap-2 px-4 py-2 border-2 border-primary rounded-full text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-                <User className="w-4 h-4" />Sign In
-              </Link>
             )}
             <button aria-label="Menu" onClick={() => setOpen(v => !v)} className="md:hidden p-2 text-foreground">
               {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
