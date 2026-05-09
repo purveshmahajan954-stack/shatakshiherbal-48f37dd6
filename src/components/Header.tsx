@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2 } from "lucide-react";
+import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2, LogOut, Shield, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const navItems = [
@@ -16,7 +18,27 @@ const navItems = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [placing, setPlacing] = useState(false);
   const { count, total, items, remove, clear } = useCart();
+  const { user, isAdmin, signOut } = useAuth();
+
+  const placeOrder = async () => {
+    if (!user || items.length === 0) return;
+    setPlacing(true);
+    const { error } = await supabase.from("orders").insert({
+      user_id: user.id,
+      items: items as any,
+      total,
+    });
+    setPlacing(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Order placed! We'll be in touch.");
+    clear();
+    setCartOpen(false);
+  };
 
   return (
     <>
@@ -93,15 +115,25 @@ export function Header() {
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span><span>₹{total}</span>
                     </div>
-                    <button onClick={() => { toast.success("Checkout coming soon"); }} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition">Checkout</button>
+                    <button onClick={placeOrder} disabled={placing} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                      {placing && <Loader2 className="w-4 h-4 animate-spin" />}
+                      {placing ? "Placing…" : "Place Order"}
+                    </button>
                     <button onClick={clear} className="w-full text-sm text-muted-foreground hover:text-foreground">Clear cart</button>
                   </div>
                 )}
               </SheetContent>
             </Sheet>
-            <Link to="/sign-in" className="hidden sm:flex items-center gap-2 px-4 py-2 border-2 border-primary rounded-full text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-              <User className="w-4 h-4" />Sign In
-            </Link>
+            {isAdmin && (
+              <Link to="/admin" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-gold/15 text-gold hover:bg-gold/25 transition">
+                <Shield className="w-3.5 h-3.5" />Admin
+              </Link>
+            )}
+            {user && (
+              <button onClick={signOut} className="hidden sm:flex items-center gap-2 px-4 py-2 border-2 border-primary rounded-full text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                <LogOut className="w-4 h-4" />Sign Out
+              </button>
+            )}
             <button aria-label="Menu" onClick={() => setOpen(v => !v)} className="md:hidden p-2 text-foreground">
               {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -114,7 +146,12 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <Link to="/sign-in" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-primary">Sign In</Link>
+            {isAdmin && (
+              <Link to="/admin" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-gold">Admin Panel</Link>
+            )}
+            {user ? (
+              <button onClick={() => { signOut(); setOpen(false); }} className="py-2 text-sm font-medium text-primary text-left">Sign Out</button>
+            ) : null}
           </nav>
         )}
       </header>

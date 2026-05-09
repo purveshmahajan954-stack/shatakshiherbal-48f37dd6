@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useState } from "react";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
@@ -16,12 +18,25 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase.from("contact_messages").insert({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim() || null,
+      message: form.message.trim(),
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setSent(true);
-    setForm({ name: "", email: "", message: "" });
+    setForm({ name: "", email: "", phone: "", message: "" });
     setTimeout(() => setSent(false), 4000);
   };
 
@@ -49,10 +64,13 @@ function ContactPage() {
             ))}
           </div>
           <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-card max-w-2xl mx-auto space-y-4">
-            <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email address" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <textarea required rows={5} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Your message" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <button type="submit" className="bg-primary text-primary-foreground px-8 py-3 rounded-md font-medium hover:bg-primary/90 transition">Send Message</button>
+            <input required maxLength={200} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
+            <input required type="email" maxLength={320} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email address" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
+            <input maxLength={20} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="Phone (optional)" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
+            <textarea required rows={5} maxLength={5000} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Your message" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
+            <button type="submit" disabled={busy} className="bg-primary text-primary-foreground px-8 py-3 rounded-md font-medium hover:bg-primary/90 transition disabled:opacity-50 inline-flex items-center gap-2">
+              {busy && <Loader2 className="w-4 h-4 animate-spin" />}{busy ? "Sending…" : "Send Message"}
+            </button>
             {sent && <p className="text-primary text-sm">Thanks! We'll get back to you soon.</p>}
           </form>
         </div>
