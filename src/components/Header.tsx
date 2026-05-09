@@ -150,7 +150,12 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <Link to="/sign-in" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-primary">Sign In</Link>
+            {isAdmin && (
+              <Link to="/admin" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-gold">Admin Panel</Link>
+            )}
+            {user ? (
+              <button onClick={() => { signOut(); setOpen(false); }} className="py-2 text-sm font-medium text-primary text-left">Sign Out</button>
+            ) : null}
           </nav>
         )}
       </header>
