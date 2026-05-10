@@ -73,7 +73,7 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2 sm:gap-4">
-            <button aria-label="Search" onClick={() => toast("Search coming soon")} className="p-2 hover:text-primary transition-colors"><Search className="w-5 h-5" /></button>
+            <Link to="/shop" aria-label="Search products" className="p-2 hover:text-primary transition-colors"><Search className="w-5 h-5" /></Link>
             <Sheet open={cartOpen} onOpenChange={setCartOpen}>
               <SheetTrigger asChild>
                 <button aria-label="Cart" className="relative p-2 hover:text-primary transition-colors">
