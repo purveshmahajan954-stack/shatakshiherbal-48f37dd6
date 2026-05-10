@@ -20,7 +20,7 @@ export function Categories() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
           {categories.map((c) => (
-            <Link to="/shop" key={c.name} className="group rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer hover:-translate-y-1 transition-transform shadow-card"
+            <Link to="/shop" hash="products" key={c.name} className="group rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer hover:-translate-y-1 transition-transform shadow-card"
               style={{ backgroundColor: c.bg }}>
               <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-2xl mb-4 shadow-sm">{c.icon}</div>
               <h3 className="font-display text-lg font-semibold text-foreground mb-1">{c.name}</h3>
