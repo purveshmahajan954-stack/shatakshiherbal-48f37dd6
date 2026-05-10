@@ -61,7 +61,7 @@ export function FeaturedProducts() {
                     </div>
                     <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
                   </div>
-                  <button onClick={() => toast.success(`${p.name} added to cart`)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
+                  <button onClick={() => handleAdd(p.name, p.price)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
                     <Plus className="w-5 h-5" />
                   </button>
                 </div>
