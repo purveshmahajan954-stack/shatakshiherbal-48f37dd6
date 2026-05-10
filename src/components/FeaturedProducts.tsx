@@ -18,7 +18,7 @@ export function FeaturedProducts() {
     toast.success(`${name} added to cart`);
   };
   return (
-    <section className="py-24 bg-cream">
+    <section id="products" className="py-24 bg-cream scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="max-w-xl">
