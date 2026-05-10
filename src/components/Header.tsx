@@ -138,9 +138,8 @@ export function Header() {
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span><span>₹{total}</span>
                     </div>
-                    <button onClick={placeOrder} disabled={placing} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2">
-                      {placing && <Loader2 className="w-4 h-4 animate-spin" />}
-                      {placing ? "Placing…" : "Place Order"}
+                    <button onClick={openCheckout} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition inline-flex items-center justify-center gap-2">
+                      Checkout (Cash on Delivery)
                     </button>
                     <button onClick={clear} className="w-full text-sm text-muted-foreground hover:text-foreground">Clear cart</button>
                   </div>
