@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2, LogOut, Shield, Loader2 } from "lucide-react";
+import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2, LogOut, Shield, Loader2, Banknote } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -18,26 +19,48 @@ const navItems = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [placing, setPlacing] = useState(false);
+  const [shipping, setShipping] = useState({ name: "", phone: "", address: "", city: "", pincode: "", notes: "" });
   const { count, total, items, remove, clear } = useCart();
   const { user, isAdmin, signOut } = useAuth();
 
-  const placeOrder = async () => {
+  const openCheckout = () => {
     if (!user || items.length === 0) return;
+    setCheckoutOpen(true);
+  };
+
+  const placeOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || items.length === 0) return;
+    const name = shipping.name.trim();
+    const phone = shipping.phone.trim();
+    const address = shipping.address.trim();
+    if (name.length < 2) return toast.error("Please enter your full name");
+    if (!/^\d{10}$/.test(phone)) return toast.error("Enter a valid 10-digit phone number");
+    if (address.length < 8) return toast.error("Please enter a complete address");
+    if (!/^\d{6}$/.test(shipping.pincode.trim())) return toast.error("Enter a valid 6-digit pincode");
+
     setPlacing(true);
+    const fullAddress = `${address}, ${shipping.city.trim()} - ${shipping.pincode.trim()}${shipping.notes.trim() ? ` | Notes: ${shipping.notes.trim()}` : ""} | Payment: Cash on Delivery`;
     const { error } = await supabase.from("orders").insert({
       user_id: user.id,
       items: items as any,
       total,
+      shipping_name: name,
+      shipping_phone: phone,
+      shipping_address: fullAddress,
     });
     setPlacing(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Order placed! We'll be in touch.");
+    toast.success("Order placed! Pay cash on delivery. We'll call you to confirm.");
     clear();
+    setCheckoutOpen(false);
     setCartOpen(false);
+    setShipping({ name: "", phone: "", address: "", city: "", pincode: "", notes: "" });
   };
 
   return (
