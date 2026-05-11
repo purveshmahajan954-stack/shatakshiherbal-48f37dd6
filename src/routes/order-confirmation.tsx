@@ -61,6 +61,13 @@ function OrderConfirmationPage() {
       else setOrder(data as unknown as Order);
       setLoading(false);
     })();
+
+    const channel = supabase
+      .channel(`order-${orderId}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders", filter: `id=eq.${orderId}` },
+        (payload) => setOrder((prev) => prev ? { ...prev, ...(payload.new as any) } : prev))
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [orderId, user, authLoading, navigate]);
 
   return (
