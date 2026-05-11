@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Banknote, Package, MapPin, Phone, User, Loader2 } from "lucide-react";
+import { OrderStatusTracker } from "@/components/OrderStatusTracker";
 
 type Order = {
   id: string;
