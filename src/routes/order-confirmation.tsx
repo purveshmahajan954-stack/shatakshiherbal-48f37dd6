@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Banknote, Package, MapPin, Phone, User, Loader2 } from "lucide-react";
+import { OrderStatusTracker } from "@/components/OrderStatusTracker";
 
 type Order = {
   id: string;
@@ -60,6 +61,13 @@ function OrderConfirmationPage() {
       else setOrder(data as unknown as Order);
       setLoading(false);
     })();
+
+    const channel = supabase
+      .channel(`order-${orderId}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders", filter: `id=eq.${orderId}` },
+        (payload) => setOrder((prev) => prev ? { ...prev, ...(payload.new as any) } : prev))
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [orderId, user, authLoading, navigate]);
 
   return (
@@ -87,6 +95,8 @@ function OrderConfirmationPage() {
                   <span className="font-mono font-semibold text-sm">{order.id}</span>
                 </div>
               </div>
+
+              <OrderStatusTracker status={order.status} />
 
               <div className="bg-white rounded-2xl p-6 border border-border">
                 <div className="flex items-center gap-3 mb-4">
