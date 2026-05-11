@@ -24,6 +24,7 @@ export function Header() {
   const [shipping, setShipping] = useState({ name: "", phone: "", address: "", city: "", pincode: "", notes: "" });
   const { count, total, items, remove, clear } = useCart();
   const { user, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const openCheckout = () => {
     if (!user || items.length === 0) return;
