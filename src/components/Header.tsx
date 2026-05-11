@@ -175,6 +175,9 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            {user && (
+              <Link to="/my-orders" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-primary">My Orders</Link>
+            )}
             {isAdmin && (
               <Link to="/admin" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-gold">Admin Panel</Link>
             )}
