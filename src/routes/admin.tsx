@@ -107,7 +107,7 @@ function AdminPage() {
           <div className="py-16 text-center"><Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" /></div>
         ) : (
           <div className="bg-white rounded-xl shadow-card overflow-hidden">
-            {tab === "orders" && <OrdersTable rows={orders} />}
+            {tab === "orders" && <OrdersTable rows={orders} onUpdate={(id, status) => setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))} />}
             {tab === "users" && <UsersTable rows={profiles} />}
             {tab === "messages" && <MessagesTable rows={messages} />}
           </div>
