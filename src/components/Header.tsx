@@ -148,6 +148,11 @@ export function Header() {
                 )}
               </SheetContent>
             </Sheet>
+            {user && (
+              <Link to="/my-orders" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition">
+                <ShoppingBag className="w-3.5 h-3.5" />My Orders
+              </Link>
+            )}
             {isAdmin && (
               <Link to="/admin" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-gold/15 text-gold hover:bg-gold/25 transition">
                 <Shield className="w-3.5 h-3.5" />Admin
@@ -170,6 +175,9 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            {user && (
+              <Link to="/my-orders" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-primary">My Orders</Link>
+            )}
             {isAdmin && (
               <Link to="/admin" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-gold">Admin Panel</Link>
             )}
