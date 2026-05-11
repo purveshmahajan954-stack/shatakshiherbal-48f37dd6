@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2, LogOut, Shield, Loader2, Banknote } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
