@@ -96,6 +96,8 @@ function OrderConfirmationPage() {
                 </div>
               </div>
 
+              <OrderStatusTracker status={order.status} />
+
               <div className="bg-white rounded-2xl p-6 border border-border">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
