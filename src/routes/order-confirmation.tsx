@@ -57,7 +57,7 @@ function OrderConfirmationPage() {
         .maybeSingle();
       if (error) setError(error.message);
       else if (!data) setError("Order not found");
-      else setOrder(data as Order);
+      else setOrder(data as unknown as Order);
       setLoading(false);
     })();
   }, [orderId, user, authLoading, navigate]);
