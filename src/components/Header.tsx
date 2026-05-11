@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2, LogOut, Shield, Loader2, Banknote } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ export function Header() {
   const [shipping, setShipping] = useState({ name: "", phone: "", address: "", city: "", pincode: "", notes: "" });
   const { count, total, items, remove, clear } = useCart();
   const { user, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const openCheckout = () => {
     if (!user || items.length === 0) return;
@@ -43,24 +44,25 @@ export function Header() {
 
     setPlacing(true);
     const fullAddress = `${address}, ${shipping.city.trim()} - ${shipping.pincode.trim()}${shipping.notes.trim() ? ` | Notes: ${shipping.notes.trim()}` : ""} | Payment: Cash on Delivery`;
-    const { error } = await supabase.from("orders").insert({
+    const { data, error } = await supabase.from("orders").insert({
       user_id: user.id,
       items: items as any,
       total,
       shipping_name: name,
       shipping_phone: phone,
       shipping_address: fullAddress,
-    });
+    }).select("id").single();
     setPlacing(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Order placed! Pay cash on delivery. We'll call you to confirm.");
+    toast.success("Order placed! Pay cash on delivery.");
     clear();
     setCheckoutOpen(false);
     setCartOpen(false);
     setShipping({ name: "", phone: "", address: "", city: "", pincode: "", notes: "" });
+    if (data?.id) navigate({ to: "/order-confirmation", search: { orderId: data.id } });
   };
 
   return (
