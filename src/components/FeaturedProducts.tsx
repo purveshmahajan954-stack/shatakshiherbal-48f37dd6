@@ -68,7 +68,7 @@ export function FeaturedProducts() {
                   <span className={`absolute top-4 left-4 z-10 ${p.badgeColor} text-primary-foreground text-[10px] font-bold tracking-wider px-3 py-1.5 rounded`}>{p.badge}</span>
                 )}
                 <span className="absolute top-12 left-4 z-10 bg-gold text-white text-[10px] font-bold tracking-wider px-3 py-1.5 rounded">-{p.discount}%</span>
-                <img src={heroImg} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
                 <button onClick={() => handleAdd(p.name, p.price)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
               </div>
               <div className="p-5">
