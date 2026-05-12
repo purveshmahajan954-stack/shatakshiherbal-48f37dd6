@@ -1,24 +1,37 @@
-import heroImg from "@/assets/hero-product.png";
+import img1 from "@/assets/product-1.png";
+import img2 from "@/assets/product-2.png";
+import img3 from "@/assets/product-3.png";
+import img4 from "@/assets/product-4.png";
+import img5 from "@/assets/product-5.png";
+import img6 from "@/assets/product-6.png";
+import img7 from "@/assets/product-7.png";
+import img8 from "@/assets/product-8.png";
+import img9 from "@/assets/product-9.png";
+import img10 from "@/assets/product-10.png";
+import img11 from "@/assets/product-11.png";
+import img12 from "@/assets/product-12.png";
+import img13 from "@/assets/product-13.png";
+import img14 from "@/assets/product-14.png";
 import { ArrowRight, Plus, Star, Zap } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 
 const products = [
-  { name: "Acidic Capsules", desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 1299, oldPrice: 1799, save: 500, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 28 },
-  { name: "Active G5", desc: "Advanced Ayurvedic formulation to manage blood sugar levels and support healthy…", price: 649, oldPrice: 899, save: 250, rating: 4.7, reviews: 189, badge: "NEW", badgeColor: "bg-primary-light", discount: 28 },
-  { name: "Active Green", desc: "Herbal blend of potent anti-diabetic herbs to naturally regulate glucose metabolism…", price: 899, oldPrice: 1199, save: 300, rating: 4.9, reviews: 412, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
-  { name: "Active Blue", desc: "Clinically inspired Ayurvedic formula to manage Type 2 diabetes, improve insulin…", price: 449, oldPrice: 599, save: 150, rating: 4.6, reviews: 156, badge: null, badgeColor: "", discount: 25 },
-  { name: "Ashwagandha Plus", desc: "Premium ashwagandha root extract to reduce stress, boost stamina and improve sleep…", price: 549, oldPrice: 799, save: 250, rating: 4.8, reviews: 521, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 31 },
-  { name: "Triphala Churna", desc: "Classical three-fruit blend that supports digestion, gentle detox and bowel regularity…", price: 299, oldPrice: 399, save: 100, rating: 4.7, reviews: 387, badge: null, badgeColor: "", discount: 25 },
-  { name: "Kumkumadi Serum", desc: "Saffron-infused Ayurvedic facial serum for a radiant complexion and even skin tone…", price: 999, oldPrice: 1499, save: 500, rating: 4.9, reviews: 612, badge: "TOP RATED", badgeColor: "bg-gold", discount: 33 },
-  { name: "Bhringraj Hair Oil", desc: "Cold-pressed bhringraj oil to reduce hair fall, strengthen roots and add natural shine…", price: 399, oldPrice: 549, save: 150, rating: 4.7, reviews: 298, badge: "NEW", badgeColor: "bg-primary-light", discount: 27 },
-  { name: "Tulsi Green Tea", desc: "Refreshing blend of tulsi and green tea leaves for daily immunity and clarity…", price: 249, oldPrice: 349, save: 100, rating: 4.6, reviews: 174, badge: null, badgeColor: "", discount: 28 },
-  { name: "Giloy Juice", desc: "Pure giloy stem extract to boost immunity, support liver health and fight fatigue…", price: 349, oldPrice: 499, save: 150, rating: 4.7, reviews: 221, badge: null, badgeColor: "", discount: 30 },
-  { name: "Chyawanprash Gold", desc: "Traditional herbal jam with 40+ Ayurvedic herbs for strength, immunity and vitality…", price: 599, oldPrice: 849, save: 250, rating: 4.8, reviews: 456, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 29 },
-  { name: "Brahmi Capsules", desc: "Memory and concentration support with pure brahmi extract, ideal for students…", price: 499, oldPrice: 699, save: 200, rating: 4.6, reviews: 142, badge: null, badgeColor: "", discount: 28 },
-  { name: "Neem Tablets", desc: "Pure neem leaf tablets that purify blood, support clear skin and natural detox…", price: 299, oldPrice: 449, save: 150, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 33 },
-  { name: "Shilajit Resin", desc: "Himalayan shilajit resin packed with fulvic acid for energy, stamina and vitality…", price: 1499, oldPrice: 1999, save: 500, rating: 4.9, reviews: 389, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
+  { name: "Acidic Capsules", image: img1, desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 1299, oldPrice: 1799, save: 500, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 28 },
+  { name: "Active G5", image: img2, desc: "Advanced Ayurvedic formulation to manage blood sugar levels and support healthy…", price: 649, oldPrice: 899, save: 250, rating: 4.7, reviews: 189, badge: "NEW", badgeColor: "bg-primary-light", discount: 28 },
+  { name: "Active Green", image: img3, desc: "Herbal blend of potent anti-diabetic herbs to naturally regulate glucose metabolism…", price: 899, oldPrice: 1199, save: 300, rating: 4.9, reviews: 412, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
+  { name: "Active Blue", image: img4, desc: "Clinically inspired Ayurvedic formula to manage Type 2 diabetes, improve insulin…", price: 449, oldPrice: 599, save: 150, rating: 4.6, reviews: 156, badge: null, badgeColor: "", discount: 25 },
+  { name: "Ashwagandha Plus", image: img5, desc: "Premium ashwagandha root extract to reduce stress, boost stamina and improve sleep…", price: 549, oldPrice: 799, save: 250, rating: 4.8, reviews: 521, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 31 },
+  { name: "Triphala Churna", image: img6, desc: "Classical three-fruit blend that supports digestion, gentle detox and bowel regularity…", price: 299, oldPrice: 399, save: 100, rating: 4.7, reviews: 387, badge: null, badgeColor: "", discount: 25 },
+  { name: "Kumkumadi Serum", image: img7, desc: "Saffron-infused Ayurvedic facial serum for a radiant complexion and even skin tone…", price: 999, oldPrice: 1499, save: 500, rating: 4.9, reviews: 612, badge: "TOP RATED", badgeColor: "bg-gold", discount: 33 },
+  { name: "Bhringraj Hair Oil", image: img8, desc: "Cold-pressed bhringraj oil to reduce hair fall, strengthen roots and add natural shine…", price: 399, oldPrice: 549, save: 150, rating: 4.7, reviews: 298, badge: "NEW", badgeColor: "bg-primary-light", discount: 27 },
+  { name: "Tulsi Green Tea", image: img9, desc: "Refreshing blend of tulsi and green tea leaves for daily immunity and clarity…", price: 249, oldPrice: 349, save: 100, rating: 4.6, reviews: 174, badge: null, badgeColor: "", discount: 28 },
+  { name: "Giloy Juice", image: img10, desc: "Pure giloy stem extract to boost immunity, support liver health and fight fatigue…", price: 349, oldPrice: 499, save: 150, rating: 4.7, reviews: 221, badge: null, badgeColor: "", discount: 30 },
+  { name: "Chyawanprash Gold", image: img11, desc: "Traditional herbal jam with 40+ Ayurvedic herbs for strength, immunity and vitality…", price: 599, oldPrice: 849, save: 250, rating: 4.8, reviews: 456, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 29 },
+  { name: "Brahmi Capsules", image: img12, desc: "Memory and concentration support with pure brahmi extract, ideal for students…", price: 499, oldPrice: 699, save: 200, rating: 4.6, reviews: 142, badge: null, badgeColor: "", discount: 28 },
+  { name: "Neem Tablets", image: img13, desc: "Pure neem leaf tablets that purify blood, support clear skin and natural detox…", price: 299, oldPrice: 449, save: 150, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 33 },
+  { name: "Shilajit Resin", image: img14, desc: "Himalayan shilajit resin packed with fulvic acid for energy, stamina and vitality…", price: 1499, oldPrice: 1999, save: 500, rating: 4.9, reviews: 389, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
 ];
 
 export function FeaturedProducts() {
