@@ -1,4 +1,4 @@
-import heroImg from "@/assets/hero-product.jpg";
+import heroImg from "@/assets/hero-product.png";
 import { ArrowRight, Plus, Star, Zap } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
