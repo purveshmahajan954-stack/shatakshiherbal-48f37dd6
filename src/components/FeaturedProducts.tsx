@@ -1,6 +1,6 @@
 import heroImg from "@/assets/hero-product.jpg";
-import { ArrowRight, Plus, Star } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { ArrowRight, Plus, Star, Zap } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 
@@ -23,9 +23,15 @@ const products = [
 
 export function FeaturedProducts() {
   const { add } = useCart();
+  const navigate = useNavigate();
   const handleAdd = (name: string, price: number) => {
     add(name, price);
     toast.success(`${name} added to cart`);
+  };
+  const handleBuyNow = (name: string, price: number) => {
+    add(name, price);
+    toast.success(`Proceeding to checkout with ${name}`);
+    navigate({ to: "/shop" });
   };
   return (
     <section id="products" className="py-24 bg-cream scroll-mt-24">
@@ -63,16 +69,21 @@ export function FeaturedProducts() {
                   <span className="text-sm font-semibold">{p.rating}</span>
                   <span className="text-xs text-muted-foreground">({p.reviews})</span>
                 </div>
-                <div className="flex items-end justify-between pt-4 border-t border-border">
-                  <div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold text-foreground">₹{p.price}</span>
-                      <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
+                <div className="pt-4 border-t border-border">
+                  <div className="flex items-end justify-between mb-3">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-foreground">₹{p.price}</span>
+                        <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
+                      </div>
+                      <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
                     </div>
-                    <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
+                    <button onClick={() => handleAdd(p.name, p.price)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
+                      <Plus className="w-5 h-5" />
+                    </button>
                   </div>
-                  <button onClick={() => handleAdd(p.name, p.price)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
-                    <Plus className="w-5 h-5" />
+                  <button onClick={() => handleBuyNow(p.name, p.price)} className="w-full inline-flex items-center justify-center gap-2 bg-gold text-white py-2.5 rounded-md font-semibold text-sm hover:bg-gold/90 transition-colors">
+                    <Zap className="w-4 h-4" /> Buy Now
                   </button>
                 </div>
               </div>
