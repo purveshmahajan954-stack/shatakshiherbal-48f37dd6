@@ -85,6 +85,7 @@ export function FeaturedProducts() {
                   <button onClick={() => handleBuyNow(p.name, p.price)} className="w-full inline-flex items-center justify-center gap-2 bg-gold text-white py-2.5 rounded-md font-semibold text-sm hover:bg-gold/90 transition-colors">
                     <Zap className="w-4 h-4" /> Buy Now
                   </button>
+                </div>
               </div>
             </article>
           ))}
