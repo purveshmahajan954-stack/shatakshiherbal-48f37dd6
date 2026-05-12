@@ -1,6 +1,6 @@
 import img1 from "@/assets/product-1.jpg";
 import img2 from "@/assets/product-2.png";
-import img3 from "@/assets/product-3.png";
+import img3 from "@/assets/product-3_new.png";
 import img4 from "@/assets/product-4.png";
 import img5 from "@/assets/product-5.png";
 import img6 from "@/assets/product-6.png";
