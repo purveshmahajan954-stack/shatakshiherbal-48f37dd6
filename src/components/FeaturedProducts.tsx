@@ -1,6 +1,6 @@
 import heroImg from "@/assets/hero-product.jpg";
-import { ArrowRight, Plus, Star } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { ArrowRight, Plus, Star, Zap } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 
@@ -23,9 +23,15 @@ const products = [
 
 export function FeaturedProducts() {
   const { add } = useCart();
+  const navigate = useNavigate();
   const handleAdd = (name: string, price: number) => {
     add(name, price);
     toast.success(`${name} added to cart`);
+  };
+  const handleBuyNow = (name: string, price: number) => {
+    add(name, price);
+    toast.success(`Proceeding to checkout with ${name}`);
+    navigate({ to: "/shop" });
   };
   return (
     <section id="products" className="py-24 bg-cream scroll-mt-24">
