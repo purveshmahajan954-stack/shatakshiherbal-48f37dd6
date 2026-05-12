@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
-import { AuthGate } from "@/components/AuthGate";
+
 import {
   Outlet,
   Link,
