@@ -8,7 +8,7 @@ import img7 from "@/assets/product-7_new.png";
 import img8 from "@/assets/product-8_new.png";
 import img9 from "@/assets/product-9_new.png";
 import img10 from "@/assets/product-10_new.png";
-import img11 from "@/assets/product-11.png";
+import img11 from "@/assets/product-11_new.png";
 import img12 from "@/assets/product-12.png";
 import img13 from "@/assets/product-13.png";
 import img14 from "@/assets/product-14.png";
