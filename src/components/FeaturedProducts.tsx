@@ -1,4 +1,4 @@
-import img1 from "@/assets/product-1.png";
+import img1 from "@/assets/product-1.jpg";
 import img2 from "@/assets/product-2.png";
 import img3 from "@/assets/product-3.png";
 import img4 from "@/assets/product-4.png";
