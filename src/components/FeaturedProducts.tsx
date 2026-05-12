@@ -10,7 +10,7 @@ import img9 from "@/assets/product-9_new.png";
 import img10 from "@/assets/product-10_new.png";
 import img11 from "@/assets/product-11_new.png";
 import img12 from "@/assets/product-12_new.png";
-import img13 from "@/assets/product-13.png";
+import img13 from "@/assets/product-13_new.png";
 import img14 from "@/assets/product-14.png";
 import { ArrowRight, Plus, Star, Zap } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
