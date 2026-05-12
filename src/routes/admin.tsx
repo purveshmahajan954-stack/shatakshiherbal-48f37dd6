@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 type Profile = { id: string; full_name: string | null; email: string | null; created_at: string };
-type Order = { id: string; user_id: string; items: any; total: number; status: string; created_at: string; shipping_name: string | null; shipping_phone: string | null; shipping_address: string | null };
+type Order = { id: string; user_id: string; items: any; total: number; status: string; created_at: string };
 type Message = { id: string; name: string; email: string; phone: string | null; message: string; created_at: string };
 
 function AdminPage() {
@@ -107,7 +107,7 @@ function AdminPage() {
           <div className="py-16 text-center"><Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" /></div>
         ) : (
           <div className="bg-white rounded-xl shadow-card overflow-hidden">
-            {tab === "orders" && <OrdersTable rows={orders} onUpdate={(id, status) => setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))} />}
+            {tab === "orders" && <OrdersTable rows={orders} />}
             {tab === "users" && <UsersTable rows={profiles} />}
             {tab === "messages" && <MessagesTable rows={messages} />}
           </div>
@@ -126,43 +126,24 @@ function fmt(d: string) {
   return new Date(d).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
-const STATUS_OPTIONS = ["pending", "confirmed", "shipped", "delivered", "cancelled"] as const;
-
-function OrdersTable({ rows, onUpdate }: { rows: Order[]; onUpdate: (id: string, status: string) => void }) {
+function OrdersTable({ rows }: { rows: Order[] }) {
   if (!rows.length) return <Empty label="No orders yet." />;
-  const updateStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-    if (error) return alert(error.message);
-    onUpdate(id, status);
-  };
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-muted/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
-          <tr><th className="p-3">Date</th><th className="p-3">Customer</th><th className="p-3">Items</th><th className="p-3">Total</th><th className="p-3">Status</th></tr>
+          <tr><th className="p-3">Date</th><th className="p-3">User ID</th><th className="p-3">Items</th><th className="p-3">Total</th><th className="p-3">Status</th></tr>
         </thead>
         <tbody>
           {rows.map((o) => (
-            <tr key={o.id} className="border-t border-border align-top">
+            <tr key={o.id} className="border-t border-border">
               <td className="p-3 whitespace-nowrap">{fmt(o.created_at)}</td>
-              <td className="p-3 text-xs">
-                <div className="font-semibold text-sm">{o.shipping_name || "—"}</div>
-                <div className="text-muted-foreground">{o.shipping_phone || ""}</div>
-                <div className="text-muted-foreground max-w-[16rem]">{o.shipping_address || ""}</div>
-              </td>
+              <td className="p-3 font-mono text-xs">{o.user_id.slice(0, 8)}…</td>
               <td className="p-3">
                 {Array.isArray(o.items) ? o.items.map((i: any) => `${i.name} ×${i.qty}`).join(", ") : "—"}
               </td>
               <td className="p-3 font-semibold">₹{Number(o.total).toLocaleString("en-IN")}</td>
-              <td className="p-3">
-                <select
-                  value={o.status}
-                  onChange={(e) => updateStatus(o.id, e.target.value)}
-                  className="px-2 py-1 rounded border border-border bg-white text-xs capitalize focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </td>
+              <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">{o.status}</span></td>
             </tr>
           ))}
         </tbody>

@@ -1,12 +1,11 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2, LogOut, Shield, Loader2, Banknote } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Search, ShoppingBag, User, Sparkles, Menu, X, Trash2, LogOut, Shield, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -19,50 +18,26 @@ const navItems = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [placing, setPlacing] = useState(false);
-  const [shipping, setShipping] = useState({ name: "", phone: "", address: "", city: "", pincode: "", notes: "" });
   const { count, total, items, remove, clear } = useCart();
   const { user, isAdmin, signOut } = useAuth();
-  const navigate = useNavigate();
 
-  const openCheckout = () => {
+  const placeOrder = async () => {
     if (!user || items.length === 0) return;
-    setCheckoutOpen(true);
-  };
-
-  const placeOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || items.length === 0) return;
-    const name = shipping.name.trim();
-    const phone = shipping.phone.trim();
-    const address = shipping.address.trim();
-    if (name.length < 2) return toast.error("Please enter your full name");
-    if (!/^\d{10}$/.test(phone)) return toast.error("Enter a valid 10-digit phone number");
-    if (address.length < 8) return toast.error("Please enter a complete address");
-    if (!/^\d{6}$/.test(shipping.pincode.trim())) return toast.error("Enter a valid 6-digit pincode");
-
     setPlacing(true);
-    const fullAddress = `${address}, ${shipping.city.trim()} - ${shipping.pincode.trim()}${shipping.notes.trim() ? ` | Notes: ${shipping.notes.trim()}` : ""} | Payment: Cash on Delivery`;
-    const { data, error } = await supabase.from("orders").insert({
+    const { error } = await supabase.from("orders").insert({
       user_id: user.id,
       items: items as any,
       total,
-      shipping_name: name,
-      shipping_phone: phone,
-      shipping_address: fullAddress,
-    }).select("id").single();
+    });
     setPlacing(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Order placed! Pay cash on delivery.");
+    toast.success("Order placed! We'll be in touch.");
     clear();
-    setCheckoutOpen(false);
     setCartOpen(false);
-    setShipping({ name: "", phone: "", address: "", city: "", pincode: "", notes: "" });
-    if (data?.id) navigate({ to: "/order-confirmation", search: { orderId: data.id } });
   };
 
   return (
@@ -140,19 +115,15 @@ export function Header() {
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span><span>₹{total}</span>
                     </div>
-                    <button onClick={openCheckout} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition inline-flex items-center justify-center gap-2">
-                      Checkout (Cash on Delivery)
+                    <button onClick={placeOrder} disabled={placing} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                      {placing && <Loader2 className="w-4 h-4 animate-spin" />}
+                      {placing ? "Placing…" : "Place Order"}
                     </button>
                     <button onClick={clear} className="w-full text-sm text-muted-foreground hover:text-foreground">Clear cart</button>
                   </div>
                 )}
               </SheetContent>
             </Sheet>
-            {user && (
-              <Link to="/my-orders" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition">
-                <ShoppingBag className="w-3.5 h-3.5" />My Orders
-              </Link>
-            )}
             {isAdmin && (
               <Link to="/admin" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-gold/15 text-gold hover:bg-gold/25 transition">
                 <Shield className="w-3.5 h-3.5" />Admin
@@ -175,9 +146,6 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            {user && (
-              <Link to="/my-orders" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-primary">My Orders</Link>
-            )}
             {isAdmin && (
               <Link to="/admin" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold text-gold">Admin Panel</Link>
             )}
@@ -187,47 +155,6 @@ export function Header() {
           </nav>
         )}
       </header>
-
-      <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-display text-2xl">Shipping Details</DialogTitle>
-            <DialogDescription>Fill in your delivery address. Payment is Cash on Delivery.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={placeOrder} className="space-y-3 mt-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input required value={shipping.name} onChange={e => setShipping(s => ({ ...s, name: e.target.value }))} placeholder="Full name" className="w-full px-4 py-3 rounded-lg border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary" maxLength={100} />
-              <input required value={shipping.phone} onChange={e => setShipping(s => ({ ...s, phone: e.target.value.replace(/\D/g, "").slice(0, 10) }))} placeholder="Phone (10 digits)" inputMode="numeric" className="w-full px-4 py-3 rounded-lg border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-            <textarea required value={shipping.address} onChange={e => setShipping(s => ({ ...s, address: e.target.value }))} placeholder="House no, street, area" rows={2} className="w-full px-4 py-3 rounded-lg border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" maxLength={500} />
-            <div className="grid grid-cols-2 gap-3">
-              <input required value={shipping.city} onChange={e => setShipping(s => ({ ...s, city: e.target.value }))} placeholder="City" className="w-full px-4 py-3 rounded-lg border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary" maxLength={80} />
-              <input required value={shipping.pincode} onChange={e => setShipping(s => ({ ...s, pincode: e.target.value.replace(/\D/g, "").slice(0, 6) }))} placeholder="Pincode" inputMode="numeric" className="w-full px-4 py-3 rounded-lg border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-            <textarea value={shipping.notes} onChange={e => setShipping(s => ({ ...s, notes: e.target.value }))} placeholder="Order notes (optional)" rows={2} className="w-full px-4 py-3 rounded-lg border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" maxLength={300} />
-
-            <div className="border border-primary/30 bg-accent/40 rounded-lg p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-                <Banknote className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-sm">Cash on Delivery</div>
-                <div className="text-xs text-muted-foreground">Pay ₹{total} in cash when your order arrives.</div>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-2 border-t border-border">
-              <span className="text-sm text-muted-foreground">Total payable</span>
-              <span className="font-bold text-xl">₹{total}</span>
-            </div>
-
-            <button type="submit" disabled={placing} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2">
-              {placing && <Loader2 className="w-4 h-4 animate-spin" />}
-              {placing ? "Placing order…" : "Confirm Order (COD)"}
-            </button>
-          </form>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
