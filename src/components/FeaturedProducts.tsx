@@ -6,7 +6,7 @@ import img5 from "@/assets/product-5_new.png";
 import img6 from "@/assets/product-6_new.png";
 import img7 from "@/assets/product-7_new.png";
 import img8 from "@/assets/product-8_new.png";
-import img9 from "@/assets/product-9.png";
+import img9 from "@/assets/product-9_new.png";
 import img10 from "@/assets/product-10.png";
 import img11 from "@/assets/product-11.png";
 import img12 from "@/assets/product-12.png";
