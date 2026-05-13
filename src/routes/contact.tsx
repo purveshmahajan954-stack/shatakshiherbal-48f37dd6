@@ -52,7 +52,7 @@ function ContactPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
-              { icon: Mail, label: "Email", value: "hello@shatakshi.com" },
+              { icon: Mail, label: "Email", value: "sunil.katiya06@gmail.com" },
               { icon: Phone, label: "Phone", value: "+91 98765 43210" },
               { icon: MapPin, label: "Address", value: "Mumbai, India" },
             ].map(({ icon: Icon, label, value }) => (
