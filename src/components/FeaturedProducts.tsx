@@ -25,6 +25,7 @@ import img24 from "@/assets/product-24_new.png";
 import img25 from "@/assets/product-25_new.png";
 import img26 from "@/assets/product-26_new.png";
 import img27 from "@/assets/product-27_new.png";
+import img28 from "@/assets/product-28_new.png";
 import { ArrowRight, Plus, Star, Zap } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -58,6 +59,7 @@ const products = [
   { name: "Piles Care Tablets", image: img25, desc: "Piles Care Tablets offer natural relief from piles, fissures and constipation....", price: 269, oldPrice: 469, save: 200, rating: 4.6, reviews: 145, badge: "NEW", badgeColor: "bg-primary-light", discount: 25 },
   { name: "Stress Relief Capsules", image: img26, desc: "Stress Relief Capsules calm the mind and promote restful sleep naturally....", price: 299, oldPrice: 549, save: 250, rating: 4.8, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 27 },
   { name: "Vita Energy Tonic", image: img27, desc: "Vita Energy Tonic revitalizes the body and boosts daily stamina naturally....", price: 349, oldPrice: 599, save: 250, rating: 4.7, reviews: 276, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 30 },
+  { name: "Wellness Herbal Mix", image: img28, desc: "Wellness Herbal Mix supports overall health with a blend of pure Ayurvedic herbs....", price: 279, oldPrice: 499, save: 220, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 28 },
 ];
 
 export function FeaturedProducts() {
