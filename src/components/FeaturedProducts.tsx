@@ -30,7 +30,7 @@ const products = [
   { name: "Arthovit M", image: img10, desc: "Pure giloy stem extract to boost immunity, support liver health and fight fatigue…", price: 349, oldPrice: 499, save: 150, rating: 4.7, reviews: 221, badge: null, badgeColor: "", discount: 30 },
   { name: "Asthometic Capsule", image: img11, desc: "Traditional herbal jam with 40+ Ayurvedic herbs for strength, immunity and vitality…", price: 599, oldPrice: 849, save: 250, rating: 4.8, reviews: 456, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 29 },
   { name: "C.N.Z Capsule", image: img12, desc: "Memory and concentration support with pure brahmi extract, ideal for students…", price: 499, oldPrice: 699, save: 200, rating: 4.6, reviews: 142, badge: null, badgeColor: "", discount: 28 },
-  { name: "Neem Tablets", image: img13, desc: "Pure neem leaf tablets that purify blood, support clear skin and natural detox…", price: 299, oldPrice: 449, save: 150, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 33 },
+  { name: "Charma R Capsule", image: img13, desc: "Pure neem leaf tablets that purify blood, support clear skin and natural detox…", price: 299, oldPrice: 449, save: 150, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 33 },
   { name: "Shilajit Resin", image: img14, desc: "Himalayan shilajit resin packed with fulvic acid for energy, stamina and vitality…", price: 1499, oldPrice: 1999, save: 500, rating: 4.9, reviews: 389, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
 ];
 
