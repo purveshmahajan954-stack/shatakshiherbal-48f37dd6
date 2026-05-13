@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 
 const products = [
-  { name: "Acidic Capsules", image: img1, desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 129, oldPrice: 0, save: 0, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 0 },
+  { name: "Acidic Capsules", image: img1, desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 129, oldPrice: 1799, save: 1670, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 93 },
   { name: "Active G5", image: img2, desc: "Advanced Ayurvedic formulation to manage blood sugar levels and support healthy…", price: 139, oldPrice: 899, save: 760, rating: 4.7, reviews: 189, badge: "NEW", badgeColor: "bg-primary-light", discount: 84 },
   { name: "Active Green", image: img3, desc: "Herbal blend of potent anti-diabetic herbs to naturally regulate glucose metabolism…", price: 139, oldPrice: 1199, save: 1060, rating: 4.9, reviews: 412, badge: "TOP RATED", badgeColor: "bg-gold", discount: 88 },
   { name: "Arsho F Powder", image: img4, desc: "Arsho F Powder helps support healthy digestion and provides relief from piles....", price: 449, oldPrice: 599, save: 150, rating: 4.6, reviews: 156, badge: null, badgeColor: "", discount: 25 },
@@ -87,9 +87,9 @@ export function FeaturedProducts() {
                     <div>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold text-foreground">₹{p.price}{p.price === 139 ? "/- per 10 capsules" : ""}</span>
-                        {p.oldPrice > 0 && <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>}
+                        <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
                       </div>
-                      {p.save > 0 && <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>}
+                      <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
                     </div>
                     <button onClick={() => handleAdd(p.name, p.price)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
                       <Plus className="w-5 h-5" />
