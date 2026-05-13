@@ -54,7 +54,7 @@ function ContactPage() {
             {[
               { icon: Mail, label: "Email", value: "sunil.katiya06@gmail.com" },
               { icon: Phone, label: "Phone", value: "+91 97544 68444" },
-              { icon: MapPin, label: "Address", value: "Mumbai, India" },
+              { icon: MapPin, label: "Address", value: "By-pass Road, near Chitragupt school, Shivaji Ward, Gadarwara, Madhya Pradesh 487551" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="bg-white p-6 rounded-2xl shadow-card text-center">
                 <Icon className="w-6 h-6 text-primary mx-auto mb-3" />
