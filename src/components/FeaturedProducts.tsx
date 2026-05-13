@@ -12,6 +12,19 @@ import img11 from "@/assets/product-11_new.png";
 import img12 from "@/assets/product-12_new.png";
 import img13 from "@/assets/product-13_new.png";
 import img14 from "@/assets/product-14_new.png";
+import img15 from "@/assets/product-15_new.png";
+import img16 from "@/assets/product-16_new.png";
+import img17 from "@/assets/product-17_new.png";
+import img18 from "@/assets/product-18_new.png";
+import img19 from "@/assets/product-19_new.png";
+import img20 from "@/assets/product-20_new.png";
+import img21 from "@/assets/product-21_new.png";
+import img22 from "@/assets/product-22_new.png";
+import img23 from "@/assets/product-23_new.png";
+import img24 from "@/assets/product-24_new.png";
+import img25 from "@/assets/product-25_new.png";
+import img26 from "@/assets/product-26_new.png";
+import img27 from "@/assets/product-27_new.png";
 import { ArrowRight, Plus, Star, Zap } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -32,6 +45,19 @@ const products = [
   { name: "C.N.Z Capsule", image: img12, desc: "C.N.Z Capsule is specially formulated to support overall wellness, immunity....", price: 499, oldPrice: 699, save: 200, rating: 4.6, reviews: 142, badge: null, badgeColor: "", discount: 28 },
   { name: "Charma R Capsule", image: img13, desc: "Charma R Capsule is designed to support healthy skin, natural glow....", price: 339, oldPrice: 449, save: 110, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 33 },
   { name: "Dr. Sona Artho Tablets", image: img14, desc: "Dr. Sona Artho Tablets are specially formulated to support joint comfort.....", price: 349, oldPrice: 1999, save: 1650, rating: 4.9, reviews: 389, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
+  { name: "Femi Care Tablets", image: img15, desc: "Femi Care Tablets support women's hormonal balance and overall wellness....", price: 299, oldPrice: 499, save: 200, rating: 4.6, reviews: 178, badge: null, badgeColor: "", discount: 28 },
+  { name: "Gastro Relief Syrup", image: img16, desc: "Gastro Relief Syrup helps soothe digestion and relieve gas naturally....", price: 189, oldPrice: 299, save: 110, rating: 4.5, reviews: 134, badge: "NEW", badgeColor: "bg-primary-light", discount: 25 },
+  { name: "Hair Vit Capsules", image: img17, desc: "Hair Vit Capsules nourish hair roots and promote natural hair growth....", price: 399, oldPrice: 699, save: 300, rating: 4.7, reviews: 245, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 30 },
+  { name: "Immuno Boost Tablets", image: img18, desc: "Immuno Boost Tablets strengthen immunity with powerful Ayurvedic herbs....", price: 249, oldPrice: 449, save: 200, rating: 4.8, reviews: 367, badge: "TOP RATED", badgeColor: "bg-gold", discount: 27 },
+  { name: "Joint Care Oil", image: img19, desc: "Joint Care Oil provides relief from joint pain and stiffness naturally....", price: 199, oldPrice: 349, save: 150, rating: 4.6, reviews: 198, badge: null, badgeColor: "", discount: 25 },
+  { name: "Kidney Care Capsules", image: img20, desc: "Kidney Care Capsules support healthy kidney function and detoxification....", price: 459, oldPrice: 799, save: 340, rating: 4.7, reviews: 156, badge: null, badgeColor: "", discount: 28 },
+  { name: "Liver Detox Syrup", image: img21, desc: "Liver Detox Syrup cleanses the liver and improves digestive health....", price: 219, oldPrice: 399, save: 180, rating: 4.6, reviews: 212, badge: "NEW", badgeColor: "bg-primary-light", discount: 25 },
+  { name: "Memory Plus Tablets", image: img22, desc: "Memory Plus Tablets enhance brain function, memory and concentration....", price: 329, oldPrice: 549, save: 220, rating: 4.8, reviews: 289, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 29 },
+  { name: "Nasal Care Drops", image: img23, desc: "Nasal Care Drops provide instant relief from nasal congestion and cold....", price: 99, oldPrice: 179, save: 80, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 25 },
+  { name: "Ortho Pain Relief Oil", image: img24, desc: "Ortho Pain Relief Oil soothes muscle and joint pain with herbal warmth....", price: 179, oldPrice: 299, save: 120, rating: 4.7, reviews: 234, badge: null, badgeColor: "", discount: 28 },
+  { name: "Piles Care Tablets", image: img25, desc: "Piles Care Tablets offer natural relief from piles, fissures and constipation....", price: 269, oldPrice: 469, save: 200, rating: 4.6, reviews: 145, badge: "NEW", badgeColor: "bg-primary-light", discount: 25 },
+  { name: "Stress Relief Capsules", image: img26, desc: "Stress Relief Capsules calm the mind and promote restful sleep naturally....", price: 299, oldPrice: 549, save: 250, rating: 4.8, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 27 },
+  { name: "Vita Energy Tonic", image: img27, desc: "Vita Energy Tonic revitalizes the body and boosts daily stamina naturally....", price: 349, oldPrice: 599, save: 250, rating: 4.7, reviews: 276, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 30 },
 ];
 
 export function FeaturedProducts() {
