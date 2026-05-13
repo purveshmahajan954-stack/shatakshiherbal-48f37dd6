@@ -86,7 +86,7 @@ export function FeaturedProducts() {
                   <div className="flex items-end justify-between mb-3">
                     <div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-foreground">₹{p.price}</span>
+                        <span className="text-2xl font-bold text-foreground">₹{p.price}{p.price === 139 ? "/- per 10 capsules" : ""}</span>
                         <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
                       </div>
                       <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
