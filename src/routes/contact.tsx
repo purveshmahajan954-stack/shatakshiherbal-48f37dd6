@@ -53,7 +53,7 @@ function ContactPage() {
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
               { icon: Mail, label: "Email", value: "sunil.katiya06@gmail.com" },
-              { icon: Phone, label: "Phone", value: "+91 98765 43210" },
+              { icon: Phone, label: "Phone", value: "+91 97544 68444" },
               { icon: MapPin, label: "Address", value: "Mumbai, India" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="bg-white p-6 rounded-2xl shadow-card text-center">
