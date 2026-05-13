@@ -25,6 +25,7 @@ import img24 from "@/assets/product-24_new.png";
 import img25 from "@/assets/product-25_new.png";
 import img26 from "@/assets/product-26_new.png";
 import img27 from "@/assets/product-27_new.png";
+import img28 from "@/assets/product-28_new.png";
 import { ArrowRight, Plus, Star, Zap } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
