@@ -31,7 +31,7 @@ const products = [
   { name: "Asthometic Capsule", image: img11, desc: "Asthometic Capsule is formulated to support respiratory wellness ....", price: 599, oldPrice: 849, save: 250, rating: 4.8, reviews: 456, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 29 },
   { name: "C.N.Z Capsule", image: img12, desc: "C.N.Z Capsule is specially formulated to support overall wellness, immunity....", price: 499, oldPrice: 699, save: 200, rating: 4.6, reviews: 142, badge: null, badgeColor: "", discount: 28 },
   { name: "Charma R Capsule", image: img13, desc: "Charma R Capsule is designed to support healthy skin, natural glow....", price: 299, oldPrice: 449, save: 150, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 33 },
-  { name: "Dr. Sona Artho Tablets", image: img14, desc: "Himalayan shilajit resin packed with fulvic acid for energy, stamina and vitality…", price: 1499, oldPrice: 1999, save: 500, rating: 4.9, reviews: 389, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
+  { name: "Dr. Sona Artho Tablets", image: img14, desc: "Dr. Sona Artho Tablets are specially formulated to support joint comfort.....", price: 1499, oldPrice: 1999, save: 500, rating: 4.9, reviews: 389, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
 ];
 
 export function FeaturedProducts() {
