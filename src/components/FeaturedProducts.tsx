@@ -59,7 +59,7 @@ const products = [
   { name: "Sakhi Sundari ", image: img25, desc: "Sakhi Sundari  offer natural relief from piles, fissures and constipation....", price: 269, oldPrice: 469, save: 200, rating: 4.6, reviews: 145, badge: "NEW", badgeColor: "bg-primary-light", discount: 25 },
   { name: "Skin Z Capsules", image: img26, desc: "Skin Z Capsules calm the mind and promote restful sleep naturally....", price: 299, oldPrice: 549, save: 250, rating: 4.8, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 27 },
   { name: "TH - Z Capsules", image: img27, desc: "TH - Z Capsules revitalizes the body and boosts daily stamina naturally....", price: 349, oldPrice: 599, save: 250, rating: 4.7, reviews: 276, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 30 },
-  { name: "Wellness Herbal Mix", image: img28, desc: "Wellness Herbal Mix supports overall health with a blend of pure Ayurvedic herbs....", price: 279, oldPrice: 499, save: 220, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 28 },
+  { name: "Vat Nashak Capsules", image: img28, desc: "Vat Nashak Capsules supports overall health with a blend of pure Ayurvedic herbs....", price: 279, oldPrice: 499, save: 220, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 28 },
 ];
 
 export function FeaturedProducts() {
