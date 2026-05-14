@@ -58,7 +58,7 @@ const products = [
   { name: "Safa Amrit Capsules", image: img24, desc: "Safa Amrit Capsules soothes improves digestive health with herbal warmth....", price: 179, oldPrice: 299, save: 120, rating: 4.7, reviews: 234, badge: null, badgeColor: "", discount: 28 },
   { name: "Sakhi Sundari ", image: img25, desc: "Sakhi Sundari  offer natural beauty and wellness....", price: 269, oldPrice: 469, save: 200, rating: 4.6, reviews: 145, badge: "NEW", badgeColor: "bg-primary-light", discount: 25 },
   { name: "Skin Z Capsules", image: img26, desc: "Skin Z Capsules help to natural nutrition for healthy skin....", price: 299, oldPrice: 549, save: 250, rating: 4.8, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 27 },
-  { name: "TH - Z Capsules", image: img27, desc: "TH - Z Capsules revitalizes the body and boosts daily stamina naturally....", price: 349, oldPrice: 599, save: 250, rating: 4.7, reviews: 276, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 30 },
+  { name: "TH - Z Capsules", image: img27, desc: "TH - Z Capsules revitalizes the body and supports thyroid health....", price: 349, oldPrice: 599, save: 250, rating: 4.7, reviews: 276, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 30 },
   { name: "Vat Nashak Capsules", image: img28, desc: "Vat Nashak Capsules supports overall health with a blend of pure Ayurvedic herbs....", price: 279, oldPrice: 499, save: 220, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 28 },
 ];
 
