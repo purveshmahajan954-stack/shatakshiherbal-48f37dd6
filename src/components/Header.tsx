@@ -52,10 +52,10 @@ export function Header() {
           <Sparkles className="w-3 h-3 text-primary-light" />
         </span>
       </div>
-      <header className="bg-cream/90 backdrop-blur sticky top-0 z-50 border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-            <img src={logoImg} alt="Shatakshi Herbal" className="h-14 w-auto object-contain" />
+      <header className="bg-cream/95 backdrop-blur sticky top-0 z-50 border-b border-border/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 md:h-24">
+          <Link to="/" className="flex items-center shrink-0" onClick={() => setOpen(false)}>
+            <img src={logoImg} alt="Shatakshi Herbal" className="h-16 md:h-20 w-auto object-contain block" />
           </Link>
           <nav className="hidden md:flex items-center gap-10">
             {navItems.map((item) => (
