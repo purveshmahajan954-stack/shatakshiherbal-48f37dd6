@@ -55,11 +55,7 @@ export function Header() {
       <header className="bg-cream/90 backdrop-blur sticky top-0 z-50 border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-            <div className="flex flex-col items-center">
-              <div className="text-2xl">🌿</div>
-              <div className="text-[10px] font-bold tracking-[0.2em] text-foreground leading-tight">SHATAKSHI</div>
-              <div className="text-[8px] tracking-[0.3em] text-primary border-t border-primary pt-0.5">HERBAL</div>
-            </div>
+            <img src={logoImg} alt="Shatakshi Herbal" className="h-14 w-auto object-contain" />
           </Link>
           <nav className="hidden md:flex items-center gap-10">
             {navItems.map((item) => (
