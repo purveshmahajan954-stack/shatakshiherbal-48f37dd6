@@ -42,15 +42,6 @@ export function Header() {
 
   return (
     <>
-      <div className="bg-dark-green text-cream text-xs sm:text-sm py-3 px-4 text-center">
-        <span className="inline-flex items-center gap-2 flex-wrap justify-center">
-          <Sparkles className="w-3 h-3 text-primary-light" />
-          <span className="font-medium tracking-wide">FREE SHIPPING ON ORDERS ABOVE ₹999</span>
-          <span className="opacity-50">|</span>
-          <span>USE CODE <span className="text-gold font-bold">HERBAL10</span> FOR 10% OFF</span>
-          <Sparkles className="w-3 h-3 text-primary-light" />
-        </span>
-      </div>
       <header className="bg-cream/90 backdrop-blur sticky top-0 z-50 border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
