@@ -6,6 +6,7 @@ import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import logoImg from "@/assets/logo.jpg";
 
 const navItems = [
   { label: "Home", to: "/" },
