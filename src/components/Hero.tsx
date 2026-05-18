@@ -25,7 +25,7 @@ export function Hero() {
               Shop Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link to="/product-info" className="inline-flex items-center gap-2 border border-primary/30 bg-accent/40 text-foreground px-8 py-4 rounded-md font-medium hover:bg-accent transition-all">
-              Products Reviews
+              Explore Products
             </Link>
           </div>
 

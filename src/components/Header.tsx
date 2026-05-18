@@ -6,7 +6,6 @@ import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import logoImg from "@/assets/logo.jpg";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -52,10 +51,14 @@ export function Header() {
           <Sparkles className="w-3 h-3 text-primary-light" />
         </span>
       </div>
-      <header className="bg-cream/95 backdrop-blur sticky top-0 z-50 border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20 md:h-24">
-          <Link to="/" className="flex items-center shrink-0" onClick={() => setOpen(false)}>
-            <img src={logoImg} alt="Shatakshi Herbal" className="h-16 md:h-20 w-auto object-contain block" />
+      <header className="bg-cream/90 backdrop-blur sticky top-0 z-50 border-b border-border/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
+          <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+            <div className="flex flex-col items-center">
+              <div className="text-2xl">🌿</div>
+              <div className="text-[10px] font-bold tracking-[0.2em] text-foreground leading-tight">SHATAKSHI</div>
+              <div className="text-[8px] tracking-[0.3em] text-primary border-t border-primary pt-0.5">HERBAL</div>
+            </div>
           </Link>
           <nav className="hidden md:flex items-center gap-10">
             {navItems.map((item) => (
