@@ -6,7 +6,7 @@ type CartCtx = {
   items: CartItem[];
   count: number;
   total: number;
-  add: (name: string, price: number) => void;
+  add: (name: string, price: number, qty?: number) => void;
   remove: (name: string) => void;
   clear: () => void;
 };
@@ -30,11 +30,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [items]);
 
-  const add = (name: string, price: number) => {
+  const add = (name: string, price: number, qty: number = 1) => {
     setItems((prev) => {
       const found = prev.find((i) => i.name === name);
-      if (found) return prev.map((i) => (i.name === name ? { ...i, qty: i.qty + 1 } : i));
-      return [...prev, { name, price, qty: 1 }];
+      if (found) return prev.map((i) => (i.name === name ? { ...i, qty: i.qty + qty } : i));
+      return [...prev, { name, price, qty }];
     });
   };
   const remove = (name: string) => setItems((prev) => prev.filter((i) => i.name !== name));

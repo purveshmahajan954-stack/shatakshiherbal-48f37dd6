@@ -1,105 +1,24 @@
-import img1 from "@/assets/product-1.jpg";
-import img2 from "@/assets/product-2.png";
-import img3 from "@/assets/product-3_new.png";
-import img4 from "@/assets/product-4_new.png";
-import img5 from "@/assets/product-5_new.png";
-import img6 from "@/assets/product-6_new.png";
-import img7 from "@/assets/product-7_new.png";
-import img8 from "@/assets/product-8_new.png";
-import img9 from "@/assets/product-9_new.png";
-import img10 from "@/assets/product-10_new.png";
-import img11 from "@/assets/product-11_new.png";
-import img12 from "@/assets/product-12_new.png";
-import img13 from "@/assets/product-13_new.png";
-import img14 from "@/assets/product-14_new.png";
-import img15 from "@/assets/product-15_new.png";
-import img16 from "@/assets/product-16_new.png";
-import img17 from "@/assets/product-17_new.png";
-import img18 from "@/assets/product-18_new.png";
-import img19 from "@/assets/product-19_new.png";
-import img20 from "@/assets/product-20_new.png";
-import img21 from "@/assets/product-21_new.png";
-import img22 from "@/assets/product-22_new.png";
-import img23 from "@/assets/product-23_new.png";
-import img24 from "@/assets/product-24_new.png";
-import img25 from "@/assets/product-25_new.png";
-import img26 from "@/assets/product-26_new.png";
-import img27 from "@/assets/product-27_new.png";
-import img28 from "@/assets/product-28_new.png";
 import { ArrowRight, Plus, Star, Zap } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
-
-const products = [
-  { name: "Acidic Capsules", image: img1, desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 169, oldPrice: 1799, save: 1630, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 28 },
-  { name: "Active G5", image: img2, desc: "Advanced Ayurvedic formulation to manage blood sugar levels and support healthy…", price: 139, oldPrice: 899, save: 760, rating: 4.7, reviews: 189, badge: "NEW", badgeColor: "bg-primary-light", discount: 28 },
-  { name: "Active Green", image: img3, desc: "Herbal blend of potent anti-diabetic herbs to naturally regulate glucose metabolism…", price: 149, oldPrice: 1199, save: 1050, rating: 4.9, reviews: 412, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
-  { name: "Arsho F Powder", image: img4, desc: "Arsho F Powder helps support healthy digestion and provides relief from piles....", price: 349, oldPrice: 599, save: 250, rating: 4.6, reviews: 156, badge: null, badgeColor: "", discount: 25 },
-  { name: "Aarogya Jeevan", image: img5, desc: "Aarogya Jeevan is dedicated to bringing natural wellness solutions for a healthier....", price: 349, oldPrice: 799, save: 450, rating: 4.8, reviews: 521, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 31 },
-  { name: "Active Z Tablets", image: img6, desc: "Active Z Tablets are formulated to support daily energy, immunity, and overall body.....", price: 230, oldPrice: 399, save: 169, rating: 4.7, reviews: 387, badge: null, badgeColor: "", discount: 25 },
-  { name: "Active Green XT", image: img7, desc: "Active Green XT is a natural wellness formula crafted to support immunity....", price: 159, oldPrice: 1499, save: 1340, rating: 4.9, reviews: 612, badge: "TOP RATED", badgeColor: "bg-gold", discount: 33 },
-  { name: "Active Glucose", image: img8, desc: "Active Glucose provides instant energy and helps keep your body refreshed....", price: 149, oldPrice: 549, save: 400, rating: 4.7, reviews: 298, badge: "NEW", badgeColor: "bg-primary-light", discount: 27 },
-  { name: "Artho Z", image: img9, desc: "Artho Z is specially formulated to support joint comfort, flexibility....", price: 339, oldPrice: 349, save: 100, rating: 4.6, reviews: 174, badge: null, badgeColor: "", discount: 28 },
-  { name: "Arthovit M", image: img10, desc: "Arthovit M is designed to support healthy joints, muscle strength....", price: 429, oldPrice: 499, save: 70, rating: 4.7, reviews: 221, badge: null, badgeColor: "", discount: 30 },
-  { name: "Asthometic Capsule", image: img11, desc: "Asthometic Capsule is formulated to support respiratory wellness ....", price: 439, oldPrice: 849, save: 410, rating: 4.8, reviews: 456, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 29 },
-  { name: "C.N.Z Capsule", image: img12, desc: "C.N.Z Capsule is specially formulated to support overall wellness, immunity....", price: 499, oldPrice: 699, save: 200, rating: 4.6, reviews: 142, badge: null, badgeColor: "", discount: 28 },
-  { name: "Charma R Capsule", image: img13, desc: "Charma R Capsule is designed to support healthy skin, natural glow....", price: 339, oldPrice: 449, save: 110, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 33 },
-  { name: "Dr. Sona Artho Tablets", image: img14, desc: "Dr. Sona Artho Tablets are specially formulated to support joint comfort.....", price: 349, oldPrice: 1999, save: 1650, rating: 4.9, reviews: 389, badge: "TOP RATED", badgeColor: "bg-gold", discount: 25 },
-  { name: "Dr Sona Vatplus Capsule ", image: img15, desc: "Dr Sona Vatplus Capsule is a herbal wellness supplement that helps pain .....", price: 340, oldPrice: 499, save: 159, rating: 4.6, reviews: 178, badge: null, badgeColor: "", discount: 32 },
-  { name: "Omega Capsule ", image: img16, desc: "Omega Capsule helps soothe digestion and relieve gas naturally....", price: 199, oldPrice: 299, save: 100, rating: 4.5, reviews: 134, badge: "NEW", badgeColor: "bg-primary-light", discount: 33 },
-  { name: "Multivitamin Complex ", image: img17, desc: "Multivitamin Complex is support to help a daily nutritional supplements...", price: 340, oldPrice: 699, save: 359, rating: 4.7, reviews: 245, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 51 },
-  { name: "Glow up Capsules", image: img18, desc: "Glow up Capsules is a help to natural glow and overall wellness...", price: 499, oldPrice: 449, save: -50, rating: 4.8, reviews: 367, badge: "TOP RATED", badgeColor: "bg-gold", discount: 0 },
-  { name: "Multi Shine Herbal Capsules", image: img19, desc: "Multi Shine Herbal Capsules provides to natural glow and overall wellness...", price: 269, oldPrice: 349, save: 80, rating: 4.6, reviews: 198, badge: null, badgeColor: "", discount: 23 },
-  { name: "Gaso Touch Capsules", image: img20, desc: "Gaso Touch Capsules support healthy kidney function and detoxification....", price: 230, oldPrice: 799, save: 569, rating: 4.7, reviews: 156, badge: null, badgeColor: "", discount: 71 },
-  { name: "Power Booster Powder", image: img21, desc: "Power Booster Powder cleanses the liver and improves digestive health....", price: 340, oldPrice: 399, save: 59, rating: 4.6, reviews: 212, badge: "NEW", badgeColor: "bg-primary-light", discount: 15 },
-  { name: "Purify Capsules", image: img22, desc: "Purify Capsules enhance brain function, memory and concentration....", price: 399, oldPrice: 549, save: 150, rating: 4.8, reviews: 289, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 27 },
-  { name: "RX Gold Capsules", image: img23, desc: "RX Gold Capsules provide instant relief from nasal congestion and cold....", price: 599, oldPrice: 179, save: -420, rating: 4.5, reviews: 167, badge: null, badgeColor: "", discount: 0 },
-  { name: "Safa Amrit Capsules", image: img24, desc: "Safa Amrit Capsules soothes improves digestive health with herbal warmth....", price: 249, oldPrice: 299, save: 50, rating: 4.7, reviews: 234, badge: null, badgeColor: "", discount: 17 },
-  { name: "Sakhi Sundari ", image: img25, desc: "Sakhi Sundari  offer natural beauty and wellness....", price: 249, oldPrice: 469, save: 220, rating: 4.6, reviews: 145, badge: "NEW", badgeColor: "bg-primary-light", discount: 47 },
-  { name: "Skin Z Capsules", image: img26, desc: "Skin Z Capsules help to natural nutrition for healthy skin....", price: 280, oldPrice: 549, save: 269, rating: 4.8, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 49 },
-  { name: "TH - Z Capsules", image: img27, desc: "TH - Z Capsules revitalizes the body and supports thyroid health....", price: 499, oldPrice: 599, save: 100, rating: 4.7, reviews: 276, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 17 },
-  { name: "Vat Nashak Capsules", image: img28, desc: "Vat Nashak Capsules supports natural help to relief pain...", price: 340, oldPrice: 499, save: 159, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 32 },
-  { name: "Liver Care Syrup", image: img1, desc: "Liver Care Syrup supports healthy liver function and natural detoxification....", price: 249, oldPrice: 399, save: 150, rating: 4.7, reviews: 184, badge: "NEW", badgeColor: "bg-primary-light", discount: 37 },
-  { name: "Immuno Boost Tablets", image: img2, desc: "Immuno Boost Tablets strengthen immunity with powerful herbal extracts....", price: 299, oldPrice: 499, save: 200, rating: 4.8, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 40 },
-  { name: "Stress Relief Capsules", image: img3, desc: "Stress Relief Capsules help calm the mind and support mental wellness....", price: 329, oldPrice: 549, save: 220, rating: 4.6, reviews: 198, badge: null, badgeColor: "", discount: 40 },
-  { name: "Hair Grow Oil", image: img4, desc: "Hair Grow Oil nourishes the scalp and promotes natural hair growth....", price: 199, oldPrice: 349, save: 150, rating: 4.7, reviews: 423, badge: "TOP RATED", badgeColor: "bg-gold", discount: 43 },
-  { name: "Diabetic Care Churna", image: img5, desc: "Diabetic Care Churna helps maintain healthy blood sugar levels naturally....", price: 279, oldPrice: 449, save: 170, rating: 4.8, reviews: 267, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 38 },
-  { name: "Heart Wellness Tablets", image: img6, desc: "Heart Wellness Tablets support cardiac health and healthy circulation....", price: 399, oldPrice: 699, save: 300, rating: 4.9, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 43 },
-  { name: "Sleep Calm Capsules", image: img7, desc: "Sleep Calm Capsules promote restful sleep with natural herbal blend....", price: 259, oldPrice: 429, save: 170, rating: 4.6, reviews: 156, badge: "NEW", badgeColor: "bg-primary-light", discount: 40 },
-  { name: "Memory Plus Tablets", image: img8, desc: "Memory Plus Tablets enhance brain function, memory and concentration....", price: 349, oldPrice: 599, save: 250, rating: 4.7, reviews: 289, badge: null, badgeColor: "", discount: 42 },
-  { name: "Weight Balance Powder", image: img9, desc: "Weight Balance Powder supports healthy weight management naturally....", price: 449, oldPrice: 799, save: 350, rating: 4.5, reviews: 178, badge: null, badgeColor: "", discount: 44 },
-  { name: "Detox Tea Blend", image: img10, desc: "Detox Tea Blend cleanses the body with pure ayurvedic herbs....", price: 199, oldPrice: 349, save: 150, rating: 4.6, reviews: 234, badge: "NEW", badgeColor: "bg-primary-light", discount: 43 },
-  { name: "Bone Strength Tablets", image: img11, desc: "Bone Strength Tablets support healthy bones and joint mobility....", price: 379, oldPrice: 649, save: 270, rating: 4.7, reviews: 198, badge: null, badgeColor: "", discount: 42 },
-  { name: "Eye Care Drops", image: img12, desc: "Eye Care Drops soothe and refresh tired eyes with herbal extracts....", price: 149, oldPrice: 249, save: 100, rating: 4.5, reviews: 145, badge: null, badgeColor: "", discount: 40 },
-  { name: "Womens Wellness Capsules", image: img13, desc: "Womens Wellness Capsules support hormonal balance and vitality....", price: 459, oldPrice: 749, save: 290, rating: 4.8, reviews: 267, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 39 },
-  { name: "Mens Power Tablets", image: img14, desc: "Mens Power Tablets boost energy, stamina and overall vitality....", price: 499, oldPrice: 899, save: 400, rating: 4.7, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 44 },
-  { name: "Cough Relief Syrup", image: img15, desc: "Cough Relief Syrup provides natural relief from cough and cold....", price: 179, oldPrice: 299, save: 120, rating: 4.6, reviews: 234, badge: null, badgeColor: "", discount: 40 },
-  { name: "Pain Relief Oil", image: img16, desc: "Pain Relief Oil offers fast relief from muscle and joint pain....", price: 229, oldPrice: 399, save: 170, rating: 4.7, reviews: 289, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 43 },
-  { name: "Triphala Churna", image: img17, desc: "Triphala Churna supports digestion and natural detoxification....", price: 199, oldPrice: 329, save: 130, rating: 4.8, reviews: 412, badge: "TOP RATED", badgeColor: "bg-gold", discount: 40 },
-  { name: "Ashwagandha Capsules", image: img18, desc: "Ashwagandha Capsules reduce stress and boost energy naturally....", price: 299, oldPrice: 499, save: 200, rating: 4.9, reviews: 523, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 40 },
-  { name: "Brahmi Tablets", image: img19, desc: "Brahmi Tablets enhance memory and cognitive function....", price: 269, oldPrice: 449, save: 180, rating: 4.7, reviews: 234, badge: null, badgeColor: "", discount: 40 },
-  { name: "Neem Capsules", image: img20, desc: "Neem Capsules support healthy skin and natural blood purification....", price: 199, oldPrice: 349, save: 150, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 43 },
-  { name: "Tulsi Drops", image: img21, desc: "Tulsi Drops boost immunity with pure holy basil extracts....", price: 149, oldPrice: 249, save: 100, rating: 4.7, reviews: 267, badge: null, badgeColor: "", discount: 40 },
-  { name: "Giloy Juice", image: img22, desc: "Giloy Juice strengthens immunity and supports overall wellness....", price: 229, oldPrice: 379, save: 150, rating: 4.6, reviews: 178, badge: null, badgeColor: "", discount: 39 },
-  { name: "Aloe Vera Juice", image: img23, desc: "Aloe Vera Juice supports digestion, skin health and detoxification....", price: 199, oldPrice: 329, save: 130, rating: 4.7, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 40 },
-  { name: "Amla Juice", image: img24, desc: "Amla Juice rich in Vitamin C boosts immunity and hair health....", price: 189, oldPrice: 299, save: 110, rating: 4.8, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 37 },
-  { name: "Karela Jamun Juice", image: img25, desc: "Karela Jamun Juice helps regulate blood sugar levels naturally....", price: 219, oldPrice: 359, save: 140, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 39 },
-  { name: "Wheatgrass Powder", image: img26, desc: "Wheatgrass Powder rich in nutrients supports overall wellness....", price: 349, oldPrice: 549, save: 200, rating: 4.7, reviews: 234, badge: "NEW", badgeColor: "bg-primary-light", discount: 36 },
-  { name: "Spirulina Tablets", image: img27, desc: "Spirulina Tablets are a superfood rich in protein and nutrients....", price: 399, oldPrice: 649, save: 250, rating: 4.8, reviews: 287, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 38 },
-];
+import { products } from "@/lib/products";
 
 export function FeaturedProducts() {
   const { add } = useCart();
   const navigate = useNavigate();
-  const handleAdd = (name: string, price: number) => {
+  const handleAdd = (e: React.MouseEvent, name: string, price: number) => {
+    e.preventDefault();
+    e.stopPropagation();
     add(name, price);
     toast.success(`${name} added to cart`);
   };
-  const handleBuyNow = (name: string, price: number) => {
+  const handleBuyNow = (e: React.MouseEvent, name: string, price: number, slug: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     add(name, price);
-    toast.success(`Proceeding to checkout with ${name}`);
-    navigate({ to: "/shop" });
+    toast.success(`Proceeding with ${name}`);
+    navigate({ to: "/product/$slug", params: { slug } });
   };
   return (
     <section id="products" className="py-24 bg-cream scroll-mt-24">
@@ -117,45 +36,51 @@ export function FeaturedProducts() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((p) => (
-            <article key={p.name} className="group bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-soft transition-all">
-              <div className="relative bg-accent/30">
-                {p.badge && (
-                  <span className={`absolute top-4 left-4 z-10 ${p.badgeColor} text-primary-foreground text-[10px] font-bold tracking-wider px-3 py-1.5 rounded`}>{p.badge}</span>
-                )}
-                <span className="absolute top-12 left-4 z-10 bg-gold text-white text-[10px] font-bold tracking-wider px-3 py-1.5 rounded">-{p.discount}%</span>
-                <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
-                <button onClick={() => handleAdd(p.name, p.price)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
-              </div>
-              <div className="p-5">
-                <div className="text-[10px] font-bold tracking-wider text-primary-light uppercase mb-2">Ayurvedic Tablets / Medicines</div>
-                <h3 className="font-display text-xl font-semibold mb-2">{p.name}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{p.desc}</p>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex gap-0.5">
-                    {[1,2,3,4,5].map(i => <Star key={i} className={`w-3.5 h-3.5 ${i <= Math.floor(p.rating) ? 'fill-gold text-gold' : 'text-muted'}`} />)}
-                  </div>
-                  <span className="text-sm font-semibold">{p.rating}</span>
-                  <span className="text-xs text-muted-foreground">({p.reviews})</span>
+            <Link to="/product/$slug" params={{ slug: p.slug }} key={p.slug} className="group bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-soft transition-all block">
+              <article>
+                <div className="relative bg-accent/30">
+                  {p.badge && (
+                    <span className={`absolute top-4 left-4 z-10 ${p.badgeColor} text-primary-foreground text-[10px] font-bold tracking-wider px-3 py-1.5 rounded`}>{p.badge}</span>
+                  )}
+                  {p.discount > 0 && (
+                    <span className="absolute top-12 left-4 z-10 bg-gold text-white text-[10px] font-bold tracking-wider px-3 py-1.5 rounded">-{p.discount}%</span>
+                  )}
+                  <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <button onClick={(e) => handleAdd(e, p.name, p.price)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
                 </div>
-                <div className="pt-4 border-t border-border">
-                  <div className="flex items-end justify-between mb-3">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-foreground">₹{p.price}</span>
-                        <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
-                      </div>
-                      <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
+                <div className="p-5">
+                  <div className="text-[10px] font-bold tracking-wider text-primary-light uppercase mb-2">{p.category}</div>
+                  <h3 className="font-display text-xl font-semibold mb-2">{p.name}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{p.desc}</p>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map(i => <Star key={i} className={`w-3.5 h-3.5 ${i <= Math.floor(p.rating) ? 'fill-gold text-gold' : 'text-muted'}`} />)}
                     </div>
-                    <button onClick={() => handleAdd(p.name, p.price)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
-                      <Plus className="w-5 h-5" />
+                    <span className="text-sm font-semibold">{p.rating}</span>
+                    <span className="text-xs text-muted-foreground">({p.reviews})</span>
+                  </div>
+                  <div className="pt-4 border-t border-border">
+                    <div className="flex items-end justify-between mb-3">
+                      <div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-bold text-foreground">₹{p.price}</span>
+                          <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
+                        </div>
+                        {p.save > 0 && (
+                          <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
+                        )}
+                      </div>
+                      <button onClick={(e) => handleAdd(e, p.name, p.price)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <button onClick={(e) => handleBuyNow(e, p.name, p.price, p.slug)} className="w-full inline-flex items-center justify-center gap-2 bg-gold text-white py-2.5 rounded-md font-semibold text-sm hover:bg-gold/90 transition-colors">
+                      <Zap className="w-4 h-4" /> Buy Now
                     </button>
                   </div>
-                  <button onClick={() => handleBuyNow(p.name, p.price)} className="w-full inline-flex items-center justify-center gap-2 bg-gold text-white py-2.5 rounded-md font-semibold text-sm hover:bg-gold/90 transition-colors">
-                    <Zap className="w-4 h-4" /> Buy Now
-                  </button>
                 </div>
-              </div>
-            </article>
+              </article>
+            </Link>
           ))}
         </div>
       </div>
