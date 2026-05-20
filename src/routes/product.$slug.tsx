@@ -197,7 +197,7 @@ function ProductDetailPage() {
                 <div>
                   <h3 className="font-display text-xl mb-3">Key Benefits</h3>
                   <ul className="space-y-2">
-                    {product.benefits.map((b) => (
+                    {product.benefits.map((b: string) => (
                       <li key={b} className="flex items-start gap-2 text-sm text-foreground">
                         <Leaf className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                         <span>{b}</span>
