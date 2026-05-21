@@ -103,7 +103,7 @@ const base = [
   { name: "Multi vitamin", image: img22, desc: "Multi vitamin strengthens immunity and supports overall wellness....", price: 229, oldPrice: 379, save: 150, rating: 4.6, reviews: 178, badge: null, badgeColor: "", discount: 39 },
   { name: "X gold Powder", image: img23, desc: "X gold Powder supports digestion, skin health and detoxification....", price: 199, oldPrice: 329, save: 130, rating: 4.7, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 40 },
   { name: "Shat Prabha Tab", image: img24, desc: "Shat Prabha Tab rich in Vitamin C boosts immunity and hair health....", price: 189, oldPrice: 299, save: 110, rating: 4.8, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 37 },
-  { name: "Karela Jamun Juice", image: img25, desc: "Karela Jamun Juice helps regulate blood sugar levels naturally....", price: 219, oldPrice: 359, save: 140, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 39 },
+  { name: "Femina Careers tablets", image: img25, desc: "Femina Careers tablets helps regulate blood sugar levels naturally....", price: 219, oldPrice: 359, save: 140, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 39 },
   { name: "Wheatgrass Powder", image: img26, desc: "Wheatgrass Powder rich in nutrients supports overall wellness....", price: 349, oldPrice: 549, save: 200, rating: 4.7, reviews: 234, badge: "NEW", badgeColor: "bg-primary-light", discount: 36 },
   { name: "Spirulina Tablets", image: img27, desc: "Spirulina Tablets are a superfood rich in protein and nutrients....", price: 399, oldPrice: 649, save: 250, rating: 4.8, reviews: 287, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 38 },
 ];
