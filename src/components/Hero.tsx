@@ -83,6 +83,9 @@ export function Hero() {
 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="relative">
           <div className="relative rounded-3xl overflow-hidden shadow-soft bg-white aspect-square">
+            {!loaded[slide] && (
+              <Skeleton className="absolute inset-0 w-full h-full rounded-3xl bg-accent/40" />
+            )}
             <AnimatePresence mode="wait">
               <motion.img
                 key={slide}
@@ -90,11 +93,12 @@ export function Hero() {
                 alt="Shatakshi Herbal Product"
                 width={1024}
                 height={1024}
-                loading="eager"
-                fetchPriority="high"
+                loading={slide === 0 ? "eager" : "lazy"}
+                fetchPriority={slide === 0 ? "high" : "low"}
                 decoding="async"
+                onLoad={() => markLoaded(slide)}
                 initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: loaded[slide] ? 1 : 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.6 }}
                 className="absolute inset-0 w-full h-full object-cover"
