@@ -2,7 +2,7 @@ import { ArrowRight, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 const categories = [
-  { name: "Skin Care", desc: "Natural glow formulas", count: 12, icon: "✨", bg: "oklch(0.92 0.05 145)", chip: "oklch(0.78 0.13 50)" },
+  { name: "Diabetes, thyroid BP and cholesterol Care", desc: "Natural management formulas", count: 12, icon: "🩺", bg: "oklch(0.92 0.05 145)", chip: "oklch(0.78 0.13 50)" },
   { name: "Herbal Powder / Churna", desc: "Pure herbal churnas", count: 10, icon: "🌾", bg: "oklch(0.93 0.07 90)", chip: "oklch(0.7 0.15 75)" },
   { name: "Ayurvedic Tablets / Medicines", desc: "Authentic formulations", count: 15, icon: "💊", bg: "oklch(0.92 0.04 200)", chip: "oklch(0.55 0.12 200)" },
   { name: "Herbal Juices", desc: "Fresh herbal extracts", count: 8, icon: "🥤", bg: "oklch(0.93 0.06 145)", chip: "oklch(0.5 0.13 155)" },
