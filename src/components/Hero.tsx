@@ -78,8 +78,34 @@ export function Hero() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="relative">
-          <div className="relative rounded-3xl overflow-hidden shadow-soft bg-white">
-            <img src={heroImg} alt="Shatakshi Herbal Acidic Capsules" className="w-full h-auto" width={1024} height={1024} loading="eager" fetchPriority="high" decoding="async" />
+          <div className="relative rounded-3xl overflow-hidden shadow-soft bg-white aspect-square">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={slide}
+                src={heroSlides[slide]}
+                alt="Shatakshi Herbal Product"
+                width={1024}
+                height={1024}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                initial={{ opacity: 0, scale: 1.02 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </AnimatePresence>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {heroSlides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSlide(i)}
+                  aria-label={`Slide ${i + 1}`}
+                  className={`h-2 rounded-full transition-all ${i === slide ? "w-6 bg-primary" : "w-2 bg-white/70"}`}
+                />
+              ))}
+            </div>
           </div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity }}
             className="absolute top-8 -left-4 lg:left-8 bg-white rounded-2xl shadow-soft px-5 py-3 flex items-center gap-3">
