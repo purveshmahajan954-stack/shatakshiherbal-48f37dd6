@@ -1,7 +1,7 @@
-import heroImg from "@/assets/hero-slide-1.jpg";
-import heroImg2 from "@/assets/hero-slide-2.jpg";
-import heroImg3 from "@/assets/hero-slide-3.jpg";
-import heroImg4 from "@/assets/hero-slide-4.jpg";
+import heroImg from "@/assets/hero-slide-1.webp";
+import heroImg2 from "@/assets/hero-slide-2.webp";
+import heroImg3 from "@/assets/hero-slide-3.webp";
+import heroImg4 from "@/assets/hero-slide-4.webp";
 import { ArrowRight, Leaf, Sparkles, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@tanstack/react-router";
@@ -14,6 +14,8 @@ export function Hero() {
   const [slide, setSlide] = useState(0);
   const [loaded, setLoaded] = useState<boolean[]>(() => heroSlides.map(() => false));
   useEffect(() => {
+    // Warm subsequent slides in the background so transitions feel instant
+    heroSlides.slice(1).forEach((src) => { const img = new Image(); img.src = src; });
     const id = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 3500);
     return () => clearInterval(id);
   }, []);
