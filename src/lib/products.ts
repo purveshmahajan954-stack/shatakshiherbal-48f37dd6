@@ -45,10 +45,82 @@ export type Product = {
   benefits: string[];
   usage: string;
   ingredients: string;
+  categories: string[];
+};
+
+export const CATEGORY_LABELS: Record<string, string> = {
+  "diabetes-care": "Diabetes, thyroid BP and cholesterol Care",
+  "arthritis-care": "Arthritis Joints pain care",
+  "liver-kidney-care": "Liver kidney care",
+  "asthma-allergy-care": "Asthma allergy care",
+  "skin-care": "Skin Psoriasis, Charm Rog care",
+  "piles-care": "Piles care",
+  "acidity-care": "Acidity digestive care",
+  "wellness-care": "Wellness Weakness care",
+  "vital-care": "Vital Vitiligo sex power",
+  "stree-care": "Stree rog care",
+};
+
+const categoryMap: Record<string, string[]> = {
+  "Acidic Capsules": ["acidity-care"],
+  "Active G5": ["diabetes-care"],
+  "Active Green": ["diabetes-care"],
+  "Arsho F Powder": ["piles-care"],
+  "Aarogya Jeevan": ["asthma-allergy-care"],
+  "Active Z Tablets": ["diabetes-care"],
+  "Active Green XT": ["diabetes-care"],
+  "Active Glucose": ["diabetes-care"],
+  "Artho Z": ["arthritis-care"],
+  "Arthovit M": ["arthritis-care", "piles-care"],
+  "Asthometic Capsule": ["asthma-allergy-care"],
+  "C.N.Z Capsule": ["wellness-care"],
+  "Charma R Capsule": ["skin-care"],
+  "Dr. Sona Artho Tablets": ["arthritis-care"],
+  "Dr Sona Vatplus Capsule": ["arthritis-care"],
+  "Omega Capsule": ["wellness-care"],
+  "Multivitamin Complex": ["wellness-care", "acidity-care"],
+  "Glow up Capsules": ["skin-care"],
+  "Multi Shine Herbal Capsules": ["wellness-care"],
+  "Gaso Touch Capsules": ["acidity-care"],
+  "Power Booster Powder": ["wellness-care", "acidity-care"],
+  "Purify Capsules": ["skin-care"],
+  "RX Gold Capsules": ["vital-care"],
+  "Safa Amrit Capsules": ["acidity-care"],
+  "Sakhi Sundari": ["stree-care"],
+  "Skin Z Capsules": ["skin-care"],
+  "TH - Z Capsules": ["diabetes-care"],
+  "Vat Nashak Capsules": ["arthritis-care"],
+  "Active Risup": ["diabetes-care"],
+  "BP Tablets": ["diabetes-care"],
+  "Active Z Premium Tablets": ["diabetes-care"],
+  "Vedantak Powder": ["arthritis-care"],
+  "Camrop capsule": ["arthritis-care"],
+  "Vayam powder": ["arthritis-care"],
+  "Cartilage Tablets": ["arthritis-care"],
+  "Aaram oil": ["arthritis-care"],
+  "Vatmaniras": ["arthritis-care"],
+  "Liver Maniras": ["liver-kidney-care", "acidity-care"],
+  "Kidney cure capsule": ["liver-kidney-care"],
+  "KFT XL 2": ["liver-kidney-care"],
+  "Livona Syrup": ["liver-kidney-care"],
+  "Asthmatic capsule": ["asthma-allergy-care"],
+  "Alc Maniras tablets": ["asthma-allergy-care"],
+  "Max cold powder": ["asthma-allergy-care"],
+  "Charmer capsules": ["skin-care"],
+  "Derma cream": ["skin-care"],
+  "Beauty cream": ["skin-care"],
+  "Acid capsule": ["acidity-care"],
+  "Multicomplex capsule": ["wellness-care"],
+  "Multi vitamin": ["wellness-care"],
+  "X gold Powder": ["vital-care"],
+  "Shat Prabha Tab": ["stree-care"],
+  "Femina Careers tablets": ["stree-care"],
 };
 
 export const slugify = (s: string) =>
   s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+
 
 const base = [
   { name: "Acidic Capsules", image: img1, desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 169, oldPrice: 1799, save: 1630, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 28 },
