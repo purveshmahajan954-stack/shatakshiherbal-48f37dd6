@@ -6,15 +6,19 @@ import { ArrowRight, Leaf, Sparkles, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const heroSlides = [heroImg, heroImg2, heroImg3, heroImg4];
 
 export function Hero() {
   const [slide, setSlide] = useState(0);
+  const [loaded, setLoaded] = useState<boolean[]>(() => heroSlides.map(() => false));
   useEffect(() => {
     const id = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 3500);
     return () => clearInterval(id);
   }, []);
+  const markLoaded = (i: number) =>
+    setLoaded((prev) => (prev[i] ? prev : prev.map((v, idx) => (idx === i ? true : v))));
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-cream via-cream to-accent/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center">
