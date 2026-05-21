@@ -6,15 +6,19 @@ import { ArrowRight, Leaf, Sparkles, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const heroSlides = [heroImg, heroImg2, heroImg3, heroImg4];
 
 export function Hero() {
   const [slide, setSlide] = useState(0);
+  const [loaded, setLoaded] = useState<boolean[]>(() => heroSlides.map(() => false));
   useEffect(() => {
     const id = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 3500);
     return () => clearInterval(id);
   }, []);
+  const markLoaded = (i: number) =>
+    setLoaded((prev) => (prev[i] ? prev : prev.map((v, idx) => (idx === i ? true : v))));
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-cream via-cream to-accent/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center">
@@ -79,6 +83,9 @@ export function Hero() {
 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="relative">
           <div className="relative rounded-3xl overflow-hidden shadow-soft bg-white aspect-square">
+            {!loaded[slide] && (
+              <Skeleton className="absolute inset-0 w-full h-full rounded-3xl bg-accent/40" />
+            )}
             <AnimatePresence mode="wait">
               <motion.img
                 key={slide}
@@ -86,11 +93,12 @@ export function Hero() {
                 alt="Shatakshi Herbal Product"
                 width={1024}
                 height={1024}
-                loading="eager"
-                fetchPriority="high"
+                loading={slide === 0 ? "eager" : "lazy"}
+                fetchPriority={slide === 0 ? "high" : "low"}
                 decoding="async"
+                onLoad={() => markLoaded(slide)}
                 initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: loaded[slide] ? 1 : 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.6 }}
                 className="absolute inset-0 w-full h-full object-cover"
