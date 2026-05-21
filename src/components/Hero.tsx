@@ -14,6 +14,8 @@ export function Hero() {
   const [slide, setSlide] = useState(0);
   const [loaded, setLoaded] = useState<boolean[]>(() => heroSlides.map(() => false));
   useEffect(() => {
+    // Warm subsequent slides in the background so transitions feel instant
+    heroSlides.slice(1).forEach((src) => { const img = new Image(); img.src = src; });
     const id = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 3500);
     return () => clearInterval(id);
   }, []);
