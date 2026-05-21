@@ -107,7 +107,9 @@ export function FeaturedProducts() {
             </Link>
           ))}
         </div>
+        )}
       </div>
+
     </section>
   );
 }
