@@ -1,7 +1,7 @@
-import heroImg from "@/assets/hero-product.jpg";
-import heroImg2 from "@/assets/product-1.png";
-import heroImg3 from "@/assets/product-3.png";
-import heroImg4 from "@/assets/product-5.png";
+import heroImg from "@/assets/hero-slide-1.jpg";
+import heroImg2 from "@/assets/hero-slide-2.jpg";
+import heroImg3 from "@/assets/hero-slide-3.jpg";
+import heroImg4 from "@/assets/hero-slide-4.jpg";
 import { ArrowRight, Leaf, Sparkles, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@tanstack/react-router";
