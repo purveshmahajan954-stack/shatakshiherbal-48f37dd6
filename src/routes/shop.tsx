@@ -4,7 +4,12 @@ import { Footer } from "@/components/Footer";
 import { Categories } from "@/components/Categories";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
 
+type ShopSearch = { cat?: string };
+
 export const Route = createFileRoute("/shop")({
+  validateSearch: (search: Record<string, unknown>): ShopSearch => ({
+    cat: typeof search.cat === "string" ? search.cat : undefined,
+  }),
   component: ShopPage,
   head: () => ({
     meta: [
