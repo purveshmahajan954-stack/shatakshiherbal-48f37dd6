@@ -1,5 +1,5 @@
 import { ArrowRight, Plus, Star, Zap, X } from "lucide-react";
-import { Link, useNavigate, useLocation } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 import { products, CATEGORY_LABELS } from "@/lib/products";
@@ -7,10 +7,11 @@ import { products, CATEGORY_LABELS } from "@/lib/products";
 export function FeaturedProducts() {
   const { add } = useCart();
   const navigate = useNavigate();
-  const location = useLocation();
-  const cat = new URLSearchParams(location.searchStr ?? "").get("cat") ?? "";
+  const search = useSearch({ strict: false }) as { cat?: string };
+  const cat = search.cat ?? "";
   const activeLabel = cat ? CATEGORY_LABELS[cat] : "";
   const filtered = cat ? products.filter((p) => p.categories.includes(cat)) : products;
+
 
   const handleAdd = (e: React.MouseEvent, name: string, price: number) => {
     e.preventDefault();
