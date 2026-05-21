@@ -7,6 +7,11 @@ const categories = [
   { name: "Liver kidney care", desc: "Authentic formulations", count: 15, icon: "🛡️", bg: "oklch(0.92 0.04 200)", chip: "oklch(0.55 0.12 200)" },
   { name: "Asthma allergy care", desc: "Fresh herbal extracts", count: 8, icon: "🫁", bg: "oklch(0.93 0.06 145)", chip: "oklch(0.5 0.13 155)" },
   { name: "Skin Psoriasis, Charm Rog care", desc: "Daily wellness essentials", count: 9, icon: "✨", bg: "oklch(0.93 0.05 20)", chip: "oklch(0.65 0.16 20)" },
+  { name: "Piles care", desc: "Natural piles relief", count: 6, icon: "🌿", bg: "oklch(0.92 0.06 60)", chip: "oklch(0.6 0.15 40)" },
+  { name: "Acidity digestive care", desc: "Gut & digestion support", count: 8, icon: "🔥", bg: "oklch(0.93 0.07 50)", chip: "oklch(0.65 0.16 50)" },
+  { name: "Wellness Weakness care", desc: "Strength & vitality boost", count: 7, icon: "💪", bg: "oklch(0.92 0.05 120)", chip: "oklch(0.55 0.14 140)" },
+  { name: "Vital Vitiligo sex power", desc: "Vitality & confidence", count: 5, icon: "⚡", bg: "oklch(0.92 0.06 280)", chip: "oklch(0.55 0.16 280)" },
+  { name: "Stree rog care", desc: "Women's wellness range", count: 6, icon: "🌸", bg: "oklch(0.93 0.05 350)", chip: "oklch(0.6 0.16 350)" },
 ];
 
 export function Categories() {
