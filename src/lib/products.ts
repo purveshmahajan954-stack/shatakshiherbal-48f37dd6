@@ -191,6 +191,7 @@ export const products: Product[] = base.map((p) => ({
   ],
   usage: "Take 1-2 capsules twice daily after meals with warm water, or as directed by your physician.",
   ingredients: "A proprietary blend of authentic Ayurvedic herbs including traditional rasayanas, processed as per classical texts.",
+  categories: categoryMap[p.name] ?? [],
 }));
 
 export const getProductBySlug = (slug: string) => products.find((p) => p.slug === slug);
