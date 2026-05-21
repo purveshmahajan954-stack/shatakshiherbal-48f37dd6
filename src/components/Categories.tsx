@@ -2,16 +2,16 @@ import { ArrowRight, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 const categories = [
-  { name: "Diabetes, thyroid BP and cholesterol Care", desc: "Natural management formulas", count: 12, icon: "🩺", bg: "oklch(0.92 0.05 145)", chip: "oklch(0.78 0.13 50)" },
-  { name: "Arthritis Joints pain care", desc: "Pure herbal churnas", count: 10, icon: "🦴", bg: "oklch(0.93 0.07 90)", chip: "oklch(0.7 0.15 75)" },
-  { name: "Liver kidney care", desc: "Authentic formulations", count: 15, icon: "🛡️", bg: "oklch(0.92 0.04 200)", chip: "oklch(0.55 0.12 200)" },
-  { name: "Asthma allergy care", desc: "Fresh herbal extracts", count: 8, icon: "🫁", bg: "oklch(0.93 0.06 145)", chip: "oklch(0.5 0.13 155)" },
-  { name: "Skin Psoriasis, Charm Rog care", desc: "Daily wellness essentials", count: 9, icon: "✨", bg: "oklch(0.93 0.05 20)", chip: "oklch(0.65 0.16 20)" },
-  { name: "Piles care", desc: "Natural piles relief", count: 6, icon: "🌿", bg: "oklch(0.92 0.06 60)", chip: "oklch(0.6 0.15 40)" },
-  { name: "Acidity digestive care", desc: "Gut & digestion support", count: 8, icon: "🔥", bg: "oklch(0.93 0.07 50)", chip: "oklch(0.65 0.16 50)" },
-  { name: "Wellness Weakness care", desc: "Strength & vitality boost", count: 7, icon: "💪", bg: "oklch(0.92 0.05 120)", chip: "oklch(0.55 0.14 140)" },
-  { name: "Vital Vitiligo sex power", desc: "Vitality & confidence", count: 5, icon: "⚡", bg: "oklch(0.92 0.06 280)", chip: "oklch(0.55 0.16 280)" },
-  { name: "Stree rog care", desc: "Women's wellness range", count: 6, icon: "🌸", bg: "oklch(0.93 0.05 350)", chip: "oklch(0.6 0.16 350)" },
+  { slug: "diabetes-care", name: "Diabetes, thyroid BP and cholesterol Care", desc: "Natural management formulas", count: 8, icon: "🩺", bg: "oklch(0.92 0.05 145)", chip: "oklch(0.78 0.13 50)" },
+  { slug: "arthritis-care", name: "Arthritis Joints pain care", desc: "Pure herbal churnas", count: 11, icon: "🦴", bg: "oklch(0.93 0.07 90)", chip: "oklch(0.7 0.15 75)" },
+  { slug: "liver-kidney-care", name: "Liver kidney care", desc: "Authentic formulations", count: 4, icon: "🛡️", bg: "oklch(0.92 0.04 200)", chip: "oklch(0.55 0.12 200)" },
+  { slug: "asthma-allergy-care", name: "Asthma allergy care", desc: "Fresh herbal extracts", count: 5, icon: "🫁", bg: "oklch(0.93 0.06 145)", chip: "oklch(0.5 0.13 155)" },
+  { slug: "skin-care", name: "Skin Psoriasis, Charm Rog care", desc: "Daily wellness essentials", count: 7, icon: "✨", bg: "oklch(0.93 0.05 20)", chip: "oklch(0.65 0.16 20)" },
+  { slug: "piles-care", name: "Piles care", desc: "Natural piles relief", count: 2, icon: "🌿", bg: "oklch(0.92 0.06 60)", chip: "oklch(0.6 0.15 40)" },
+  { slug: "acidity-care", name: "Acidity digestive care", desc: "Gut & digestion support", count: 7, icon: "🔥", bg: "oklch(0.93 0.07 50)", chip: "oklch(0.65 0.16 50)" },
+  { slug: "wellness-care", name: "Wellness Weakness care", desc: "Strength & vitality boost", count: 7, icon: "💪", bg: "oklch(0.92 0.05 120)", chip: "oklch(0.55 0.14 140)" },
+  { slug: "vital-care", name: "Vital Vitiligo sex power", desc: "Vitality & confidence", count: 2, icon: "⚡", bg: "oklch(0.92 0.06 280)", chip: "oklch(0.55 0.16 280)" },
+  { slug: "stree-care", name: "Stree rog care", desc: "Women's wellness range", count: 3, icon: "🌸", bg: "oklch(0.93 0.05 350)", chip: "oklch(0.6 0.16 350)" },
 ];
 
 export function Categories() {
@@ -25,7 +25,7 @@ export function Categories() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
           {categories.map((c) => (
-            <Link to="/shop" key={c.name} className="group rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer hover:-translate-y-1 transition-transform shadow-card"
+            <Link to="/shop" search={{ cat: c.slug }} key={c.slug} className="group rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer hover:-translate-y-1 transition-transform shadow-card"
               style={{ backgroundColor: c.bg }}>
               <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-2xl mb-4 shadow-sm">{c.icon}</div>
               <h3 className="font-display text-lg font-semibold text-foreground mb-1">{c.name}</h3>

@@ -1,12 +1,18 @@
-import { ArrowRight, Plus, Star, Zap } from "lucide-react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, Plus, Star, Zap, X } from "lucide-react";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
-import { products } from "@/lib/products";
+import { products, CATEGORY_LABELS } from "@/lib/products";
 
 export function FeaturedProducts() {
   const { add } = useCart();
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { cat?: string };
+  const cat = search.cat ?? "";
+  const activeLabel = cat ? CATEGORY_LABELS[cat] : "";
+  const filtered = cat ? products.filter((p) => p.categories.includes(cat)) : products;
+
+
   const handleAdd = (e: React.MouseEvent, name: string, price: number) => {
     e.preventDefault();
     e.stopPropagation();
@@ -24,18 +30,36 @@ export function FeaturedProducts() {
     <section id="products" className="py-24 bg-cream scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div className="max-w-xl">
-            <div className="text-sm font-semibold text-primary-light tracking-[0.2em] uppercase mb-3">Handpicked For You</div>
-            <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-4">Featured Products</h2>
-            <p className="text-muted-foreground">Our most loved Ayurvedic formulations — trusted by thousands of wellness seekers.</p>
+          <div className="max-w-2xl">
+            <div className="text-sm font-semibold text-primary-light tracking-[0.2em] uppercase mb-3">
+              {activeLabel ? "Category" : "Handpicked For You"}
+            </div>
+            <h2 className="font-display text-4xl sm:text-5xl text-foreground mb-4">
+              {activeLabel || "Featured Products"}
+            </h2>
+            <p className="text-muted-foreground">
+              {activeLabel
+                ? `Showing ${filtered.length} product${filtered.length === 1 ? "" : "s"} in this category.`
+                : "Our most loved Ayurvedic formulations — trusted by thousands of wellness seekers."}
+            </p>
           </div>
-          <Link to="/shop" className="inline-flex items-center gap-2 border border-primary/40 px-6 py-3 rounded-full font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-            View All Products <ArrowRight className="w-4 h-4" />
-          </Link>
+          {activeLabel ? (
+            <Link to="/shop" className="inline-flex items-center gap-2 border border-primary/40 px-6 py-3 rounded-full font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+              <X className="w-4 h-4" /> Clear filter
+            </Link>
+          ) : (
+            <Link to="/shop" className="inline-flex items-center gap-2 border border-primary/40 px-6 py-3 rounded-full font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+              View All Products <ArrowRight className="w-4 h-4" />
+            </Link>
+          )}
         </div>
 
+        {filtered.length === 0 ? (
+          <div className="text-center py-20 text-muted-foreground">No products found in this category.</div>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((p) => (
+          {filtered.map((p) => (
+
             <Link to="/product/$slug" params={{ slug: p.slug }} key={p.slug} className="group bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-soft transition-all block">
               <article>
                 <div className="relative bg-accent/30">
@@ -83,7 +107,9 @@ export function FeaturedProducts() {
             </Link>
           ))}
         </div>
+        )}
       </div>
+
     </section>
   );
 }
