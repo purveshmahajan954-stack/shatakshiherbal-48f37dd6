@@ -1,4 +1,4 @@
-import heroImg from "@/assets/hero-product.jpg";
+import heroImg from "@/assets/hero-product.webp";
 import { Leaf, FlaskConical, Sprout, Trophy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 

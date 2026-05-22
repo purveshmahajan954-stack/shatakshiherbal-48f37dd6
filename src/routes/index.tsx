@@ -18,6 +18,9 @@ export const Route = createFileRoute("/")({
       { title: "Shatakshi Herbal — Pure Ayurvedic Healing for Modern Life" },
       { name: "description", content: "Premium Ayurvedic formulations crafted from nature's finest ingredients. AYUSH certified, 100% natural herbal medicines." },
     ],
+    links: [
+      { rel: "preload", as: "image", href: "/src/assets/hero-slide-1.webp", fetchpriority: "high" },
+    ],
   }),
 });
 
