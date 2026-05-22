@@ -21,6 +21,13 @@ const footerLinks = [
   { label: "Talk to Doctor", to: "/contact" },
 ] as const;
 
+const policyLinks = [
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms & Conditions", to: "/terms" },
+  { label: "Refund & Cancellation", to: "/refund" },
+  { label: "Shipping & Delivery", to: "/shipping" },
+] as const;
+
 const socials = [
   { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
   { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
@@ -69,6 +76,14 @@ export function Footer() {
               </a>
             ))}
           </div>
+
+          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 pt-2">
+            {policyLinks.map((l) => (
+              <Link key={l.label} to={l.to} className="text-xs text-cream/60 hover:text-cream transition-colors">
+                {l.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
         <div className="border-t border-cream/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-cream/60">
