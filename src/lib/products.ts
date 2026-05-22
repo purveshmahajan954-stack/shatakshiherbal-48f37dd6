@@ -174,7 +174,7 @@ const base = [
   { name: "Multicomplex capsule", image: img21, desc: "Multicomplex capsule boost immunity with pure holy basil extracts....", price: 249, oldPrice: 340, save: 91, rating: 4.7, reviews: 267, badge: null, badgeColor: "", discount: 27 },
   { name: "Multi vitamin", image: img22, desc: "Multi vitamin strengthens immunity and supports overall wellness....", price: 340, oldPrice: 379, save: 39, rating: 4.6, reviews: 178, badge: null, badgeColor: "", discount: 10 },
   { name: "X gold Powder", image: img23, desc: "X gold Powder supports digestion, skin health and detoxification....", price: 211, oldPrice: 599, save: 388, rating: 4.7, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 65 },
-  { name: "Shat Prabha Tab", image: img24, desc: "Shat Prabha Tab rich in Vitamin C boosts immunity and hair health....", price: 189, oldPrice: 440, save: 251, rating: 4.8, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 57 },
+  { name: "Shat Prabha Tab", image: img24, desc: "Shat Prabha Tab rich in Vitamin C boosts immunity and hair health....", price: 799, oldPrice: 1499, save: 700, rating: 4.8, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 47 },
   { name: "Femina Careers tablets", image: img25, desc: "Femina Careers tablets helps regulate blood sugar levels naturally....", price: 219, oldPrice: 359, save: 140, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 39 },
 ];
 
