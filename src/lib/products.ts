@@ -115,6 +115,7 @@ const categoryMap: Record<string, string[]> = {
   "X gold Powder": ["vital-care"],
   "Shat Prabha Tab": ["stree-care"],
   "Femina Careers tablets": ["stree-care"],
+  "Multicomplex Wellness Capsule": ["wellness-care"],
 };
 
 export const slugify = (s: string) =>
@@ -176,6 +177,7 @@ const base = [
   { name: "X gold Powder", image: img23, desc: "X gold Powder supports digestion, skin health and detoxification....", price: 211, oldPrice: 599, save: 388, rating: 4.7, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 65 },
   { name: "Shat Prabha Tab", image: img24, desc: "Shat Prabha Tab rich in Vitamin C boosts immunity and hair health....", price: 799, oldPrice: 1499, save: 700, rating: 4.8, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 47 },
   { name: "Femina Careers tablets", image: img25, desc: "Femina Careers tablets helps regulate blood sugar levels naturally....", price: 1000, oldPrice: 1599, save: 599, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 37 },
+  { name: "Multicomplex Wellness Capsule", image: img26, desc: "Multicomplex Wellness Capsule boosts overall wellness, energy and immunity naturally....", price: 349, oldPrice: 599, save: 250, rating: 4.7, reviews: 156, badge: "NEW", badgeColor: "bg-primary-light", discount: 42 },
 ];
 
 export const products: Product[] = base.map((p) => ({
