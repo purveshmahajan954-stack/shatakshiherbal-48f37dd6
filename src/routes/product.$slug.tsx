@@ -105,7 +105,7 @@ function ProductDetailPage() {
 
               <div className="bg-white rounded-2xl p-6 shadow-card mb-6">
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="font-display text-4xl font-bold text-foreground">₹{product.price}</span>
+                  <span className="text-4xl text-foreground">₹{product.price}</span>
                   <span className="text-lg text-muted-foreground line-through">₹{product.oldPrice}</span>
                   {product.save > 0 && (
                     <span className="text-xs font-semibold text-primary bg-accent px-2 py-1 rounded">Save ₹{product.save}</span>
