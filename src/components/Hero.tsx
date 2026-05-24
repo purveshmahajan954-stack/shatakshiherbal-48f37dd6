@@ -50,16 +50,24 @@ export function Hero() {
             <div className="flex items-center gap-3">
               <div className="flex -space-x-2">
                 {[
-                  { l: "P", bg: "bg-primary" },
-                  { l: "R", bg: "bg-primary-light" },
-                  { l: "A", bg: "bg-dark-hero" },
-                  { l: "M", bg: "bg-primary-light/70" },
-                ].map((a, i) => (
-                  <div key={i} className={`w-9 h-9 rounded-full ${a.bg} text-cream text-xs font-bold flex items-center justify-center ring-2 ring-cream`}>
-                    {a.l}
-                  </div>
+                  "https://i.pravatar.cc/80?img=47",
+                  "https://i.pravatar.cc/80?img=32",
+                  "https://i.pravatar.cc/80?img=12",
+                  "https://i.pravatar.cc/80?img=68",
+                ].map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`Happy customer ${i + 1}`}
+                    width={36}
+                    height={36}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-9 h-9 rounded-full object-cover ring-2 ring-cream bg-accent"
+                  />
                 ))}
               </div>
+
               <div>
                 <div className="flex items-center gap-1.5">
                   <div className="flex gap-0.5">
