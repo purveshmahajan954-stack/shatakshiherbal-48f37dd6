@@ -82,19 +82,34 @@ function ProductDetailPage() {
           </nav>
 
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
-            <div className="bg-white rounded-3xl overflow-hidden shadow-card relative">
-              {product.badge && (
-                <span className={`absolute top-5 left-5 z-10 ${product.badgeColor} text-primary-foreground text-xs font-bold tracking-wider px-3 py-1.5 rounded`}>
-                  {product.badge}
-                </span>
-              )}
-              {product.discount > 0 && (
-                <span className="absolute top-5 right-5 z-10 bg-gold text-white text-xs font-bold tracking-wider px-3 py-1.5 rounded">
-                  -{product.discount}%
-                </span>
-              )}
-              <img src={product.image} alt={product.name} className="w-full aspect-square object-cover" />
+            <div className="space-y-3">
+              <div className="bg-white rounded-3xl overflow-hidden shadow-card relative">
+                {product.badge && activeImg === 0 && (
+                  <span className={`absolute top-5 left-5 z-10 ${product.badgeColor} text-primary-foreground text-xs font-bold tracking-wider px-3 py-1.5 rounded`}>
+                    {product.badge}
+                  </span>
+                )}
+                {product.discount > 0 && activeImg === 0 && (
+                  <span className="absolute top-5 right-5 z-10 bg-gold text-white text-xs font-bold tracking-wider px-3 py-1.5 rounded">
+                    -{product.discount}%
+                  </span>
+                )}
+                <img key={activeImg} src={gallery[activeImg]} alt={product.name} className="w-full aspect-square object-cover animate-in fade-in duration-300" />
+              </div>
+              <div className="grid grid-cols-6 gap-2">
+                {gallery.map((src, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(i)}
+                    aria-label={`View image ${i + 1}`}
+                    className={`relative rounded-xl overflow-hidden border-2 transition aspect-square ${activeImg === i ? "border-primary ring-2 ring-primary/30" : "border-transparent hover:border-primary/40"}`}
+                  >
+                    <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
             </div>
+
 
             <div>
               <div className="text-[11px] font-bold tracking-[0.2em] text-primary-light uppercase mb-3">{product.category}</div>
