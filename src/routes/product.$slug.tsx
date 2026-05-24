@@ -43,7 +43,7 @@ export const Route = createFileRoute("/product/$slug")({
 });
 
 function ProductDetailPage() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: Product };
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "reviews" | "info">("description");
