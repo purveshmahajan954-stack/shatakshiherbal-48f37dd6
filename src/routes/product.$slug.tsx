@@ -53,6 +53,9 @@ function ProductDetailPage() {
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "reviews" | "info">("description");
+  const gallery = [product.image, badgeNoSugar, badgeGmp, badgeNoExtracts, badgeNoFlavours, badgeBpaFree];
+  const [activeImg, setActiveImg] = useState(0);
+
 
   const handleAdd = () => {
     add(product.name, product.price, qty);
