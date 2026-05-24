@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck, Sparkles, Droplet, Sun, Moon, Heart, FlaskConical } from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -169,7 +169,111 @@ function ProductDetailPage() {
             </div>
           </div>
 
+          {/* Happy Customers strip */}
+          <section className="mt-20">
+            <h2 className="font-display text-3xl text-center text-foreground mb-8">Hear from our Happy Customers</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+              {[
+                { img: "https://i.pravatar.cc/300?img=47", name: "Mahesh Sharma", quote: "My wife used it in her first cycle and she noticed a clear difference. Thank you." },
+                { img: "https://i.pravatar.cc/300?img=32", name: "Khushi Jindal", quote: "Such an effective Ayurvedic treatment for period-related issues. Highly recommend." },
+                { img: "https://i.pravatar.cc/300?img=12", name: "Pooja Mehta", quote: "I'm so happy with this product. Took it for a month and felt amazing results." },
+                { img: "https://i.pravatar.cc/300?img=68", name: "Vandana Rajput", quote: "Itne dino me results aate hai. I was having a regular period for the last few months." },
+              ].map((c) => (
+                <article key={c.name} className="bg-white rounded-2xl overflow-hidden shadow-card">
+                  <div className="aspect-[4/3] bg-accent/30 overflow-hidden">
+                    <img src={c.img} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex gap-0.5 mb-2">
+                      {[1,2,3,4,5].map(i => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{c.quote}</p>
+                    <div className="text-[11px] font-semibold text-foreground mt-2">— {c.name}</div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          {/* Benefits highlight around product */}
+          <section className="mt-20 bg-white rounded-3xl p-8 lg:p-12 shadow-card">
+            <h2 className="font-display text-3xl text-center text-foreground mb-2">Key Benefits of {product.name}</h2>
+            <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">A holistic formulation that supports your wellness from the inside out.</p>
+            <div className="grid lg:grid-cols-[1fr_auto_1fr] gap-8 items-center">
+              <div className="space-y-6">
+                {product.benefits.slice(0, Math.ceil(product.benefits.length / 2)).map((b: string, i: number) => (
+                  <div key={b} className="flex items-start gap-4 lg:justify-end lg:text-right">
+                    <div className="flex-1 lg:order-1">
+                      <div className="font-semibold text-foreground">{b}</div>
+                    </div>
+                    <div className="w-12 h-12 rounded-full border-2 border-primary/30 bg-accent/30 flex items-center justify-center shrink-0 lg:order-2">
+                      {[<Heart className="w-5 h-5 text-primary" />, <Sparkles className="w-5 h-5 text-primary" />, <Sun className="w-5 h-5 text-primary" />][i % 3]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="relative w-full max-w-[260px] mx-auto">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gold/20 to-primary/20 blur-2xl" />
+                <img src={product.image} alt={product.name} className="relative w-full aspect-square object-contain" />
+              </div>
+              <div className="space-y-6">
+                {product.benefits.slice(Math.ceil(product.benefits.length / 2)).map((b: string, i: number) => (
+                  <div key={b} className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full border-2 border-primary/30 bg-accent/30 flex items-center justify-center shrink-0">
+                      {[<Droplet className="w-5 h-5 text-primary" />, <Leaf className="w-5 h-5 text-primary" />, <Shield className="w-5 h-5 text-primary" />][i % 3]}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-foreground">{b}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Easy to Consume */}
+          <section className="mt-12 rounded-3xl overflow-hidden bg-gradient-to-r from-accent/60 to-cream p-8 lg:p-12">
+            <div className="grid lg:grid-cols-2 gap-10 items-center">
+              <div className="relative">
+                <img src={product.image} alt={product.name} className="w-full max-w-sm mx-auto aspect-square object-contain drop-shadow-xl" />
+              </div>
+              <div>
+                <h2 className="font-display text-4xl text-primary mb-6">Easy to Consume!</h2>
+                <ul className="space-y-4">
+                  {[
+                    { icon: <Droplet className="w-5 h-5 text-primary" />, text: "Shake well and take the recommended dose with warm water." },
+                    { icon: <Sun className="w-5 h-5 text-primary" />, text: "Take on an empty stomach in the morning or as directed." },
+                    { icon: <Moon className="w-5 h-5 text-primary" />, text: "Repeat 30 mins after dinner for best results." },
+                    { icon: <Shield className="w-5 h-5 text-primary" />, text: "Store tightly closed in a cool and dry place." },
+                  ].map((s, i) => (
+                    <li key={i} className="flex items-start gap-3 bg-white/70 backdrop-blur rounded-xl p-4">
+                      <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center shrink-0">{s.icon}</div>
+                      <span className="text-sm font-medium text-foreground pt-1.5">{s.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* Key Ingredients */}
+          <section className="mt-12 bg-white rounded-3xl p-8 lg:p-12 shadow-card">
+            <h2 className="font-display text-3xl text-center text-foreground mb-2">Powerful Natural Ingredients</h2>
+            <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">{product.ingredients}</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {product.ingredients.split(/,|\+/).map((ing: string) => ing.trim()).filter(Boolean).slice(0, 8).map((ing: string, i: number) => (
+                <div key={ing + i} className="bg-accent/30 rounded-2xl p-5 text-center hover:bg-accent/50 transition">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-white flex items-center justify-center mb-3">
+                    <FlaskConical className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="font-semibold text-sm text-foreground">{ing}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <div className="mt-16">
+
             <div className="flex gap-2 border-b border-border mb-8 overflow-x-auto">
               {([
                 { id: "description", label: "Description" },
