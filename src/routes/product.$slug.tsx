@@ -6,6 +6,12 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getProductBySlug, sampleReviews, products, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
+import badgeNoSugar from "@/assets/badge-no-sugar.jpg";
+import badgeGmp from "@/assets/badge-gmp.jpg";
+import badgeNoExtracts from "@/assets/badge-no-extracts.jpg";
+import badgeNoFlavours from "@/assets/badge-no-flavours.jpg";
+import badgeBpaFree from "@/assets/badge-bpa-free.jpg";
+
 
 export const Route = createFileRoute("/product/$slug")({
   component: ProductDetailPage,
