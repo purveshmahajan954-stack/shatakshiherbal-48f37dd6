@@ -201,7 +201,7 @@ function ProductDetailPage() {
             <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">A holistic formulation that supports your wellness from the inside out.</p>
             <div className="grid lg:grid-cols-[1fr_auto_1fr] gap-8 items-center">
               <div className="space-y-6">
-                {product.benefits.slice(0, Math.ceil(product.benefits.length / 2)).map((b, i) => (
+                {product.benefits.slice(0, Math.ceil(product.benefits.length / 2)).map((b: string, i: number) => (
                   <div key={b} className="flex items-start gap-4 lg:justify-end lg:text-right">
                     <div className="flex-1 lg:order-1">
                       <div className="font-semibold text-foreground">{b}</div>
@@ -217,7 +217,7 @@ function ProductDetailPage() {
                 <img src={product.image} alt={product.name} className="relative w-full aspect-square object-contain" />
               </div>
               <div className="space-y-6">
-                {product.benefits.slice(Math.ceil(product.benefits.length / 2)).map((b, i) => (
+                {product.benefits.slice(Math.ceil(product.benefits.length / 2)).map((b: string, i: number) => (
                   <div key={b} className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-full border-2 border-primary/30 bg-accent/30 flex items-center justify-center shrink-0">
                       {[<Droplet className="w-5 h-5 text-primary" />, <Leaf className="w-5 h-5 text-primary" />, <Shield className="w-5 h-5 text-primary" />][i % 3]}
@@ -261,7 +261,7 @@ function ProductDetailPage() {
             <h2 className="font-display text-3xl text-center text-foreground mb-2">Powerful Natural Ingredients</h2>
             <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">{product.ingredients}</p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {product.ingredients.split(/,|\+/).map((ing) => ing.trim()).filter(Boolean).slice(0, 8).map((ing, i) => (
+              {product.ingredients.split(/,|\+/).map((ing: string) => ing.trim()).filter(Boolean).slice(0, 8).map((ing: string, i: number) => (
                 <div key={ing + i} className="bg-accent/30 rounded-2xl p-5 text-center hover:bg-accent/50 transition">
                   <div className="w-12 h-12 mx-auto rounded-full bg-white flex items-center justify-center mb-3">
                     <FlaskConical className="w-6 h-6 text-primary" />
