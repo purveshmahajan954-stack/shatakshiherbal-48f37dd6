@@ -58,7 +58,7 @@ function ProductDetailPage() {
 
 
   const handleAdd = () => {
-    add(product.name, product.price, qty);
+    add({ name: product.name, price: product.price, image: product.image, slug: product.slug }, qty);
     toast.success(`${qty} × ${product.name} added to cart`);
   };
 
