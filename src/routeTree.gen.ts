@@ -15,11 +15,17 @@ import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as ProductInfoRouteImport } from './routes/product-info'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
+import { Route as PaymentFailedRouteImport } from './routes/payment-failed'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay.webhook'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -51,9 +57,34 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment-success',
+  path: '/payment-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentFailedRoute = PaymentFailedRouteImport.update({
+  id: '/payment-failed',
+  path: '/payment-failed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -76,12 +107,23 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRazorpayWebhookRoute =
+  ApiPublicRazorpayWebhookRouteImport.update({
+    id: '/api/public/razorpay/webhook',
+    path: '/api/public/razorpay/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/orders': typeof OrdersRoute
+  '/payment-failed': typeof PaymentFailedRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
   '/refund': typeof RefundRoute
@@ -89,12 +131,18 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/orders': typeof OrdersRoute
+  '/payment-failed': typeof PaymentFailedRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
   '/refund': typeof RefundRoute
@@ -102,13 +150,19 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/orders': typeof OrdersRoute
+  '/payment-failed': typeof PaymentFailedRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
   '/refund': typeof RefundRoute
@@ -116,6 +170,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,7 +178,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/cart'
+    | '/checkout'
     | '/contact'
+    | '/orders'
+    | '/payment-failed'
+    | '/payment-success'
     | '/privacy'
     | '/product-info'
     | '/refund'
@@ -131,12 +191,18 @@ export interface FileRouteTypes {
     | '/shop'
     | '/terms'
     | '/product/$slug'
+    | '/api/public/razorpay/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/admin'
+    | '/cart'
+    | '/checkout'
     | '/contact'
+    | '/orders'
+    | '/payment-failed'
+    | '/payment-success'
     | '/privacy'
     | '/product-info'
     | '/refund'
@@ -144,12 +210,18 @@ export interface FileRouteTypes {
     | '/shop'
     | '/terms'
     | '/product/$slug'
+    | '/api/public/razorpay/webhook'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/admin'
+    | '/cart'
+    | '/checkout'
     | '/contact'
+    | '/orders'
+    | '/payment-failed'
+    | '/payment-success'
     | '/privacy'
     | '/product-info'
     | '/refund'
@@ -157,13 +229,19 @@ export interface FileRouteTypes {
     | '/shop'
     | '/terms'
     | '/product/$slug'
+    | '/api/public/razorpay/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  CartRoute: typeof CartRoute
+  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  OrdersRoute: typeof OrdersRoute
+  PaymentFailedRoute: typeof PaymentFailedRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductInfoRoute: typeof ProductInfoRoute
   RefundRoute: typeof RefundRoute
@@ -171,6 +249,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   TermsRoute: typeof TermsRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -217,11 +296,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment-success': {
+      id: '/payment-success'
+      path: '/payment-success'
+      fullPath: '/payment-success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-failed': {
+      id: '/payment-failed'
+      path: '/payment-failed'
+      fullPath: '/payment-failed'
+      preLoaderRoute: typeof PaymentFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -252,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/razorpay/webhook': {
+      id: '/api/public/razorpay/webhook'
+      path: '/api/public/razorpay/webhook'
+      fullPath: '/api/public/razorpay/webhook'
+      preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -259,7 +380,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  CartRoute: CartRoute,
+  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  OrdersRoute: OrdersRoute,
+  PaymentFailedRoute: PaymentFailedRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
   PrivacyRoute: PrivacyRoute,
   ProductInfoRoute: ProductInfoRoute,
   RefundRoute: RefundRoute,
@@ -267,6 +393,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   TermsRoute: TermsRoute,
   ProductSlugRoute: ProductSlugRoute,
+  ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

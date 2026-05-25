@@ -13,18 +13,17 @@ export function FeaturedProducts() {
   const filtered = cat ? products.filter((p) => p.categories.includes(cat)) : products;
 
 
-  const handleAdd = (e: React.MouseEvent, name: string, price: number) => {
+  const handleAdd = (e: React.MouseEvent, p: { name: string; price: number; image: string; slug: string }) => {
     e.preventDefault();
     e.stopPropagation();
-    add(name, price);
-    toast.success(`${name} added to cart`);
+    add({ name: p.name, price: p.price, image: p.image, slug: p.slug });
+    toast.success(`${p.name} added to cart`);
   };
-  const handleBuyNow = (e: React.MouseEvent, name: string, price: number, slug: string) => {
+  const handleBuyNow = (e: React.MouseEvent, p: { name: string; price: number; image: string; slug: string }) => {
     e.preventDefault();
     e.stopPropagation();
-    add(name, price);
-    toast.success(`Proceeding with ${name}`);
-    navigate({ to: "/product/$slug", params: { slug } });
+    add({ name: p.name, price: p.price, image: p.image, slug: p.slug });
+    navigate({ to: "/checkout" });
   };
   return (
     <section id="products" className="py-24 bg-cream scroll-mt-24">
@@ -70,7 +69,7 @@ export function FeaturedProducts() {
                     <span className="absolute top-12 left-4 z-10 bg-gold text-white text-[10px] font-bold tracking-wider px-3 py-1.5 rounded">-{p.discount}%</span>
                   )}
                   <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <button onClick={(e) => handleAdd(e, p.name, p.price)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
+                  <button onClick={(e) => handleAdd(e, p)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
                 </div>
                 <div className="p-5">
                   <div className="text-[10px] font-bold tracking-wider text-primary-light uppercase mb-2">{p.category}</div>
@@ -94,11 +93,11 @@ export function FeaturedProducts() {
                           <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
                         )}
                       </div>
-                      <button onClick={(e) => handleAdd(e, p.name, p.price)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
+                      <button onClick={(e) => handleAdd(e, p)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
                         <Plus className="w-5 h-5" />
                       </button>
                     </div>
-                    <button onClick={(e) => handleBuyNow(e, p.name, p.price, p.slug)} className="w-full inline-flex items-center justify-center gap-2 bg-gold text-white py-2.5 rounded-md font-semibold text-sm hover:bg-gold/90 transition-colors">
+                    <button onClick={(e) => handleBuyNow(e, p)} className="w-full inline-flex items-center justify-center gap-2 bg-gold text-white py-2.5 rounded-md font-semibold text-sm hover:bg-gold/90 transition-colors">
                       <Zap className="w-4 h-4" /> Buy Now
                     </button>
                   </div>
