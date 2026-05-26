@@ -6,7 +6,32 @@ import { Footer } from "@/components/Footer";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { getMyOrders } from "@/lib/payments.functions";
-import { Loader2, Package, ShoppingBag } from "lucide-react";
+import { Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle, Copy } from "lucide-react";
+import { toast } from "sonner";
+
+type TimelineStep = { key: string; label: string; state: "done" | "current" | "todo" | "failed" };
+
+function buildTimeline(paymentStatus: string): TimelineStep[] {
+  const failed = paymentStatus === "failed" || paymentStatus === "signature_failed";
+  const paid = paymentStatus === "paid";
+  return [
+    { key: "created", label: "Order Created", state: "done" },
+    {
+      key: "paid",
+      label: "Payment Received",
+      state: paid ? "done" : failed ? "todo" : "current",
+    },
+    {
+      key: failed ? "failed" : "fulfilled",
+      label: failed ? "Payment Failed" : "Confirmed & Fulfilled",
+      state: failed ? "failed" : paid ? "done" : "todo",
+    },
+  ];
+}
+
+function copy(text: string, label: string) {
+  navigator.clipboard?.writeText(text).then(() => toast.success(`${label} copied`));
+}
 
 export const Route = createFileRoute("/orders")({
   head: () => ({
