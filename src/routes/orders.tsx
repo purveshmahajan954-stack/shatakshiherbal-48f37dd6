@@ -6,7 +6,32 @@ import { Footer } from "@/components/Footer";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { getMyOrders } from "@/lib/payments.functions";
-import { Loader2, Package, ShoppingBag } from "lucide-react";
+import { Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle, Copy } from "lucide-react";
+import { toast } from "sonner";
+
+type TimelineStep = { key: string; label: string; state: "done" | "current" | "todo" | "failed" };
+
+function buildTimeline(paymentStatus: string): TimelineStep[] {
+  const failed = paymentStatus === "failed" || paymentStatus === "signature_failed";
+  const paid = paymentStatus === "paid";
+  return [
+    { key: "created", label: "Order Created", state: "done" },
+    {
+      key: "paid",
+      label: "Payment Received",
+      state: paid ? "done" : failed ? "todo" : "current",
+    },
+    {
+      key: failed ? "failed" : "fulfilled",
+      label: failed ? "Payment Failed" : "Confirmed & Fulfilled",
+      state: failed ? "failed" : paid ? "done" : "todo",
+    },
+  ];
+}
+
+function copy(text: string, label: string) {
+  navigator.clipboard?.writeText(text).then(() => toast.success(`${label} copied`));
+}
 
 export const Route = createFileRoute("/orders")({
   head: () => ({
@@ -93,6 +118,79 @@ function OrdersPage() {
                       </li>
                     ))}
                   </ul>
+
+                  {/* Status timeline */}
+                  <div className="mt-6 pt-5 border-t border-border">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">Order Status</div>
+                    <ol className="flex items-start gap-2 sm:gap-3">
+                      {buildTimeline(o.payment_status).map((step, idx, arr) => {
+                        const isLast = idx === arr.length - 1;
+                        const dot =
+                          step.state === "failed"
+                            ? "bg-destructive text-destructive-foreground"
+                            : step.state === "done"
+                            ? "bg-primary text-primary-foreground"
+                            : step.state === "current"
+                            ? "bg-gold text-white animate-pulse"
+                            : "bg-muted text-muted-foreground";
+                        const line =
+                          step.state === "done" ? "bg-primary" : step.state === "failed" ? "bg-destructive" : "bg-border";
+                        return (
+                          <li key={step.key} className="flex-1 flex flex-col items-center text-center">
+                            <div className="flex items-center w-full">
+                              <div className="flex-1 h-0.5 bg-transparent" />
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${dot}`}>
+                                {step.state === "failed" ? (
+                                  <XCircle className="w-4 h-4" />
+                                ) : step.state === "done" ? (
+                                  <Check className="w-4 h-4" />
+                                ) : (
+                                  <CircleDashed className="w-4 h-4" />
+                                )}
+                              </div>
+                              <div className={`flex-1 h-0.5 ${isLast ? "bg-transparent" : line}`} />
+                            </div>
+                            <div className={`mt-2 text-[11px] sm:text-xs font-medium ${step.state === "todo" ? "text-muted-foreground" : ""}`}>
+                              {step.label}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
+
+                  {/* Razorpay IDs */}
+                  {(o.razorpay_order_id || o.razorpay_payment_id) && (
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-cream/50 rounded-lg p-3 border border-border">
+                      {o.razorpay_order_id && (
+                        <button
+                          type="button"
+                          onClick={() => copy(o.razorpay_order_id, "Razorpay Order ID")}
+                          className="flex items-center justify-between gap-2 text-left hover:bg-white rounded px-2 py-1.5 transition"
+                        >
+                          <span>
+                            <span className="text-muted-foreground">Razorpay Order: </span>
+                            <span className="font-mono">{o.razorpay_order_id}</span>
+                          </span>
+                          <Copy className="w-3 h-3 text-muted-foreground shrink-0" />
+                        </button>
+                      )}
+                      {o.razorpay_payment_id && (
+                        <button
+                          type="button"
+                          onClick={() => copy(o.razorpay_payment_id, "Payment ID")}
+                          className="flex items-center justify-between gap-2 text-left hover:bg-white rounded px-2 py-1.5 transition"
+                        >
+                          <span>
+                            <span className="text-muted-foreground">Payment ID: </span>
+                            <span className="font-mono">{o.razorpay_payment_id}</span>
+                          </span>
+                          <Copy className="w-3 h-3 text-muted-foreground shrink-0" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   {o.payment_status !== "paid" && o.payment_status !== "confirmed" && (
                     <div className="mt-4 text-right">
                       <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline">Retry payment →</Link>
