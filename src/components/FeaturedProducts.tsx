@@ -2,10 +2,12 @@ import { ArrowRight, Plus, Star, Zap, X } from "lucide-react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 import { products, CATEGORY_LABELS } from "@/lib/products";
 
 export function FeaturedProducts() {
   const { add } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { cat?: string };
   const cat = search.cat ?? "";
@@ -23,6 +25,7 @@ export function FeaturedProducts() {
     e.preventDefault();
     e.stopPropagation();
     add({ name: p.name, price: p.price, image: p.image, slug: p.slug });
+    if (!user) toast.info("Sign in to complete your purchase");
     navigate({ to: "/checkout" });
   };
   return (

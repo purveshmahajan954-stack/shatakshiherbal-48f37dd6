@@ -59,7 +59,7 @@ function CheckoutPage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
   );
-  if (!user) return <LoginScreen />;
+  if (!user) return <LoginScreen title="Sign in to checkout" subtitle="Your cart is saved — sign in to complete your order securely" />;
 
   const totals = computeTotals(total, appliedCoupon);
 

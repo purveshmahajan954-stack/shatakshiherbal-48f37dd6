@@ -4,7 +4,7 @@ import { Leaf, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
-export function LoginScreen() {
+export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,9 +59,9 @@ export function LoginScreen() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
             <Leaf className="w-7 h-7 text-primary" />
           </div>
-          <h1 className="font-display text-3xl text-foreground">Shatakshi Herbal</h1>
+          <h1 className="font-display text-3xl text-foreground">{title ?? "Shatakshi Herbal"}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {mode === "signin" ? "Sign in to continue" : "Create your account"}
+            {subtitle ?? (mode === "signin" ? "Sign in to continue" : "Create your account")}
           </p>
         </div>
 
