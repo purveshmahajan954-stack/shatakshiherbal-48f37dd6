@@ -61,16 +61,12 @@ const createOrderInput = z.object({
     email: z.string().trim().email().max(255),
     address: z.string().trim().min(5).max(1000),
   }),
-  couponCode: z.string().trim().max(40).optional().nullable(),
 });
 
 // ---------- Server-side price recomputation (NEVER trust client totals) ----------
 // Resolves each cart item against the canonical product catalog by slug.
 // Returns trusted items (with server-authoritative price/name/image) plus totals.
-function recomputeFromItems(
-  items: z.infer<typeof cartItemSchema>[],
-  couponCode?: string | null,
-) {
+function recomputeFromItems(items: z.infer<typeof cartItemSchema>[]) {
   const trustedItems = items.map((i) => {
     const product = getProductBySlug(i.slug);
     if (!product) throw new Error(`Unknown product: ${i.slug}`);
@@ -83,7 +79,7 @@ function recomputeFromItems(
     };
   });
   const subtotal = trustedItems.reduce((s, i) => s + i.price * i.qty, 0);
-  return { trustedItems, ...computeTotals(subtotal, couponCode) };
+  return { trustedItems, ...computeTotals(subtotal) };
 }
 
 // ---------- Create Razorpay order + persist draft order row ----------
@@ -92,7 +88,8 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
   .inputValidator((input) => createOrderInput.parse(input))
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    const { trustedItems, ...totals } = recomputeFromItems(data.items, data.couponCode);
+    const { trustedItems, ...totals } = recomputeFromItems(data.items);
+
 
     if (totals.total < 1) throw new Error("Order total must be at least ₹1");
 
