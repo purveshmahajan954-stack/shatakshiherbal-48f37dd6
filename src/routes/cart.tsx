@@ -69,11 +69,11 @@ function CartPage() {
             <aside className="bg-white rounded-2xl shadow-card p-6 h-fit sticky top-24">
               <h2 className="font-display text-xl mb-4">Order Summary</h2>
               <dl className="space-y-2 text-sm">
-                <div className="flex justify-between"><dt>Subtotal</dt><dd>₹{total}</dd></div>
-                <div className="flex justify-between"><dt>Delivery</dt><dd>{delivery === 0 ? <span className="text-primary font-semibold">FREE</span> : `₹${delivery}`}</dd></div>
+                <div className="flex justify-between"><dt>Product Subtotal</dt><dd>₹{total}</dd></div>
                 <div className="flex justify-between"><dt>GST (5%)</dt><dd>₹{gst}</dd></div>
+                <div className="flex justify-between"><dt>Courier Charges</dt><dd>₹{delivery}</dd></div>
                 <div className="border-t border-border pt-3 flex justify-between text-base font-semibold">
-                  <dt>Estimated Total</dt><dd>₹{grand}</dd>
+                  <dt>Grand Total</dt><dd>₹{grand}</dd>
                 </div>
               </dl>
               <Link to="/checkout" className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90">
