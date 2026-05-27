@@ -51,6 +51,7 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductDetailPage() {
   const { product } = Route.useLoaderData() as { product: Product };
   const { add } = useCart();
+  const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "reviews" | "info">("description");
   const gallery = [product.image, badgeNoSugar, badgeGmp, badgeNoExtracts, badgeNoFlavours, badgeBpaFree];
@@ -60,6 +61,11 @@ function ProductDetailPage() {
   const handleAdd = () => {
     add({ name: product.name, price: product.price, image: product.image, slug: product.slug }, qty);
     toast.success(`${qty} × ${product.name} added to cart`);
+  };
+
+  const handleBuyNow = () => {
+    add({ name: product.name, price: product.price, image: product.image, slug: product.slug }, qty);
+    navigate({ to: "/checkout" });
   };
 
   const related = products.filter((p) => p.slug !== product.slug).slice(0, 4);
