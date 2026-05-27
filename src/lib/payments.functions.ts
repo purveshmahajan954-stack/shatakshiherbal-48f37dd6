@@ -137,7 +137,7 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
       .from("orders")
       .insert({
         user_id: userId,
-        items: data.items,
+        items: trustedItems,
         email: data.shipping.email,
         shipping_name: data.shipping.name,
         shipping_phone: data.shipping.phone,
