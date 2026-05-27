@@ -14,7 +14,7 @@ import {
   getRazorpayKeyId,
   computeTotals,
 } from "@/lib/payments.functions";
-import { Loader2, ShieldCheck, Tag, MapPin, Wallet } from "lucide-react";
+import { Loader2, ShieldCheck, MapPin, Wallet } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
