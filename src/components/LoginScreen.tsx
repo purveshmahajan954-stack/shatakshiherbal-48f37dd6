@@ -1,10 +1,27 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Loader2 } from "lucide-react";
+import { Leaf, Loader2, AlertTriangle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
 type Method = "email" | "phone";
+
+// Detect Supabase errors that indicate the phone/SMS provider isn't configured.
+function isPhoneProviderDisabledError(err: any): boolean {
+  const msg = (err?.message || "").toLowerCase();
+  const code = (err?.code || err?.error_code || "").toLowerCase();
+  return (
+    code === "sms_provider_not_configured" ||
+    code === "validation_failed" && msg.includes("phone") ||
+    msg.includes("phone provider") ||
+    msg.includes("sms provider") ||
+    msg.includes("phone logins are disabled") ||
+    msg.includes("phone signups are disabled") ||
+    msg.includes("unsupported phone provider") ||
+    (msg.includes("phone") && msg.includes("not enabled")) ||
+    (msg.includes("provider") && msg.includes("not enabled"))
+  );
+}
 
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
   const [method, setMethod] = useState<Method>("email");
