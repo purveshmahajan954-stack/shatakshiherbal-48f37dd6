@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck, Sparkles, Droplet, Sun, Moon, Heart, FlaskConical } from "lucide-react";
 import { toast } from "sonner";
