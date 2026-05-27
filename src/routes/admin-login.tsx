@@ -1,41 +1,65 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Shield, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ensureAdminUser } from "@/lib/admin-bootstrap.functions";
 
 export const Route = createFileRoute("/admin-login")({
   component: AdminLoginPage,
   head: () => ({
     meta: [
-      { title: "Admin Login — Shatakshi Herbal" },
+      { title: "Admin Sign In — Shatakshi Herbal" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
 });
 
-const ADMIN_USERNAME = "shatakshiherbal";
-const ADMIN_PASSWORD = "shatakshiherbal12345";
+const ADMIN_EMAIL = "admin@shatakshiherbal.com";
 
 function AdminLoginPage() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const ensure = useServerFn(ensureAdminUser);
+  const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // If already authed, jump straight to /admin
+  // Ensure the admin account exists on first visit. Best-effort, silent.
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("admin_auth") === "true") {
-      navigate({ to: "/admin", replace: true });
-    }
+    ensure().catch(() => {
+      /* silent — login will still surface bad creds */
+    });
+  }, [ensure]);
+
+  // If already signed in as admin, jump to /admin
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email?.toLowerCase() === ADMIN_EMAIL) {
+        navigate({ to: "/admin", replace: true });
+      }
+    });
   }, [navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setBusy(true);
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      localStorage.setItem("admin_auth", "true");
+    try {
+      // Make sure account exists with right password (idempotent).
+      await ensure().catch(() => null);
+      const { data, error: signErr } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      if (signErr) throw signErr;
+      if (data.user?.email?.toLowerCase() !== ADMIN_EMAIL) {
+        await supabase.auth.signOut();
+        throw new Error("This account is not authorized.");
+      }
       navigate({ to: "/admin", replace: true });
-    } else {
-      alert("Invalid username or password");
+    } catch (err: any) {
+      setError(err?.message || "Invalid email or password");
       setBusy(false);
     }
   };
@@ -47,10 +71,8 @@ function AdminLoginPage() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
             <Shield className="w-7 h-7 text-primary" />
           </div>
-          <h1 className="font-display text-3xl text-foreground">Admin Login</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Restricted area — authorized personnel only
-          </p>
+          <h1 className="font-display text-3xl text-foreground">Admin Sign In</h1>
+          <p className="text-sm text-muted-foreground mt-1">Restricted Area</p>
         </div>
 
         <form
@@ -58,17 +80,16 @@ function AdminLoginPage() {
           className="bg-white rounded-2xl shadow-card p-7 border border-border/50 space-y-4"
         >
           <div>
-            <label htmlFor="username" className="block text-sm font-medium mb-1.5">
-              Username
+            <label htmlFor="email" className="block text-sm font-medium mb-1.5">
+              Email
             </label>
             <input
-              id="username"
-              name="username"
-              type="text"
+              id="email"
+              type="email"
               autoComplete="username"
               required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
@@ -79,7 +100,6 @@ function AdminLoginPage() {
             </label>
             <input
               id="password"
-              name="password"
               type="password"
               autoComplete="current-password"
               required
@@ -89,13 +109,19 @@ function AdminLoginPage() {
             />
           </div>
 
+          {error && (
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+              {error}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={busy}
             className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {busy && <Loader2 className="w-4 h-4 animate-spin" />}
-            Login
+            Sign In
           </button>
         </form>
       </div>
