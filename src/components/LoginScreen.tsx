@@ -1,10 +1,27 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Loader2 } from "lucide-react";
+import { Leaf, Loader2, AlertTriangle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
 type Method = "email" | "phone";
+
+// Detect Supabase errors that indicate the phone/SMS provider isn't configured.
+function isPhoneProviderDisabledError(err: any): boolean {
+  const msg = (err?.message || "").toLowerCase();
+  const code = (err?.code || err?.error_code || "").toLowerCase();
+  return (
+    code === "sms_provider_not_configured" ||
+    code === "validation_failed" && msg.includes("phone") ||
+    msg.includes("phone provider") ||
+    msg.includes("sms provider") ||
+    msg.includes("phone logins are disabled") ||
+    msg.includes("phone signups are disabled") ||
+    msg.includes("unsupported phone provider") ||
+    (msg.includes("phone") && msg.includes("not enabled")) ||
+    (msg.includes("provider") && msg.includes("not enabled"))
+  );
+}
 
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
   const [method, setMethod] = useState<Method>("email");
@@ -13,6 +30,7 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [phoneDisabled, setPhoneDisabled] = useState(false);
 
   // Phone OTP state
   const [phone, setPhone] = useState("");
@@ -66,7 +84,11 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
       setOtpSent(true);
       toast.success(`OTP sent to ${formatted}`);
     } catch (err: any) {
-      toast.error(err.message || "Could not send OTP");
+      if (isPhoneProviderDisabledError(err)) {
+        setPhoneDisabled(true);
+      } else {
+        toast.error(err.message || "Could not send OTP");
+      }
     } finally {
       setBusy(false);
     }
@@ -205,6 +227,35 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
                 </button>
               </p>
             </>
+          ) : phoneDisabled ? (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 space-y-3">
+              <div className="flex gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-amber-900">
+                  <p className="font-semibold mb-1">Mobile OTP isn't set up yet</p>
+                  <p className="text-amber-800 leading-relaxed">
+                    SMS login needs an SMS provider (e.g. Twilio, MSG91) to be
+                    configured in the backend auth settings before it can send codes.
+                    Until then, please sign in with email or Google.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setMethod("email"); setPhoneDisabled(false); }}
+                className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition"
+              >
+                <Mail className="w-4 h-4" />
+                Use Email + Password instead
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhoneDisabled(false)}
+                className="w-full text-xs text-amber-900/70 hover:text-amber-900"
+              >
+                ← Try a different number
+              </button>
+            </div>
           ) : (
             <>
               {!otpSent ? (
