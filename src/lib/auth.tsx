@@ -19,41 +19,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, sess) => {
-      setSession(sess);
-      setUser(sess?.user ?? null);
-      if (sess?.user) {
-        // defer role fetch to avoid deadlock
-        setTimeout(async () => {
-          const { data } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", sess.user.id)
-            .eq("role", "admin")
-            .maybeSingle();
-          setIsAdmin(!!data);
-        }, 0);
-      } else {
-        setIsAdmin(false);
-      }
-    });
+    let mounted = true;
 
-    supabase.auth.getSession().then(({ data: { session: sess } }) => {
+    const applySession = (sess: Session | null) => {
+      if (!mounted) return;
       setSession(sess);
       setUser(sess?.user ?? null);
       setLoading(false);
       if (sess?.user) {
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", sess.user.id)
-          .eq("role", "admin")
-          .maybeSingle()
-          .then(({ data }) => setIsAdmin(!!data));
+        // defer role fetch to avoid deadlock with auth listener
+        setTimeout(async () => {
+          try {
+            const { data } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", sess.user.id)
+              .eq("role", "admin")
+              .maybeSingle();
+            if (mounted) setIsAdmin(!!data);
+          } catch {
+            if (mounted) setIsAdmin(false);
+          }
+        }, 0);
+      } else {
+        setIsAdmin(false);
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    // Listener first so we never miss an event during init.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_e, sess) => applySession(sess)
+    );
+
+    // Initial session restore. Catch errors and force-resolve loading state
+    // so mobile browsers with flaky storage/network can't get stuck on a
+    // "Loading…" screen forever.
+    supabase.auth
+      .getSession()
+      .then(({ data: { session: sess } }) => applySession(sess))
+      .catch(() => {
+        if (mounted) setLoading(false);
+      });
+
+    // Hard safety net: never leave the app in a perpetual loading state.
+    const failsafe = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 4000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(failsafe);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
