@@ -45,8 +45,6 @@ function CheckoutPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [coupon, setCoupon] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -61,17 +59,8 @@ function CheckoutPage() {
   );
   if (!user) return <LoginScreen title="Sign in to checkout" subtitle="Your cart is saved — sign in to complete your order securely" />;
 
-  const totals = computeTotals(total, appliedCoupon);
+  const totals = computeTotals(total);
 
-  const applyCouponCode = () => {
-    const next = computeTotals(total, coupon);
-    if (next.couponCode) {
-      setAppliedCoupon(next.couponCode);
-      toast.success(`Coupon ${next.couponCode} applied — saved ₹${next.discount}`);
-    } else {
-      toast.error("Invalid coupon or minimum order not met");
-    }
-  };
 
   const handlePay = async () => {
     if (items.length === 0) return toast.error("Your cart is empty");
