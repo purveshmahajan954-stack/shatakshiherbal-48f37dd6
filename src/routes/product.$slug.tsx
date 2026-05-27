@@ -89,11 +89,7 @@ function ProductDetailPage() {
                     {product.badge}
                   </span>
                 )}
-                {product.discount > 0 && activeImg === 0 && (
-                  <span className="absolute top-5 right-5 z-10 bg-gold text-white text-xs font-bold tracking-wider px-3 py-1.5 rounded">
-                    -{product.discount}%
-                  </span>
-                )}
+                {/* Discount badge removed */}
                 <img key={activeImg} src={gallery[activeImg]} alt={product.name} className="w-full aspect-square object-cover animate-in fade-in duration-300" />
               </div>
               <div className="grid grid-cols-6 gap-2">
