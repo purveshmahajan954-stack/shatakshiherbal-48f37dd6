@@ -87,11 +87,7 @@ export function FeaturedProducts() {
                       <div>
                         <div className="flex items-baseline gap-2">
                           <span className="text-2xl text-foreground">₹{p.price}</span>
-                          <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
                         </div>
-                        {p.save > 0 && (
-                          <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
-                        )}
                       </div>
                       <button onClick={(e) => handleAdd(e, p)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
                         <Plus className="w-5 h-5" />
