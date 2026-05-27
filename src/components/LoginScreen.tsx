@@ -120,12 +120,24 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
 
   const handleGoogle = async () => {
     setBusy(true);
+    const timeout = window.setTimeout(() => {
+      setBusy(false);
+      toast.error("Google sign-in is taking too long. Please try again in a new tab.");
+    }, 45000);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
+      const result = await Promise.race([
+        lovable.auth.signInWithOAuth("google", {
+          redirect_uri: window.location.origin,
+        }),
+        new Promise<never>((_, reject) => {
+          window.setTimeout(() => reject(new Error("Google sign-in timed out")), 45000);
+        }),
+      ]);
+      window.clearTimeout(timeout);
       if (result.error) throw result.error;
+      if (!result.redirected) setBusy(false);
     } catch (err: any) {
+      window.clearTimeout(timeout);
       toast.error(err.message || "Google sign-in failed");
       setBusy(false);
     }
