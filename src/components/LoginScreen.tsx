@@ -9,18 +9,22 @@ type Method = "email" | "phone";
 // Detect Supabase errors that indicate the phone/SMS provider isn't configured.
 function isPhoneProviderDisabledError(err: any): boolean {
   const msg = (err?.message || "").toLowerCase();
-  const code = (err?.code || err?.error_code || "").toLowerCase();
-  return (
-    code === "sms_provider_not_configured" ||
-    code === "validation_failed" && msg.includes("phone") ||
-    msg.includes("phone provider") ||
-    msg.includes("sms provider") ||
-    msg.includes("phone logins are disabled") ||
-    msg.includes("phone signups are disabled") ||
-    msg.includes("unsupported phone provider") ||
-    (msg.includes("phone") && msg.includes("not enabled")) ||
-    (msg.includes("provider") && msg.includes("not enabled"))
-  );
+  const code = (err?.code || err?.error_code || err?.name || "").toLowerCase();
+  const status = err?.status ?? err?.statusCode;
+
+  if (code === "sms_provider_not_configured") return true;
+  if (msg.includes("unsupported phone provider")) return true;
+  if (msg.includes("phone provider")) return true;
+  if (msg.includes("sms provider")) return true;
+  if (msg.includes("phone logins are disabled")) return true;
+  if (msg.includes("phone signups are disabled")) return true;
+  if (msg.includes("phone") && msg.includes("not enabled")) return true;
+  if (msg.includes("provider") && msg.includes("not enabled")) return true;
+  if (msg.includes("provider") && msg.includes("disabled")) return true;
+  // 422 from signInWithOtp with no other recognized cause is almost always
+  // a provider/config issue, not a user-fixable input problem.
+  if ((status === 422 || status === 500) && msg.includes("provider")) return true;
+  return false;
 }
 
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
