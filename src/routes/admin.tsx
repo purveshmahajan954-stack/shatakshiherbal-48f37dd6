@@ -195,12 +195,23 @@ function AdminDashboard() {
             <Shield className="w-6 h-6 text-primary" />
             <h1 className="font-display text-3xl text-foreground">Admin Dashboard</h1>
           </div>
-          <button
-            onClick={load}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-white border border-border rounded-lg hover:bg-muted/50"
-          >
-            <RotateCcw className="w-4 h-4" /> Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={load}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-white border border-border rounded-lg hover:bg-muted/50"
+            >
+              <RotateCcw className="w-4 h-4" /> Refresh
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem("admin_auth");
+                window.location.href = "/admin-login";
+              }}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-white border border-border rounded-lg hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+            >
+              <LogOut className="w-4 h-4" /> Logout
+            </button>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground mb-6">
           Manage orders, revenue, and customer details.
