@@ -14,7 +14,7 @@ import {
   getRazorpayKeyId,
   computeTotals,
 } from "@/lib/payments.functions";
-import { Loader2, ShieldCheck, Tag, MapPin, Wallet } from "lucide-react";
+import { Loader2, ShieldCheck, MapPin, Wallet } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -45,8 +45,6 @@ function CheckoutPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [coupon, setCoupon] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -61,17 +59,8 @@ function CheckoutPage() {
   );
   if (!user) return <LoginScreen title="Sign in to checkout" subtitle="Your cart is saved — sign in to complete your order securely" />;
 
-  const totals = computeTotals(total, appliedCoupon);
+  const totals = computeTotals(total);
 
-  const applyCouponCode = () => {
-    const next = computeTotals(total, coupon);
-    if (next.couponCode) {
-      setAppliedCoupon(next.couponCode);
-      toast.success(`Coupon ${next.couponCode} applied — saved ₹${next.discount}`);
-    } else {
-      toast.error("Invalid coupon or minimum order not met");
-    }
-  };
 
   const handlePay = async () => {
     if (items.length === 0) return toast.error("Your cart is empty");
@@ -88,7 +77,6 @@ function CheckoutPage() {
           data: {
             items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty, image: i.image, slug: i.slug })),
             shipping: { name, email, phone, address },
-            couponCode: appliedCoupon,
           },
         }),
       ]);
@@ -185,34 +173,20 @@ function CheckoutPage() {
               </ul>
             </section>
 
-            {/* Coupon */}
-            <section className="bg-white rounded-2xl shadow-card p-6">
-              <h2 className="flex items-center gap-2 font-display text-xl mb-4"><Tag className="w-5 h-5 text-primary" /> Coupon Code</h2>
-              <div className="flex gap-2">
-                <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="e.g. HERBAL10" className="flex-1 border border-border rounded-md px-4 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-primary" />
-                <button onClick={applyCouponCode} className="px-5 py-2.5 rounded-md bg-foreground text-background font-semibold text-sm hover:opacity-90">Apply</button>
-              </div>
-              {appliedCoupon && (
-                <p className="text-xs text-primary mt-2">✓ {appliedCoupon} applied</p>
-              )}
-              <p className="text-xs text-muted-foreground mt-3">Try <code>HERBAL10</code> (10% off ₹499+), <code>WELCOME50</code> (₹50 off ₹299+), or <code>FREESHIP</code>.</p>
-            </section>
           </div>
 
           {/* Summary */}
           <aside className="bg-white rounded-2xl shadow-card p-6 h-fit lg:sticky lg:top-24">
-            <h2 className="font-display text-xl mb-4">Order Total</h2>
+            <h2 className="font-display text-xl mb-4">Order Summary</h2>
             <dl className="space-y-2 text-sm">
-              <div className="flex justify-between"><dt>Subtotal</dt><dd>₹{totals.subtotal}</dd></div>
-              {totals.discount > 0 && (
-                <div className="flex justify-between text-primary"><dt>Coupon ({totals.couponCode})</dt><dd>−₹{totals.discount}</dd></div>
-              )}
-              <div className="flex justify-between"><dt>Delivery</dt><dd>{totals.delivery === 0 ? <span className="text-primary font-semibold">FREE</span> : `₹${totals.delivery}`}</dd></div>
+              <div className="flex justify-between"><dt>Product Subtotal</dt><dd>₹{totals.subtotal}</dd></div>
               <div className="flex justify-between"><dt>GST (5%)</dt><dd>₹{totals.gst}</dd></div>
+              <div className="flex justify-between"><dt>Courier Charges</dt><dd>₹{totals.delivery}</dd></div>
               <div className="border-t border-border pt-3 flex justify-between text-lg font-semibold">
-                <dt>Total</dt><dd>₹{totals.total}</dd>
+                <dt>Grand Total</dt><dd>₹{totals.total}</dd>
               </div>
             </dl>
+
 
             <button onClick={handlePay} disabled={busy} className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60">
               {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</> : <><Wallet className="w-4 h-4" /> Pay ₹{totals.total}</>}

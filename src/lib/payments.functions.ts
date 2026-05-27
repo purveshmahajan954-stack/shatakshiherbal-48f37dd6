@@ -26,31 +26,20 @@ export const getRazorpayKeyId = createServerFn({ method: "GET" }).handler(async 
   return { keyId: id };
 });
 
-// ---------- Coupons ----------
-const COUPONS: Record<string, { type: "percent" | "flat"; value: number; min?: number }> = {
-  HERBAL10: { type: "percent", value: 10, min: 499 },
-  WELCOME50: { type: "flat", value: 50, min: 299 },
-  FREESHIP: { type: "flat", value: 60, min: 0 }, // effectively waives delivery
-};
+// ---------- Pricing constants ----------
+export const GST_RATE = 0.05; // Fixed 5% GST on all products
+export const COURIER_CHARGE = 150; // Flat ₹150 courier on every order
 
-export function applyCoupon(subtotal: number, code?: string | null) {
-  if (!code) return { discount: 0, code: null as string | null };
-  const c = COUPONS[code.toUpperCase()];
-  if (!c) return { discount: 0, code: null };
-  if (c.min && subtotal < c.min) return { discount: 0, code: null };
-  const discount = c.type === "percent" ? Math.round((subtotal * c.value) / 100) : c.value;
-  return { discount: Math.min(discount, subtotal), code: code.toUpperCase() };
+// Pricing helpers shared with the UI.
+// No discounts, no coupons — simple flat structure.
+export function computeTotals(subtotal: number) {
+  const sub = Math.max(0, Math.round(subtotal));
+  const gst = Math.round(sub * GST_RATE);
+  const delivery = sub === 0 ? 0 : COURIER_CHARGE;
+  const total = sub + gst + delivery;
+  return { subtotal: sub, gst, delivery, total };
 }
 
-// Pricing helpers shared with the UI
-export function computeTotals(subtotal: number, couponCode?: string | null) {
-  const { discount, code } = applyCoupon(subtotal, couponCode);
-  const afterDiscount = Math.max(0, subtotal - discount);
-  const delivery = afterDiscount >= 999 ? 0 : afterDiscount === 0 ? 0 : 60;
-  const gst = Math.round(afterDiscount * 0.05); // 5% GST on Ayurvedic products
-  const total = afterDiscount + delivery + gst;
-  return { subtotal, discount, couponCode: code, delivery, gst, total };
-}
 
 // ---------- Schemas ----------
 // Note: client-supplied `price`, `name`, `image` are IGNORED on the server.
@@ -72,16 +61,12 @@ const createOrderInput = z.object({
     email: z.string().trim().email().max(255),
     address: z.string().trim().min(5).max(1000),
   }),
-  couponCode: z.string().trim().max(40).optional().nullable(),
 });
 
 // ---------- Server-side price recomputation (NEVER trust client totals) ----------
 // Resolves each cart item against the canonical product catalog by slug.
 // Returns trusted items (with server-authoritative price/name/image) plus totals.
-function recomputeFromItems(
-  items: z.infer<typeof cartItemSchema>[],
-  couponCode?: string | null,
-) {
+function recomputeFromItems(items: z.infer<typeof cartItemSchema>[]) {
   const trustedItems = items.map((i) => {
     const product = getProductBySlug(i.slug);
     if (!product) throw new Error(`Unknown product: ${i.slug}`);
@@ -94,7 +79,7 @@ function recomputeFromItems(
     };
   });
   const subtotal = trustedItems.reduce((s, i) => s + i.price * i.qty, 0);
-  return { trustedItems, ...computeTotals(subtotal, couponCode) };
+  return { trustedItems, ...computeTotals(subtotal) };
 }
 
 // ---------- Create Razorpay order + persist draft order row ----------
@@ -103,7 +88,8 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
   .inputValidator((input) => createOrderInput.parse(input))
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    const { trustedItems, ...totals } = recomputeFromItems(data.items, data.couponCode);
+    const { trustedItems, ...totals } = recomputeFromItems(data.items);
+
 
     if (totals.total < 1) throw new Error("Order total must be at least ₹1");
 
@@ -143,8 +129,8 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
         shipping_phone: data.shipping.phone,
         shipping_address: data.shipping.address,
         subtotal: totals.subtotal,
-        discount: totals.discount,
-        coupon_code: totals.couponCode,
+        discount: 0,
+        coupon_code: null,
         delivery_charge: totals.delivery,
         gst: totals.gst,
         total: totals.total,

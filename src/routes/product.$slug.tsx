@@ -89,11 +89,7 @@ function ProductDetailPage() {
                     {product.badge}
                   </span>
                 )}
-                {product.discount > 0 && activeImg === 0 && (
-                  <span className="absolute top-5 right-5 z-10 bg-gold text-white text-xs font-bold tracking-wider px-3 py-1.5 rounded">
-                    -{product.discount}%
-                  </span>
-                )}
+                {/* Discount badge removed */}
                 <img key={activeImg} src={gallery[activeImg]} alt={product.name} className="w-full aspect-square object-cover animate-in fade-in duration-300" />
               </div>
               <div className="grid grid-cols-6 gap-2">
@@ -130,12 +126,9 @@ function ProductDetailPage() {
               <div className="bg-white rounded-2xl p-6 shadow-card mb-6">
                 <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-4xl text-foreground">₹{product.price}</span>
-                  <span className="text-lg text-muted-foreground line-through">₹{product.oldPrice}</span>
-                  {product.save > 0 && (
-                    <span className="text-xs font-semibold text-primary bg-accent px-2 py-1 rounded">Save ₹{product.save}</span>
-                  )}
                 </div>
-                <p className="text-xs text-muted-foreground mb-5">Inclusive of all taxes</p>
+                <p className="text-xs text-muted-foreground mb-5">+ 5% GST · ₹150 courier on every order</p>
+
 
                 <div className="flex items-center gap-4 mb-5">
                   <span className="text-sm font-semibold">Quantity:</span>

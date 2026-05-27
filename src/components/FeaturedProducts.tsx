@@ -68,9 +68,6 @@ export function FeaturedProducts() {
                   {p.badge && (
                     <span className={`absolute top-4 left-4 z-10 ${p.badgeColor} text-primary-foreground text-[10px] font-bold tracking-wider px-3 py-1.5 rounded`}>{p.badge}</span>
                   )}
-                  {p.discount > 0 && (
-                    <span className="absolute top-12 left-4 z-10 bg-gold text-white text-[10px] font-bold tracking-wider px-3 py-1.5 rounded">-{p.discount}%</span>
-                  )}
                   <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
                   <button onClick={(e) => handleAdd(e, p)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
                 </div>
@@ -90,11 +87,7 @@ export function FeaturedProducts() {
                       <div>
                         <div className="flex items-baseline gap-2">
                           <span className="text-2xl text-foreground">₹{p.price}</span>
-                          <span className="text-sm text-muted-foreground line-through">₹{p.oldPrice}</span>
                         </div>
-                        {p.save > 0 && (
-                          <div className="inline-block mt-1 text-[10px] font-semibold text-primary bg-accent px-2 py-0.5 rounded">Save ₹{p.save}</div>
-                        )}
                       </div>
                       <button onClick={(e) => handleAdd(e, p)} aria-label={`Add ${p.name} to cart`} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-transform">
                         <Plus className="w-5 h-5" />
