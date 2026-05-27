@@ -30,6 +30,7 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [phoneDisabled, setPhoneDisabled] = useState(false);
 
   // Phone OTP state
   const [phone, setPhone] = useState("");
