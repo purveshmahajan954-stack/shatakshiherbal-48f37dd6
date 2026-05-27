@@ -84,7 +84,11 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
       setOtpSent(true);
       toast.success(`OTP sent to ${formatted}`);
     } catch (err: any) {
-      toast.error(err.message || "Could not send OTP");
+      if (isPhoneProviderDisabledError(err)) {
+        setPhoneDisabled(true);
+      } else {
+        toast.error(err.message || "Could not send OTP");
+      }
     } finally {
       setBusy(false);
     }
