@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { LoginScreen } from "@/components/LoginScreen";
@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   RotateCcw,
   ChevronDown,
+  LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -57,8 +58,20 @@ const ORDER_STATUSES = ["pending", "confirmed", "processing", "shipped", "delive
 
 function AdminPage() {
   const { isAdmin, loading, user } = useAuth();
+  const navigate = useNavigate();
+  const [gateChecked, setGateChecked] = useState(false);
 
-  if (loading) {
+  // Local admin gate: redirect to /admin-login if flag is missing
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("admin_auth") !== "true") {
+      navigate({ to: "/admin-login", replace: true });
+    } else {
+      setGateChecked(true);
+    }
+  }, [navigate]);
+
+  if (!gateChecked || loading) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -182,12 +195,23 @@ function AdminDashboard() {
             <Shield className="w-6 h-6 text-primary" />
             <h1 className="font-display text-3xl text-foreground">Admin Dashboard</h1>
           </div>
-          <button
-            onClick={load}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-white border border-border rounded-lg hover:bg-muted/50"
-          >
-            <RotateCcw className="w-4 h-4" /> Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={load}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-white border border-border rounded-lg hover:bg-muted/50"
+            >
+              <RotateCcw className="w-4 h-4" /> Refresh
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem("admin_auth");
+                window.location.href = "/admin-login";
+              }}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-white border border-border rounded-lg hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+            >
+              <LogOut className="w-4 h-4" /> Logout
+            </button>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground mb-6">
           Manage orders, revenue, and customer details.
