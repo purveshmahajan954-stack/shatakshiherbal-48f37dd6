@@ -226,15 +226,16 @@ function ProductDetailPage() {
               <div className="space-y-6">
                 {product.benefits.slice(0, Math.ceil(product.benefits.length / 2)).map((b: string, i: number) => (
                   <div key={b} className="flex items-start gap-4 lg:justify-end lg:text-right">
-                    <div className="flex-1 lg:order-1">
-                      <div className="font-semibold text-foreground">{b}</div>
-                    </div>
                     <div className="w-12 h-12 rounded-full border-2 border-primary/30 bg-accent/30 flex items-center justify-center shrink-0 lg:order-2">
                       {[<Heart className="w-5 h-5 text-primary" />, <Sparkles className="w-5 h-5 text-primary" />, <Sun className="w-5 h-5 text-primary" />][i % 3]}
+                    </div>
+                    <div className="flex-1 lg:order-1">
+                      <div className="font-semibold text-foreground">{b}</div>
                     </div>
                   </div>
                 ))}
               </div>
+
               <div className="relative w-full max-w-[260px] mx-auto">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gold/20 to-primary/20 blur-2xl" />
                 <img src={product.image} alt={product.name} className="relative w-full aspect-square object-contain" />
