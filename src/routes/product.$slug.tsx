@@ -167,7 +167,7 @@ function ProductDetailPage() {
                     <ShoppingBag className="w-4 h-4" /> Add to Cart
                   </button>
                   <button
-                    onClick={handleAdd}
+                    onClick={handleBuyNow}
                     className="inline-flex items-center justify-center gap-2 bg-gold text-white py-3.5 rounded-full font-semibold hover:bg-gold/90 transition"
                   >
                     <Zap className="w-4 h-4" /> Buy Now
