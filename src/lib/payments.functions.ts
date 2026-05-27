@@ -26,31 +26,20 @@ export const getRazorpayKeyId = createServerFn({ method: "GET" }).handler(async 
   return { keyId: id };
 });
 
-// ---------- Coupons ----------
-const COUPONS: Record<string, { type: "percent" | "flat"; value: number; min?: number }> = {
-  HERBAL10: { type: "percent", value: 10, min: 499 },
-  WELCOME50: { type: "flat", value: 50, min: 299 },
-  FREESHIP: { type: "flat", value: 60, min: 0 }, // effectively waives delivery
-};
+// ---------- Pricing constants ----------
+export const GST_RATE = 0.05; // Fixed 5% GST on all products
+export const COURIER_CHARGE = 150; // Flat ₹150 courier on every order
 
-export function applyCoupon(subtotal: number, code?: string | null) {
-  if (!code) return { discount: 0, code: null as string | null };
-  const c = COUPONS[code.toUpperCase()];
-  if (!c) return { discount: 0, code: null };
-  if (c.min && subtotal < c.min) return { discount: 0, code: null };
-  const discount = c.type === "percent" ? Math.round((subtotal * c.value) / 100) : c.value;
-  return { discount: Math.min(discount, subtotal), code: code.toUpperCase() };
+// Pricing helpers shared with the UI.
+// No discounts, no coupons — simple flat structure.
+export function computeTotals(subtotal: number) {
+  const sub = Math.max(0, Math.round(subtotal));
+  const gst = Math.round(sub * GST_RATE);
+  const delivery = sub === 0 ? 0 : COURIER_CHARGE;
+  const total = sub + gst + delivery;
+  return { subtotal: sub, gst, delivery, total };
 }
 
-// Pricing helpers shared with the UI
-export function computeTotals(subtotal: number, couponCode?: string | null) {
-  const { discount, code } = applyCoupon(subtotal, couponCode);
-  const afterDiscount = Math.max(0, subtotal - discount);
-  const delivery = afterDiscount >= 999 ? 0 : afterDiscount === 0 ? 0 : 60;
-  const gst = Math.round(afterDiscount * 0.05); // 5% GST on Ayurvedic products
-  const total = afterDiscount + delivery + gst;
-  return { subtotal, discount, couponCode: code, delivery, gst, total };
-}
 
 // ---------- Schemas ----------
 // Note: client-supplied `price`, `name`, `image` are IGNORED on the server.
