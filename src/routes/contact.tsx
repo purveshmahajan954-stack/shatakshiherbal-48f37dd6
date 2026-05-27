@@ -32,7 +32,8 @@ function ContactPage() {
     });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      console.error("contact_messages insert failed:", error);
+      toast.error("Failed to send message. Please try again.");
       return;
     }
     setSent(true);

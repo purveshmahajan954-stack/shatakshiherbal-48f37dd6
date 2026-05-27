@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getProductBySlug } from "@/lib/products";
 import crypto from "node:crypto";
 
 /**
@@ -52,12 +53,15 @@ export function computeTotals(subtotal: number, couponCode?: string | null) {
 }
 
 // ---------- Schemas ----------
+// Note: client-supplied `price`, `name`, `image` are IGNORED on the server.
+// The slug is the only trusted identifier; price/name/image are resolved
+// from the canonical product catalog to prevent payment tampering.
 const cartItemSchema = z.object({
-  name: z.string().min(1).max(200),
-  price: z.number().min(0).max(1_000_000),
+  name: z.string().min(1).max(200).optional(),
+  price: z.number().min(0).max(1_000_000).optional(),
   qty: z.number().int().min(1).max(99),
   image: z.string().max(1000).optional(),
-  slug: z.string().max(200).optional(),
+  slug: z.string().min(1).max(200),
 });
 
 const createOrderInput = z.object({
@@ -72,9 +76,25 @@ const createOrderInput = z.object({
 });
 
 // ---------- Server-side price recomputation (NEVER trust client totals) ----------
-function recomputeFromItems(items: z.infer<typeof cartItemSchema>[], couponCode?: string | null) {
-  const subtotal = items.reduce((s, i) => s + Math.round(i.price) * i.qty, 0);
-  return computeTotals(subtotal, couponCode);
+// Resolves each cart item against the canonical product catalog by slug.
+// Returns trusted items (with server-authoritative price/name/image) plus totals.
+function recomputeFromItems(
+  items: z.infer<typeof cartItemSchema>[],
+  couponCode?: string | null,
+) {
+  const trustedItems = items.map((i) => {
+    const product = getProductBySlug(i.slug);
+    if (!product) throw new Error(`Unknown product: ${i.slug}`);
+    return {
+      slug: product.slug,
+      name: product.name,
+      price: Math.round(product.price),
+      qty: i.qty,
+      image: product.image,
+    };
+  });
+  const subtotal = trustedItems.reduce((s, i) => s + i.price * i.qty, 0);
+  return { trustedItems, ...computeTotals(subtotal, couponCode) };
 }
 
 // ---------- Create Razorpay order + persist draft order row ----------
@@ -83,7 +103,7 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
   .inputValidator((input) => createOrderInput.parse(input))
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    const totals = recomputeFromItems(data.items, data.couponCode);
+    const { trustedItems, ...totals } = recomputeFromItems(data.items, data.couponCode);
 
     if (totals.total < 1) throw new Error("Order total must be at least ₹1");
 
@@ -117,7 +137,7 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
       .from("orders")
       .insert({
         user_id: userId,
-        items: data.items,
+        items: trustedItems,
         email: data.shipping.email,
         shipping_name: data.shipping.name,
         shipping_phone: data.shipping.phone,
