@@ -77,7 +77,6 @@ function CheckoutPage() {
           data: {
             items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty, image: i.image, slug: i.slug })),
             shipping: { name, email, phone, address },
-            couponCode: appliedCoupon,
           },
         }),
       ]);
