@@ -23,17 +23,18 @@ export function Hero() {
     setLoaded((prev) => (prev[i] ? prev : prev.map((v, idx) => (idx === i ? true : v))));
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-cream via-cream to-accent/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <div className="inline-flex items-center gap-2 bg-accent/60 px-4 py-2 rounded-full text-xs font-semibold text-primary mb-8">
+          <div className="inline-flex items-center gap-2 bg-accent/60 px-3 sm:px-4 py-2 rounded-full text-[11px] sm:text-xs font-semibold text-primary mb-6 sm:mb-8">
             <span className="w-2 h-2 rounded-full bg-primary-light" />
             AYUSH CERTIFIED · 100% NATURAL
           </div>
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[1.05] text-foreground">
+          <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl leading-[1.05] text-foreground">
             Pure Herbal<br />
             <span className="text-gradient-green italic">Healing</span><br />
             <span className="italic text-primary">for Modern Life</span>
           </h1>
+
           <p className="mt-8 text-base text-muted-foreground max-w-lg leading-relaxed">
             Ancient Ayurvedic wisdom, reimagined for today. Premium herbal formulations crafted from nature's finest ingredients — pure, potent, and proven.
           </p>
