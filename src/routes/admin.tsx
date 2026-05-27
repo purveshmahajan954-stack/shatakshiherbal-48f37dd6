@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   RotateCcw,
   ChevronDown,
+  LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
 
