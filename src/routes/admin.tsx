@@ -58,8 +58,20 @@ const ORDER_STATUSES = ["pending", "confirmed", "processing", "shipped", "delive
 
 function AdminPage() {
   const { isAdmin, loading, user } = useAuth();
+  const navigate = useNavigate();
+  const [gateChecked, setGateChecked] = useState(false);
 
-  if (loading) {
+  // Local admin gate: redirect to /admin-login if flag is missing
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("admin_auth") !== "true") {
+      navigate({ to: "/admin-login", replace: true });
+    } else {
+      setGateChecked(true);
+    }
+  }, [navigate]);
+
+  if (!gateChecked || loading) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
