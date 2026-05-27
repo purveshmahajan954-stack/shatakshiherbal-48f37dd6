@@ -4,14 +4,29 @@ import { Leaf, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
+type Method = "email" | "phone";
+
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
+  const [method, setMethod] = useState<Method>("email");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Phone OTP state
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+
+  const normalizePhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, "");
+    if (raw.trim().startsWith("+")) return "+" + digits;
+    if (digits.length === 10) return "+91" + digits; // default to India
+    return "+" + digits;
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     try {
@@ -38,6 +53,45 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
     }
   };
 
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formatted = normalizePhone(phone);
+    if (formatted.replace(/\D/g, "").length < 10) {
+      return toast.error("Please enter a valid phone number");
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone: formatted });
+      if (error) throw error;
+      setOtpSent(true);
+      toast.success(`OTP sent to ${formatted}`);
+    } catch (err: any) {
+      toast.error(err.message || "Could not send OTP");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otp.length < 4) return toast.error("Enter the OTP from your SMS");
+    setBusy(true);
+    try {
+      const formatted = normalizePhone(phone);
+      const { error } = await supabase.auth.verifyOtp({
+        phone: formatted,
+        token: otp,
+        type: "sms",
+      });
+      if (error) throw error;
+      toast.success("Signed in successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Invalid OTP");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleGoogle = async () => {
     setBusy(true);
     try {
@@ -45,7 +99,6 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
         redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
-      // result.redirected handled by browser
     } catch (err: any) {
       toast.error(err.message || "Google sign-in failed");
       setBusy(false);
@@ -80,53 +133,136 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
             <div className="h-px flex-1 bg-border" />OR<div className="h-px flex-1 bg-border" />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "signup" && (
-              <input
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full name"
-                className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            )}
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <input
-              required
-              minLength={6}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (min 6 chars)"
-              className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <button
-              type="submit"
-              disabled={busy}
-              className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
-            >
-              {busy && <Loader2 className="w-4 h-4 animate-spin" />}
-              {mode === "signin" ? "Sign In" : "Create Account"}
-            </button>
-          </form>
-
-          <p className="text-center text-sm text-muted-foreground mt-5">
-            {mode === "signin" ? "New here? " : "Already have an account? "}
+          {/* Method tabs */}
+          <div className="grid grid-cols-2 gap-1 p-1 bg-muted/50 rounded-md mb-4">
             <button
               type="button"
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="text-primary font-medium hover:underline"
+              onClick={() => { setMethod("email"); setOtpSent(false); }}
+              className={`text-sm py-2 rounded-md font-medium transition ${
+                method === "email" ? "bg-white shadow-sm text-foreground" : "text-muted-foreground"
+              }`}
             >
-              {mode === "signin" ? "Create account" : "Sign in"}
+              Email + Password
             </button>
-          </p>
+            <button
+              type="button"
+              onClick={() => { setMethod("phone"); setOtpSent(false); }}
+              className={`text-sm py-2 rounded-md font-medium transition ${
+                method === "phone" ? "bg-white shadow-sm text-foreground" : "text-muted-foreground"
+              }`}
+            >
+              Mobile OTP
+            </button>
+          </div>
+
+          {method === "email" ? (
+            <>
+              <form onSubmit={handleEmailSubmit} className="space-y-3">
+                {mode === "signup" && (
+                  <input
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Full name"
+                    className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                )}
+                <input
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                  required
+                  minLength={6}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password (min 6 chars)"
+                  className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                >
+                  {busy && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {mode === "signin" ? "Sign In" : "Create Account"}
+                </button>
+              </form>
+
+              <p className="text-center text-sm text-muted-foreground mt-5">
+                {mode === "signin" ? "New here? " : "Already have an account? "}
+                <button
+                  type="button"
+                  onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+                  className="text-primary font-medium hover:underline"
+                >
+                  {mode === "signin" ? "Create account" : "Sign in"}
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              {!otpSent ? (
+                <form onSubmit={handleSendOtp} className="space-y-3">
+                  <label className="block text-xs text-muted-foreground">
+                    Indian numbers default to +91. Include country code for others.
+                  </label>
+                  <input
+                    required
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 98765 43210"
+                    className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                  >
+                    {busy && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Send OTP
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyOtp} className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Enter the 6-digit code sent to <span className="font-medium text-foreground">{normalizePhone(phone)}</span>
+                  </p>
+                  <input
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                    placeholder="123456"
+                    maxLength={6}
+                    className="w-full border border-border rounded-md px-4 py-2.5 text-center tracking-[0.5em] font-mono text-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                  >
+                    {busy && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Verify & Sign In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setOtpSent(false); setOtp(""); }}
+                    className="w-full text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    ← Use a different number
+                  </button>
+                </form>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
