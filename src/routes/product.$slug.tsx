@@ -126,12 +126,9 @@ function ProductDetailPage() {
               <div className="bg-white rounded-2xl p-6 shadow-card mb-6">
                 <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-4xl text-foreground">₹{product.price}</span>
-                  <span className="text-lg text-muted-foreground line-through">₹{product.oldPrice}</span>
-                  {product.save > 0 && (
-                    <span className="text-xs font-semibold text-primary bg-accent px-2 py-1 rounded">Save ₹{product.save}</span>
-                  )}
                 </div>
-                <p className="text-xs text-muted-foreground mb-5">Inclusive of all taxes</p>
+                <p className="text-xs text-muted-foreground mb-5">+ 5% GST · ₹150 courier on every order</p>
+
 
                 <div className="flex items-center gap-4 mb-5">
                   <span className="text-sm font-semibold">Quantity:</span>
