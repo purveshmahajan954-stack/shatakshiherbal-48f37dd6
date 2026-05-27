@@ -17,9 +17,9 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, total, setQty, remove, clear, count } = useCart();
-  const delivery = total >= 999 || total === 0 ? 0 : 60;
   const gst = Math.round(total * 0.05);
-  const grand = total + delivery + gst;
+  const delivery = total === 0 ? 0 : 150;
+  const grand = total + gst + delivery;
 
   return (
     <div className="min-h-screen flex flex-col bg-cream/40">
