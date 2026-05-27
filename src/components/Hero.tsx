@@ -35,17 +35,18 @@ export function Hero() {
             <span className="italic text-primary">for Modern Life</span>
           </h1>
 
-          <p className="mt-8 text-base text-muted-foreground max-w-lg leading-relaxed">
+          <p className="mt-6 sm:mt-8 text-sm sm:text-base text-muted-foreground max-w-lg leading-relaxed">
             Ancient Ayurvedic wisdom, reimagined for today. Premium herbal formulations crafted from nature's finest ingredients — pure, potent, and proven.
           </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link to="/shop" className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition-all shadow-soft">
+          <div className="mt-7 sm:mt-10 flex flex-wrap gap-3 sm:gap-4">
+            <Link to="/shop" className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-md font-medium hover:bg-primary/90 transition-all shadow-soft text-sm sm:text-base">
               Shop Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link to="/product-info" className="inline-flex items-center gap-2 border border-primary/30 bg-accent/40 text-foreground px-8 py-4 rounded-md font-medium hover:bg-accent transition-all">
+            <Link to="/product-info" className="inline-flex items-center gap-2 border border-primary/30 bg-accent/40 text-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-md font-medium hover:bg-accent transition-all text-sm sm:text-base">
               Products Reviews
             </Link>
           </div>
+
 
           <div className="mt-10 flex flex-wrap items-center gap-6 sm:gap-8">
             <div className="flex items-center gap-3">
