@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck, Sparkles, Droplet, Sun, Moon, Heart, FlaskConical } from "lucide-react";
 import { toast } from "sonner";
@@ -51,6 +51,7 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductDetailPage() {
   const { product } = Route.useLoaderData() as { product: Product };
   const { add } = useCart();
+  const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "reviews" | "info">("description");
   const gallery = [product.image, badgeNoSugar, badgeGmp, badgeNoExtracts, badgeNoFlavours, badgeBpaFree];
@@ -60,6 +61,11 @@ function ProductDetailPage() {
   const handleAdd = () => {
     add({ name: product.name, price: product.price, image: product.image, slug: product.slug }, qty);
     toast.success(`${qty} × ${product.name} added to cart`);
+  };
+
+  const handleBuyNow = () => {
+    add({ name: product.name, price: product.price, image: product.image, slug: product.slug }, qty);
+    navigate({ to: "/checkout" });
   };
 
   const related = products.filter((p) => p.slug !== product.slug).slice(0, 4);
@@ -161,7 +167,7 @@ function ProductDetailPage() {
                     <ShoppingBag className="w-4 h-4" /> Add to Cart
                   </button>
                   <button
-                    onClick={handleAdd}
+                    onClick={handleBuyNow}
                     className="inline-flex items-center justify-center gap-2 bg-gold text-white py-3.5 rounded-full font-semibold hover:bg-gold/90 transition"
                   >
                     <Zap className="w-4 h-4" /> Buy Now
