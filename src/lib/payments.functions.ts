@@ -232,7 +232,10 @@ export const getMyOrders = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false })
       .limit(50);
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[getMyOrders]", error);
+      throw new Error("Could not load your orders. Please try again.");
+    }
     return { orders: data ?? [] };
   });
 
@@ -245,6 +248,9 @@ export const getMyOrder = createServerFn({ method: "GET" })
       .select("*")
       .eq("id", data.id)
       .maybeSingle();
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[getMyOrder]", error);
+      throw new Error("Could not load this order. Please try again.");
+    }
     return { order };
   });
