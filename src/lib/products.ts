@@ -2,7 +2,7 @@ import img1 from "@/assets/product-1.png";
 import img2 from "@/assets/product-2.webp";
 import img3 from "@/assets/product-3_new.webp";
 import img4 from "@/assets/product-4_new.webp";
-import img5 from "@/assets/product-5_new.webp";
+import img5 from "@/assets/product-5_new.jpg";
 import img6 from "@/assets/product-6_new.webp";
 import img7 from "@/assets/product-7_new.webp";
 import img8 from "@/assets/product-8_new.webp";
