@@ -1,9 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { Shield, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureAdminUser } from "@/lib/admin-bootstrap.functions";
 
 export const Route = createFileRoute("/admin-login")({
   component: AdminLoginPage,
@@ -19,18 +17,10 @@ const ADMIN_EMAIL = "admin@shatakshiherbal.com";
 
 function AdminLoginPage() {
   const navigate = useNavigate();
-  const ensure = useServerFn(ensureAdminUser);
   const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Ensure the admin account exists on first visit. Best-effort, silent.
-  useEffect(() => {
-    ensure().catch(() => {
-      /* silent — login will still surface bad creds */
-    });
-  }, [ensure]);
 
   // If already signed in as admin, jump to /admin
   useEffect(() => {
@@ -46,13 +36,11 @@ function AdminLoginPage() {
     setError(null);
     setBusy(true);
     try {
-      // Make sure account exists with right password (idempotent).
-      await ensure().catch(() => null);
       const { data, error: signErr } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
-      if (signErr) throw signErr;
+      if (signErr) throw new Error("Invalid email or password");
       if (data.user?.email?.toLowerCase() !== ADMIN_EMAIL) {
         await supabase.auth.signOut();
         throw new Error("This account is not authorized.");
@@ -63,6 +51,7 @@ function AdminLoginPage() {
       setBusy(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-cream to-primary/5 px-4 py-10">
