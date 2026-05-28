@@ -68,7 +68,7 @@ export function FeaturedProducts() {
                   {p.badge && (
                     <span className={`absolute top-4 left-4 z-10 ${p.badgeColor} text-primary-foreground text-[10px] font-bold tracking-wider px-3 py-1.5 rounded`}>{p.badge}</span>
                   )}
-                  <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square group-hover:scale-105 transition-transform duration-500 object-cover border-none" />
+                  <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
                   <button onClick={(e) => handleAdd(e, p)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
                 </div>
                 <div className="p-5">

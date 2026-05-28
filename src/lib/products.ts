@@ -1,16 +1,16 @@
-import img1 from "@/assets/product-1.png";
+import img1 from "@/assets/product-1.webp";
 import img2 from "@/assets/product-2.webp";
 import img3 from "@/assets/product-3_new.webp";
 import img4 from "@/assets/product-4_new.webp";
-import img5 from "@/assets/product-5_new.jpg";
+import img5 from "@/assets/product-5_new.webp";
 import img6 from "@/assets/product-6_new.webp";
-import img7 from "@/assets/product-7_new.png";
-import img8 from "@/assets/product-8_new.jpg";
+import img7 from "@/assets/product-7_new.webp";
+import img8 from "@/assets/product-8_new.webp";
 import img9 from "@/assets/product-9_new.webp";
 import img10 from "@/assets/product-10_new.webp";
-import img11 from "@/assets/product-11_new.png";
-import img12 from "@/assets/product-12_new.png";
-import img13 from "@/assets/product-13_new.png";
+import img11 from "@/assets/product-11_new.webp";
+import img12 from "@/assets/product-12_new.webp";
+import img13 from "@/assets/product-13_new.webp";
 import img14 from "@/assets/product-14_new.webp";
 import img15 from "@/assets/product-15_new.webp";
 import img16 from "@/assets/product-16_new.webp";
@@ -26,31 +26,6 @@ import img25 from "@/assets/product-25_new.webp";
 import img26 from "@/assets/product-26_new.webp";
 import img27 from "@/assets/product-27_new.webp";
 import img28 from "@/assets/product-28_new.webp";
-import img29 from "@/assets/product-29_dup.png";
-import img30 from "@/assets/product-30_dup.webp";
-import img31 from "@/assets/product-31_dup.png";
-import img32 from "@/assets/product-32_dup.png";
-import img33 from "@/assets/product-33_dup.png";
-import img34 from "@/assets/product-34_dup.png";
-import img35 from "@/assets/product-35_dup.png";
-import img36 from "@/assets/product-36_dup.png";
-import img37 from "@/assets/product-37_dup.png";
-import img38 from "@/assets/product-38_dup.png";
-import img39 from "@/assets/product-39_dup.png";
-import img40 from "@/assets/product-40_dup.png";
-import img41 from "@/assets/product-41_dup.png";
-import img42 from "@/assets/product-42_dup.png";
-import img43 from "@/assets/product-43_dup.png";
-import img44 from "@/assets/product-44_dup.png";
-import img45 from "@/assets/product-45_dup.png";
-import img46 from "@/assets/product-46_dup.png";
-import img47 from "@/assets/product-47_dup.png";
-import img48 from "@/assets/product-48_dup.png";
-import img49 from "@/assets/product-49_dup.png";
-import img50 from "@/assets/product-50_dup.png";
-import img51 from "@/assets/product-51_dup.png";
-import img52 from "@/assets/product-52_dup.png";
-import img53 from "@/assets/product-53_dup.png";
 
 export type Product = {
   slug: string;
@@ -176,31 +151,31 @@ const base = [
   { name: "Skin Z Capsules", image: img26, desc: "Skin Z Capsules help to natural nutrition for healthy skin....", price: 280, oldPrice: 549, save: 269, rating: 4.8, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 49 },
   { name: "TH - Z Capsules", image: img27, desc: "TH - Z Capsules revitalizes the body and supports thyroid health....", price: 420, oldPrice: 599, save: 179, rating: 4.7, reviews: 276, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 30 },
   { name: "Vat Nashak Capsules", image: img28, desc: "Vat Nashak Capsules supports natural help to relief pain...", price: 340, oldPrice: 499, save: 159, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 32 },
-  { name: "Active Risup", image: img29, desc: "Active Risup supports healthy liver function and natural detoxification....", price: 340, oldPrice: 399, save: 59, rating: 4.7, reviews: 184, badge: "NEW", badgeColor: "bg-primary-light", discount: 15 },
-  { name: "BP Tablets", image: img30, desc: "BP Tablets strengthen immunity with powerful herbal extracts....", price: 230, oldPrice: 499, save: 269, rating: 4.8, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 54 },
-  { name: "Active Z Premium Tablets", image: img31, desc: "Active Z Premium Tablets help calm the mind and support mental wellness....", price: 340, oldPrice: 549, save: 209, rating: 4.6, reviews: 198, badge: null, badgeColor: "", discount: 38 },
-  { name: "Vedantak Powder", image: img32, desc: "Vedantak Powder nourishes the scalp and promotes natural hair growth....", price: 211, oldPrice: 499, save: 288, rating: 4.7, reviews: 423, badge: "TOP RATED", badgeColor: "bg-gold", discount: 58 },
-  { name: "Camrop capsule", image: img33, desc: "Camrop capsule helps maintain healthy blood sugar levels naturally....", price: 340, oldPrice: 449, save: 109, rating: 4.8, reviews: 267, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 24 },
-  { name: "Vayam powder", image: img34, desc: "Vayam powder support cardiac health and healthy circulation....", price: 170, oldPrice: 699, save: 529, rating: 4.9, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 76 },
-  { name: "Cartilage Tablets", image: img35, desc: "Cartilage Tablets promote restful sleep with natural herbal blend....", price: 230, oldPrice: 429, save: 199, rating: 4.6, reviews: 156, badge: "NEW", badgeColor: "bg-primary-light", discount: 46 },
-  { name: "Aaram oil", image: img36, desc: "Aaram oil enhance brain function, memory and concentration....", price: 199, oldPrice: 599, save: 400, rating: 4.7, reviews: 289, badge: null, badgeColor: "", discount: 67 },
-  { name: "Vatmaniras", image: img37, desc: "Vatmaniras supports healthy weight management naturally....", price: 211, oldPrice: 799, save: 588, rating: 4.5, reviews: 178, badge: null, badgeColor: "", discount: 74 },
-  { name: "Liver Maniras", image: img38, desc: "Liver Maniras cleanses the body with pure ayurvedic herbs....", price: 211, oldPrice: 499, save: 288, rating: 4.6, reviews: 234, badge: "NEW", badgeColor: "bg-primary-light", discount: 58 },
-  { name: "Kidney cure capsule", image: img39, desc: "Kidney cure capsule support healthy bones and joint mobility....", price: 171, oldPrice: 649, save: 478, rating: 4.7, reviews: 198, badge: null, badgeColor: "", discount: 74 },
-  { name: "KFT XL 2", image: img40, desc: "KFT XL 2 soothe and refresh tired eyes with herbal extracts....", price: 249, oldPrice: 340, save: 91, rating: 4.5, reviews: 145, badge: null, badgeColor: "", discount: 27 },
-  { name: "Livona Syrup", image: img41, desc: "Livona Syrup support hormonal balance and vitality....", price: 599, oldPrice: 749, save: 150, rating: 4.8, reviews: 267, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 20 },
-  { name: "Asthmatic capsule", image: img42, desc: "Asthmatic capsule boost energy, stamina and overall vitality....", price: 420, oldPrice: 899, save: 479, rating: 4.7, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 53 },
-  { name: "Alc Maniras tablets", image: img43, desc: "Alc Maniras tablets provides natural relief from cough and cold....", price: 211, oldPrice: 440, save: 229, rating: 4.6, reviews: 234, badge: null, badgeColor: "", discount: 52 },
-  { name: "Max cold powder", image: img44, desc: "Max cold powder offers fast relief from muscle and joint pain....", price: 340, oldPrice: 399, save: 59, rating: 4.7, reviews: 289, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 15 },
-  { name: "Charmer capsules", image: img45, desc: "Charmer capsules supports digestion and natural detoxification....", price: 211, oldPrice: 499, save: 288, rating: 4.8, reviews: 412, badge: "TOP RATED", badgeColor: "bg-gold", discount: 58 },
-  { name: "Derma cream", image: img46, desc: "Derma cream reduce stress and boost energy naturally....", price: 230, oldPrice: 499, save: 269, rating: 4.9, reviews: 523, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 54 },
-  { name: "Beauty cream", image: img47, desc: "Beauty cream enhance memory and cognitive function....", price: 1000, oldPrice: 1599, save: 599, rating: 4.7, reviews: 234, badge: null, badgeColor: "", discount: 37 },
-  { name: "Acid capsule", image: img48, desc: "Acid capsule support healthy skin and natural blood purification....", price: 211, oldPrice: 499, save: 288, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 58 },
-  { name: "Multicomplex capsule", image: img49, desc: "Multicomplex capsule boost immunity with pure holy basil extracts....", price: 249, oldPrice: 340, save: 91, rating: 4.7, reviews: 267, badge: null, badgeColor: "", discount: 27 },
-  { name: "Multi vitamin", image: img50, desc: "Multi vitamin strengthens immunity and supports overall wellness....", price: 340, oldPrice: 379, save: 39, rating: 4.6, reviews: 178, badge: null, badgeColor: "", discount: 10 },
-  { name: "X gold Powder", image: img51, desc: "X gold Powder supports digestion, skin health and detoxification....", price: 211, oldPrice: 599, save: 388, rating: 4.7, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 65 },
-  { name: "Shat Prabha Tab", image: img52, desc: "Shat Prabha Tab rich in Vitamin C boosts immunity and hair health....", price: 799, oldPrice: 1499, save: 700, rating: 4.8, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 47 },
-  { name: "Femina Careers tablets", image: img53, desc: "Femina Careers tablets helps regulate blood sugar levels naturally....", price: 1000, oldPrice: 1599, save: 599, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 37 },
+  { name: "Active Risup", image: img1, desc: "Active Risup supports healthy liver function and natural detoxification....", price: 340, oldPrice: 399, save: 59, rating: 4.7, reviews: 184, badge: "NEW", badgeColor: "bg-primary-light", discount: 15 },
+  { name: "BP Tablets", image: img2, desc: "BP Tablets strengthen immunity with powerful herbal extracts....", price: 230, oldPrice: 499, save: 269, rating: 4.8, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 54 },
+  { name: "Active Z Premium Tablets", image: img3, desc: "Active Z Premium Tablets help calm the mind and support mental wellness....", price: 340, oldPrice: 549, save: 209, rating: 4.6, reviews: 198, badge: null, badgeColor: "", discount: 38 },
+  { name: "Vedantak Powder", image: img4, desc: "Vedantak Powder nourishes the scalp and promotes natural hair growth....", price: 211, oldPrice: 499, save: 288, rating: 4.7, reviews: 423, badge: "TOP RATED", badgeColor: "bg-gold", discount: 58 },
+  { name: "Camrop capsule", image: img5, desc: "Camrop capsule helps maintain healthy blood sugar levels naturally....", price: 340, oldPrice: 449, save: 109, rating: 4.8, reviews: 267, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 24 },
+  { name: "Vayam powder", image: img6, desc: "Vayam powder support cardiac health and healthy circulation....", price: 170, oldPrice: 699, save: 529, rating: 4.9, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 76 },
+  { name: "Cartilage Tablets", image: img7, desc: "Cartilage Tablets promote restful sleep with natural herbal blend....", price: 230, oldPrice: 429, save: 199, rating: 4.6, reviews: 156, badge: "NEW", badgeColor: "bg-primary-light", discount: 46 },
+  { name: "Aaram oil", image: img8, desc: "Aaram oil enhance brain function, memory and concentration....", price: 199, oldPrice: 599, save: 400, rating: 4.7, reviews: 289, badge: null, badgeColor: "", discount: 67 },
+  { name: "Vatmaniras", image: img9, desc: "Vatmaniras supports healthy weight management naturally....", price: 211, oldPrice: 799, save: 588, rating: 4.5, reviews: 178, badge: null, badgeColor: "", discount: 74 },
+  { name: "Liver Maniras", image: img10, desc: "Liver Maniras cleanses the body with pure ayurvedic herbs....", price: 211, oldPrice: 499, save: 288, rating: 4.6, reviews: 234, badge: "NEW", badgeColor: "bg-primary-light", discount: 58 },
+  { name: "Kidney cure capsule", image: img11, desc: "Kidney cure capsule support healthy bones and joint mobility....", price: 171, oldPrice: 649, save: 478, rating: 4.7, reviews: 198, badge: null, badgeColor: "", discount: 74 },
+  { name: "KFT XL 2", image: img12, desc: "KFT XL 2 soothe and refresh tired eyes with herbal extracts....", price: 249, oldPrice: 340, save: 91, rating: 4.5, reviews: 145, badge: null, badgeColor: "", discount: 27 },
+  { name: "Livona Syrup", image: img13, desc: "Livona Syrup support hormonal balance and vitality....", price: 599, oldPrice: 749, save: 150, rating: 4.8, reviews: 267, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 20 },
+  { name: "Asthmatic capsule", image: img14, desc: "Asthmatic capsule boost energy, stamina and overall vitality....", price: 420, oldPrice: 899, save: 479, rating: 4.7, reviews: 312, badge: "TOP RATED", badgeColor: "bg-gold", discount: 53 },
+  { name: "Alc Maniras tablets", image: img15, desc: "Alc Maniras tablets provides natural relief from cough and cold....", price: 211, oldPrice: 440, save: 229, rating: 4.6, reviews: 234, badge: null, badgeColor: "", discount: 52 },
+  { name: "Max cold powder", image: img16, desc: "Max cold powder offers fast relief from muscle and joint pain....", price: 340, oldPrice: 399, save: 59, rating: 4.7, reviews: 289, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 15 },
+  { name: "Charmer capsules", image: img17, desc: "Charmer capsules supports digestion and natural detoxification....", price: 211, oldPrice: 499, save: 288, rating: 4.8, reviews: 412, badge: "TOP RATED", badgeColor: "bg-gold", discount: 58 },
+  { name: "Derma cream", image: img18, desc: "Derma cream reduce stress and boost energy naturally....", price: 230, oldPrice: 499, save: 269, rating: 4.9, reviews: 523, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 54 },
+  { name: "Beauty cream", image: img19, desc: "Beauty cream enhance memory and cognitive function....", price: 1000, oldPrice: 1599, save: 599, rating: 4.7, reviews: 234, badge: null, badgeColor: "", discount: 37 },
+  { name: "Acid capsule", image: img20, desc: "Acid capsule support healthy skin and natural blood purification....", price: 211, oldPrice: 499, save: 288, rating: 4.6, reviews: 198, badge: "NEW", badgeColor: "bg-primary-light", discount: 58 },
+  { name: "Multicomplex capsule", image: img21, desc: "Multicomplex capsule boost immunity with pure holy basil extracts....", price: 249, oldPrice: 340, save: 91, rating: 4.7, reviews: 267, badge: null, badgeColor: "", discount: 27 },
+  { name: "Multi vitamin", image: img22, desc: "Multi vitamin strengthens immunity and supports overall wellness....", price: 340, oldPrice: 379, save: 39, rating: 4.6, reviews: 178, badge: null, badgeColor: "", discount: 10 },
+  { name: "X gold Powder", image: img23, desc: "X gold Powder supports digestion, skin health and detoxification....", price: 211, oldPrice: 599, save: 388, rating: 4.7, reviews: 312, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 65 },
+  { name: "Shat Prabha Tab", image: img24, desc: "Shat Prabha Tab rich in Vitamin C boosts immunity and hair health....", price: 799, oldPrice: 1499, save: 700, rating: 4.8, reviews: 345, badge: "TOP RATED", badgeColor: "bg-gold", discount: 47 },
+  { name: "Femina Careers tablets", image: img25, desc: "Femina Careers tablets helps regulate blood sugar levels naturally....", price: 1000, oldPrice: 1599, save: 599, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 37 },
 ];
 
 export const products: Product[] = base.map((p) => ({
