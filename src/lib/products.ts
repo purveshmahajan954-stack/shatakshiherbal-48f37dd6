@@ -10,7 +10,7 @@ import img9 from "@/assets/product-9_new.webp";
 import img10 from "@/assets/product-10_new.webp";
 import img11 from "@/assets/product-11_new.webp";
 import img12 from "@/assets/product-12_new.webp";
-import img13 from "@/assets/product-13_new.webp";
+import img13 from "@/assets/product-13_new.png";
 import img14 from "@/assets/product-14_new.webp";
 import img15 from "@/assets/product-15_new.webp";
 import img16 from "@/assets/product-16_new.webp";
