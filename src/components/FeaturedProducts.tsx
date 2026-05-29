@@ -1,12 +1,14 @@
-import { ArrowRight, Plus, Star, Zap, X } from "lucide-react";
+import { ArrowRight, Plus, Star, Zap, X, Heart } from "lucide-react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
+import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
 import { products, CATEGORY_LABELS } from "@/lib/products";
 
 export function FeaturedProducts() {
   const { add } = useCart();
+  const wishlist = useWishlist();
   const { user } = useAuth();
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { cat?: string };
@@ -68,6 +70,19 @@ export function FeaturedProducts() {
                   {p.badge && (
                     <span className={`absolute top-4 left-4 z-10 ${p.badgeColor} text-primary-foreground text-[10px] font-bold tracking-wider px-3 py-1.5 rounded`}>{p.badge}</span>
                   )}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const wasIn = wishlist.has(p.slug);
+                      wishlist.toggle({ name: p.name, price: p.price, image: p.image, slug: p.slug });
+                      toast.success(wasIn ? `${p.name} removed from wishlist` : `${p.name} saved to wishlist`);
+                    }}
+                    aria-label={wishlist.has(p.slug) ? `Remove ${p.name} from wishlist` : `Add ${p.name} to wishlist`}
+                    className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 backdrop-blur shadow flex items-center justify-center hover:scale-110 transition"
+                  >
+                    <Heart className={`w-4 h-4 ${wishlist.has(p.slug) ? "fill-primary text-primary" : "text-foreground"}`} />
+                  </button>
                   <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
                   <button onClick={(e) => handleAdd(e, p)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
                 </div>

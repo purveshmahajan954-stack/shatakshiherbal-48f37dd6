@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/lib/cart";
+import { WishlistProvider } from "@/lib/wishlist";
 import { AuthProvider } from "@/lib/auth";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
@@ -124,9 +125,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
-          <Outlet />
-          <WhatsAppButton />
-          <Toaster position="top-center" />
+          <WishlistProvider>
+            <Outlet />
+            <WhatsAppButton />
+            <Toaster position="top-center" />
+          </WishlistProvider>
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>

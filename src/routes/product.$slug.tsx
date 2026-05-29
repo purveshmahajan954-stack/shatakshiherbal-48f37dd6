@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getProductBySlug, sampleReviews, products, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
+import { useWishlist } from "@/lib/wishlist";
 import badgeNoSugar from "@/assets/badge-no-sugar.jpg";
 import badgeGmp from "@/assets/badge-gmp.jpg";
 import badgeNoExtracts from "@/assets/badge-no-extracts.jpg";
@@ -51,6 +52,8 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductDetailPage() {
   const { product } = Route.useLoaderData() as { product: Product };
   const { add } = useCart();
+  const wishlist = useWishlist();
+  const inWishlist = wishlist.has(product.slug);
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "reviews" | "info">("description");
@@ -173,6 +176,15 @@ function ProductDetailPage() {
                     <Zap className="w-4 h-4" /> Buy Now
                   </button>
                 </div>
+                <button
+                  onClick={() => {
+                    wishlist.toggle({ name: product.name, price: product.price, image: product.image, slug: product.slug });
+                    toast.success(inWishlist ? "Removed from wishlist" : "Saved to wishlist");
+                  }}
+                  className={`mt-3 w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold border-2 transition ${inWishlist ? "border-primary text-primary bg-primary/5" : "border-border text-foreground hover:border-primary hover:text-primary"}`}
+                >
+                  <Heart className={`w-4 h-4 ${inWishlist ? "fill-primary" : ""}`} /> {inWishlist ? "Saved to Wishlist" : "Add to Wishlist"}
+                </button>
               </div>
 
               <div className="grid grid-cols-3 gap-3 text-center">
