@@ -1,12 +1,14 @@
-import { ArrowRight, Plus, Star, Zap, X } from "lucide-react";
+import { ArrowRight, Plus, Star, Zap, X, Heart } from "lucide-react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
+import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
 import { products, CATEGORY_LABELS } from "@/lib/products";
 
 export function FeaturedProducts() {
   const { add } = useCart();
+  const wishlist = useWishlist();
   const { user } = useAuth();
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { cat?: string };
