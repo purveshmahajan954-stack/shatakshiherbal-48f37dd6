@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, Menu, X, Trash2, LogOut, Shield, Package, ArrowRight } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, Trash2, LogOut, Shield, Package, ArrowRight, Heart } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
+import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -17,6 +18,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { count, total, items, remove, clear } = useCart();
+  const { count: wishCount } = useWishlist();
   const { user, isAdmin, signOut } = useAuth();
 
 
