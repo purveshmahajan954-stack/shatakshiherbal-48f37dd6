@@ -16,28 +16,37 @@ export type Database = {
     Tables: {
       contact_messages: {
         Row: {
+          assigned_to: string | null
           created_at: string
           email: string
           id: string
           message: string
           name: string
+          notes: string | null
           phone: string | null
+          status: string
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string
           email: string
           id?: string
           message: string
           name: string
+          notes?: string | null
           phone?: string | null
+          status?: string
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string
           email?: string
           id?: string
           message?: string
           name?: string
+          notes?: string | null
           phone?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -104,6 +113,51 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          active: boolean
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          mrp: number | null
+          name: string
+          price: number
+          slug: string
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          mrp?: number | null
+          name: string
+          price?: number
+          slug: string
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          mrp?: number | null
+          name?: string
+          price?: number
+          slug?: string
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -160,7 +214,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -288,7 +342,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "manager"],
     },
   },
 } as const
