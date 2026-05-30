@@ -16,28 +16,37 @@ export type Database = {
     Tables: {
       contact_messages: {
         Row: {
+          assigned_to: string | null
           created_at: string
           email: string
           id: string
           message: string
           name: string
+          notes: string | null
           phone: string | null
+          status: string
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string
           email: string
           id?: string
           message: string
           name: string
+          notes?: string | null
           phone?: string | null
+          status?: string
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string
           email?: string
           id?: string
           message?: string
           name?: string
+          notes?: string | null
           phone?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -101,6 +110,51 @@ export type Database = {
           subtotal?: number
           total?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          active: boolean
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          mrp: number | null
+          name: string
+          price: number
+          slug: string
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          mrp?: number | null
+          name: string
+          price?: number
+          slug: string
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          mrp?: number | null
+          name?: string
+          price?: number
+          slug?: string
+          stock?: number
+          updated_at?: string
         }
         Relationships: []
       }
