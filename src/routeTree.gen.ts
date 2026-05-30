@@ -28,6 +28,11 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay.webhook'
 
 const WishlistRoute = WishlistRouteImport.update({
@@ -125,6 +130,31 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicRazorpayWebhookRoute =
   ApiPublicRazorpayWebhookRouteImport.update({
     id: '/api/public/razorpay/webhook',
@@ -150,6 +180,11 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/product/$slug': typeof ProductSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -171,6 +206,11 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/product/$slug': typeof ProductSlugRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -194,6 +234,11 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/product/$slug': typeof ProductSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -218,6 +263,11 @@ export interface FileRouteTypes {
     | '/shop'
     | '/terms'
     | '/wishlist'
+    | '/admin/dashboard'
+    | '/admin/leads'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/users'
     | '/product/$slug'
     | '/admin/'
     | '/api/public/razorpay/webhook'
@@ -239,6 +289,11 @@ export interface FileRouteTypes {
     | '/shop'
     | '/terms'
     | '/wishlist'
+    | '/admin/dashboard'
+    | '/admin/leads'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/users'
     | '/product/$slug'
     | '/admin'
     | '/api/public/razorpay/webhook'
@@ -261,6 +316,11 @@ export interface FileRouteTypes {
     | '/shop'
     | '/terms'
     | '/wishlist'
+    | '/admin/dashboard'
+    | '/admin/leads'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/users'
     | '/product/$slug'
     | '/admin/'
     | '/api/public/razorpay/webhook'
@@ -423,6 +483,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/razorpay/webhook': {
       id: '/api/public/razorpay/webhook'
       path: '/api/public/razorpay/webhook'
@@ -434,10 +529,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

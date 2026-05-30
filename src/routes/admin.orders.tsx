@@ -48,7 +48,7 @@ function OrdersPage() {
       .order("created_at", { ascending: false })
       .limit(1000);
     if (error) toast.error("Failed to load orders");
-    setOrders((data as Order[]) || []);
+    setOrders((data as unknown as Order[]) || []);
     setBusy(false);
   };
 
