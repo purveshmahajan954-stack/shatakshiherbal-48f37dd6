@@ -4,7 +4,8 @@ import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck, Sp
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { getProductBySlug, sampleReviews, products, type Product } from "@/lib/products";
+import { sampleReviews, products as staticProducts, type Product } from "@/lib/products";
+import { fetchProductBySlug } from "@/lib/use-products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import badgeNoSugar from "@/assets/badge-no-sugar.jpg";
@@ -16,8 +17,8 @@ import badgeBpaFree from "@/assets/badge-bpa-free.jpg";
 
 export const Route = createFileRoute("/product/$slug")({
   component: ProductDetailPage,
-  loader: ({ params }) => {
-    const product = getProductBySlug(params.slug);
+  loader: async ({ params }) => {
+    const product = await fetchProductBySlug(params.slug);
     if (!product) throw notFound();
     return { product };
   },
