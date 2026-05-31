@@ -72,7 +72,7 @@ function ProductDetailPage() {
     navigate({ to: "/checkout" });
   };
 
-  const related = products.filter((p) => p.slug !== product.slug).slice(0, 4);
+  const related = staticProducts.filter((p: Product) => p.slug !== product.slug).slice(0, 4);
   const ratingBreakdown = [5, 4, 3, 2, 1].map((star) => ({
     star,
     pct: star === 5 ? 70 : star === 4 ? 20 : star === 3 ? 7 : star === 2 ? 2 : 1,
