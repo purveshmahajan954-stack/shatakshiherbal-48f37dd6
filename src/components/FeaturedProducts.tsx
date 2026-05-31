@@ -1,10 +1,11 @@
-import { ArrowRight, Plus, Star, Zap, X, Heart } from "lucide-react";
+import { ArrowRight, Plus, Star, Zap, X, Heart, Loader2 } from "lucide-react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
-import { products, CATEGORY_LABELS } from "@/lib/products";
+import { CATEGORY_LABELS } from "@/lib/products";
+import { useProducts } from "@/lib/use-products";
 
 export function FeaturedProducts() {
   const { add } = useCart();
@@ -14,6 +15,7 @@ export function FeaturedProducts() {
   const search = useSearch({ strict: false }) as { cat?: string };
   const cat = search.cat ?? "";
   const activeLabel = cat ? CATEGORY_LABELS[cat] : "";
+  const { items: products, loading } = useProducts();
   const filtered = cat ? products.filter((p) => p.categories.includes(cat)) : products;
 
 
@@ -58,8 +60,10 @@ export function FeaturedProducts() {
           )}
         </div>
 
-        {filtered.length === 0 ? (
-          <div className="text-center py-20 text-muted-foreground">No products found in this category.</div>
+        {loading ? (
+          <div className="text-center py-20 text-muted-foreground"><Loader2 className="w-6 h-6 animate-spin inline" /></div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-20 text-muted-foreground">No products found{cat ? " in this category" : ""}.</div>
         ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filtered.map((p) => (
