@@ -146,11 +146,27 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
       {open && (
         <div className="border-t border-border p-4 grid md:grid-cols-2 gap-6 bg-muted/20">
           <div>
-            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Customer</h4>
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Customer (admin only)</h4>
             <div className="text-sm space-y-1">
               <div><span className="text-muted-foreground">Email:</span> {order.email || "—"}</div>
               <div><span className="text-muted-foreground">Phone:</span> {order.shipping_phone || "—"}</div>
               <div className="pt-1"><span className="text-muted-foreground">Address:</span><div className="whitespace-pre-wrap mt-0.5">{order.shipping_address || "—"}</div></div>
+            </div>
+
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Billing breakdown</h4>
+            <div className="text-sm border border-border rounded-lg bg-card divide-y divide-border">
+              <Row label="Base amount" value={`₹${Number(order.subtotal).toLocaleString("en-IN")}`} />
+              <Row label="GST (5%)" value={`₹${Number(order.gst).toLocaleString("en-IN")}`} accent />
+              <Row label="Delivery" value={`₹${Number(order.delivery_charge).toLocaleString("en-IN")}`} />
+              {Number(order.discount) > 0 && <Row label="Discount" value={`−₹${Number(order.discount).toLocaleString("en-IN")}`} />}
+              <Row label="Total bill" value={`₹${Number(order.total).toLocaleString("en-IN")}`} bold />
+            </div>
+
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Payment</h4>
+            <div className="text-sm space-y-1">
+              <div><span className="text-muted-foreground">Method:</span> {order.razorpay_payment_id ? "Online (Razorpay)" : "—"}</div>
+              <div><span className="text-muted-foreground">Razorpay order:</span> <span className="font-mono text-xs">{order.razorpay_order_id || "—"}</span></div>
+              <div><span className="text-muted-foreground">Payment ID:</span> <span className="font-mono text-xs">{order.razorpay_payment_id || "—"}</span></div>
             </div>
           </div>
           <div>
@@ -178,6 +194,15 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Row({ label, value, bold, accent }: { label: string; value: string; bold?: boolean; accent?: boolean }) {
+  return (
+    <div className="flex justify-between p-2.5">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={`${bold ? "font-semibold" : ""} ${accent ? "text-primary" : ""}`}>{value}</span>
     </div>
   );
 }
