@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { getMyOrders } from "@/lib/payments.functions";
-import { Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle, Copy } from "lucide-react";
+import { Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle, Copy, Truck } from "lucide-react";
 import { toast } from "sonner";
 
 type TimelineStep = { key: string; label: string; state: "done" | "current" | "todo" | "failed" };
