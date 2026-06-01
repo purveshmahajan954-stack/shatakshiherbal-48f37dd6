@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { getMyOrders } from "@/lib/payments.functions";
-import { Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle, Copy } from "lucide-react";
+import { Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle, Copy, Truck } from "lucide-react";
 import { toast } from "sonner";
 
 type TimelineStep = { key: string; label: string; state: "done" | "current" | "todo" | "failed" };
@@ -191,11 +191,20 @@ function OrdersPage() {
                     </div>
                   )}
 
-                  {o.payment_status !== "paid" && o.payment_status !== "confirmed" && (
-                    <div className="mt-4 text-right">
-                      <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline">Retry payment →</Link>
-                    </div>
-                  )}
+                  <div className="mt-4 flex flex-wrap justify-end gap-3">
+                    {o.tracking_id && (
+                      <Link
+                        to="/track/$trackingId"
+                        params={{ trackingId: o.tracking_id }}
+                        className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90"
+                      >
+                        <Truck className="w-4 h-4" /> Track Order
+                      </Link>
+                    )}
+                    {o.payment_status !== "paid" && o.payment_status !== "confirmed" && (
+                      <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline self-center">Retry payment →</Link>
+                    )}
+                  </div>
                 </li>
               );
             })}

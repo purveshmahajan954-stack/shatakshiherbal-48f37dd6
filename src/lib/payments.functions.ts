@@ -118,6 +118,9 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
     }
     const rzpOrder = (await rzpRes.json()) as { id: string; amount: number; currency: string };
 
+    // Generate unique tracking ID (SHIP-XXXXXX)
+    const trackingId = `SHIP-${crypto.randomBytes(4).toString("hex").toUpperCase().slice(0, 6)}`;
+
     // Persist draft order
     const { data: orderRow, error } = await supabaseAdmin
       .from("orders")
@@ -137,6 +140,9 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
         razorpay_order_id: rzpOrder.id,
         payment_status: "created",
         status: "pending",
+        tracking_id: trackingId,
+        tracking_status: "Order Placed",
+        tracking_eta: "3-5 days",
       })
       .select("id")
       .single();

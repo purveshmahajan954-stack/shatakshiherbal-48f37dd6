@@ -27,12 +27,15 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as TrackTrackingIdRouteImport } from './routes/track.$trackingId'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as ApiPublicWebhookUpdateRouteImport } from './routes/api/public/webhook-update'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay.webhook'
 
 const WishlistRoute = WishlistRouteImport.update({
@@ -125,9 +128,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const TrackTrackingIdRoute = TrackTrackingIdRouteImport.update({
+  id: '/track/$trackingId',
+  path: '/track/$trackingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
+  id: '/api/track-order',
+  path: '/api/track-order',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -154,6 +167,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AdminRoute,
+} as any)
+const ApiPublicWebhookUpdateRoute = ApiPublicWebhookUpdateRouteImport.update({
+  id: '/api/public/webhook-update',
+  path: '/api/public/webhook-update',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRazorpayWebhookRoute =
   ApiPublicRazorpayWebhookRouteImport.update({
@@ -185,8 +203,11 @@ export interface FileRoutesByFullPath {
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/track/$trackingId': typeof TrackTrackingIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -211,8 +232,11 @@ export interface FileRoutesByTo {
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/track/$trackingId': typeof TrackTrackingIdRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesById {
@@ -239,8 +263,11 @@ export interface FileRoutesById {
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/track/$trackingId': typeof TrackTrackingIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRouteTypes {
@@ -268,8 +295,11 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/products'
     | '/admin/users'
+    | '/api/track-order'
     | '/product/$slug'
+    | '/track/$trackingId'
     | '/admin/'
+    | '/api/public/webhook-update'
     | '/api/public/razorpay/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -294,8 +324,11 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/products'
     | '/admin/users'
+    | '/api/track-order'
     | '/product/$slug'
+    | '/track/$trackingId'
     | '/admin'
+    | '/api/public/webhook-update'
     | '/api/public/razorpay/webhook'
   id:
     | '__root__'
@@ -321,8 +354,11 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/products'
     | '/admin/users'
+    | '/api/track-order'
     | '/product/$slug'
+    | '/track/$trackingId'
     | '/admin/'
+    | '/api/public/webhook-update'
     | '/api/public/razorpay/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -344,7 +380,10 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   TermsRoute: typeof TermsRoute
   WishlistRoute: typeof WishlistRoute
+  ApiTrackOrderRoute: typeof ApiTrackOrderRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  TrackTrackingIdRoute: typeof TrackTrackingIdRoute
+  ApiPublicWebhookUpdateRoute: typeof ApiPublicWebhookUpdateRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
@@ -476,11 +515,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/track/$trackingId': {
+      id: '/track/$trackingId'
+      path: '/track/$trackingId'
+      fullPath: '/track/$trackingId'
+      preLoaderRoute: typeof TrackTrackingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/track-order': {
+      id: '/api/track-order'
+      path: '/api/track-order'
+      fullPath: '/api/track-order'
+      preLoaderRoute: typeof ApiTrackOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
@@ -517,6 +570,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/api/public/webhook-update': {
+      id: '/api/public/webhook-update'
+      path: '/api/public/webhook-update'
+      fullPath: '/api/public/webhook-update'
+      preLoaderRoute: typeof ApiPublicWebhookUpdateRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/razorpay/webhook': {
       id: '/api/public/razorpay/webhook'
@@ -566,7 +626,10 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   TermsRoute: TermsRoute,
   WishlistRoute: WishlistRoute,
+  ApiTrackOrderRoute: ApiTrackOrderRoute,
   ProductSlugRoute: ProductSlugRoute,
+  TrackTrackingIdRoute: TrackTrackingIdRoute,
+  ApiPublicWebhookUpdateRoute: ApiPublicWebhookUpdateRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
