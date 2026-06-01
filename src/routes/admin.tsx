@@ -16,6 +16,9 @@ import {
   X,
   Sun,
   Moon,
+  UserCircle,
+  CreditCard,
+  BarChart3,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -33,6 +36,9 @@ const ADMIN_EMAIL = "admin@shatakshiherbal.com";
 const NAV = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { to: "/admin/customers", label: "Customers", icon: UserCircle },
+  { to: "/admin/payments", label: "Payments", icon: CreditCard },
+  { to: "/admin/reports", label: "Reports", icon: BarChart3 },
   { to: "/admin/leads", label: "Leads", icon: MessageSquare },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/users", label: "Users", icon: Users },
