@@ -191,11 +191,20 @@ function OrdersPage() {
                     </div>
                   )}
 
-                  {o.payment_status !== "paid" && o.payment_status !== "confirmed" && (
-                    <div className="mt-4 text-right">
-                      <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline">Retry payment →</Link>
-                    </div>
-                  )}
+                  <div className="mt-4 flex flex-wrap justify-end gap-3">
+                    {o.tracking_id && (
+                      <Link
+                        to="/track/$trackingId"
+                        params={{ trackingId: o.tracking_id }}
+                        className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90"
+                      >
+                        <Truck className="w-4 h-4" /> Track Order
+                      </Link>
+                    )}
+                    {o.payment_status !== "paid" && o.payment_status !== "confirmed" && (
+                      <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline self-center">Retry payment →</Link>
+                    )}
+                  </div>
                 </li>
               );
             })}
