@@ -1,19 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
-import {
-  createRazorpayOrder,
-  verifyRazorpayPayment,
-  markPaymentFailed,
-  getRazorpayKeyId,
-  computeTotals,
-} from "@/lib/payments.functions";
+import { computeTotals } from "@/lib/payments.functions";
 import { Loader2, ShieldCheck, MapPin, Wallet } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
@@ -36,10 +29,6 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const { items, total, clear } = useCart();
   const { user, loading } = useAuth();
-  const createOrder = useServerFn(createRazorpayOrder);
-  const verify = useServerFn(verifyRazorpayPayment);
-  const markFailed = useServerFn(markPaymentFailed);
-  const fetchKeyId = useServerFn(getRazorpayKeyId);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -50,7 +39,7 @@ function CheckoutPage() {
   useEffect(() => {
     if (user) {
       setEmail(user.email ?? "");
-      setName((user.user_metadata as any)?.full_name ?? "");
+      setName(user.fullName ?? "");
     }
   }, [user]);
 
@@ -61,7 +50,6 @@ function CheckoutPage() {
 
   const totals = computeTotals(total);
 
-
   const handlePay = async () => {
     if (items.length === 0) return toast.error("Your cart is empty");
     if (name.trim().length < 2) return toast.error("Please enter your name");
@@ -71,15 +59,30 @@ function CheckoutPage() {
 
     setBusy(true);
     try {
-      const [{ keyId }, order] = await Promise.all([
-        fetchKeyId(),
-        createOrder({
-          data: {
+      const token = localStorage.getItem("auth_token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const [keyRes, orderRes] = await Promise.all([
+        fetch("/api/payments/razorpay-key"),
+        fetch("/api/payments/create-order", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
             items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty, image: i.image, slug: i.slug })),
             shipping: { name, email, phone, address },
-          },
+          }),
         }),
       ]);
+
+      if (!keyRes.ok) throw new Error("Could not load payment config");
+      if (!orderRes.ok) {
+        const err = await orderRes.json().catch(() => ({}));
+        throw new Error((err as any)?.error ?? "Could not initiate payment");
+      }
+
+      const { keyId } = await keyRes.json();
+      const order = await orderRes.json();
 
       const rzp = new window.Razorpay({
         key: keyId,
@@ -94,11 +97,16 @@ function CheckoutPage() {
         method: { upi: true, card: true, netbanking: true, wallet: true },
         handler: async (resp: any) => {
           try {
-            await verify({ data: {
-              razorpay_order_id: resp.razorpay_order_id,
-              razorpay_payment_id: resp.razorpay_payment_id,
-              razorpay_signature: resp.razorpay_signature,
-            }});
+            const verRes = await fetch("/api/payments/verify", {
+              method: "POST",
+              headers,
+              body: JSON.stringify({
+                razorpay_order_id: resp.razorpay_order_id,
+                razorpay_payment_id: resp.razorpay_payment_id,
+                razorpay_signature: resp.razorpay_signature,
+              }),
+            });
+            if (!verRes.ok) throw new Error("Verification failed");
             clear();
             navigate({ to: "/payment-success", search: { o: order.orderId } });
           } catch (e: any) {
@@ -107,14 +115,20 @@ function CheckoutPage() {
         },
         modal: {
           ondismiss: async () => {
-            await markFailed({ data: { razorpay_order_id: order.razorpayOrderId, reason: "dismissed" } }).catch(() => {});
+            await fetch("/api/payments/mark-failed", {
+              method: "POST", headers,
+              body: JSON.stringify({ razorpay_order_id: order.razorpayOrderId, reason: "dismissed" }),
+            }).catch(() => {});
             setBusy(false);
             navigate({ to: "/payment-failed", search: { r: order.razorpayOrderId, reason: "dismissed" } });
           },
         },
       });
       rzp.on("payment.failed", async (resp: any) => {
-        await markFailed({ data: { razorpay_order_id: order.razorpayOrderId, reason: resp?.error?.description ?? "failed" } }).catch(() => {});
+        await fetch("/api/payments/mark-failed", {
+          method: "POST", headers,
+          body: JSON.stringify({ razorpay_order_id: order.razorpayOrderId, reason: resp?.error?.description ?? "failed" }),
+        }).catch(() => {});
         navigate({ to: "/payment-failed", search: { r: order.razorpayOrderId, reason: resp?.error?.description ?? "failed" } });
       });
       rzp.open();
@@ -145,7 +159,6 @@ function CheckoutPage() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            {/* Address */}
             <section className="bg-white rounded-2xl shadow-card p-6">
               <h2 className="flex items-center gap-2 font-display text-xl mb-4"><MapPin className="w-5 h-5 text-primary" /> Shipping Address</h2>
               <div className="grid sm:grid-cols-2 gap-3">
@@ -156,7 +169,6 @@ function CheckoutPage() {
               </div>
             </section>
 
-            {/* Items */}
             <section className="bg-white rounded-2xl shadow-card p-6">
               <h2 className="font-display text-xl mb-4">Order Items ({items.length})</h2>
               <ul className="divide-y divide-border">
@@ -172,10 +184,8 @@ function CheckoutPage() {
                 ))}
               </ul>
             </section>
-
           </div>
 
-          {/* Summary */}
           <aside className="bg-white rounded-2xl shadow-card p-6 h-fit lg:sticky lg:top-24">
             <h2 className="font-display text-xl mb-4">Order Summary</h2>
             <dl className="space-y-2 text-sm">
@@ -186,7 +196,6 @@ function CheckoutPage() {
                 <dt>Grand Total</dt><dd>₹{totals.total}</dd>
               </div>
             </dl>
-
 
             <button onClick={handlePay} disabled={busy} className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60">
               {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</> : <><Wallet className="w-4 h-4" /> Pay ₹{totals.total}</>}

@@ -1,15 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { db } from "@server/db";
+import { orders } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import crypto from "node:crypto";
 
-/**
- * Razorpay webhook endpoint.
- *
- * Configure in Razorpay Dashboard → Settings → Webhooks:
- *   URL:     https://<your-replit-domain>/api/public/razorpay/webhook
- *   Secret:  RAZORPAY_WEBHOOK_SECRET (must match the env var)
- *   Events:  payment.captured, payment.failed, order.paid
- */
 export const Route = createFileRoute("/api/public/razorpay/webhook")({
   server: {
     handlers: {
@@ -33,11 +27,7 @@ export const Route = createFileRoute("/api/public/razorpay/webhook")({
         }
 
         let payload: any;
-        try {
-          payload = JSON.parse(body);
-        } catch {
-          return new Response("Invalid JSON", { status: 400 });
-        }
+        try { payload = JSON.parse(body); } catch { return new Response("Invalid JSON", { status: 400 }); }
 
         const event: string = payload.event;
         const paymentEntity = payload.payload?.payment?.entity;
@@ -49,25 +39,17 @@ export const Route = createFileRoute("/api/public/razorpay/webhook")({
 
         try {
           if (event === "payment.captured" || event === "order.paid") {
-            await supabaseAdmin
-              .from("orders")
-              .update({
-                payment_status: "paid",
-                status: "confirmed",
-                razorpay_payment_id: rzpPaymentId ?? null,
-              })
-              .eq("razorpay_order_id", rzpOrderId)
-              .neq("payment_status", "paid");
+            await db.update(orders).set({
+              paymentStatus: "paid",
+              status: "confirmed",
+              razorpayPaymentId: rzpPaymentId ?? null,
+            }).where(eq(orders.razorpayOrderId, rzpOrderId));
           } else if (event === "payment.failed") {
-            await supabaseAdmin
-              .from("orders")
-              .update({
-                payment_status: "failed",
-                status: "failed",
-                razorpay_payment_id: rzpPaymentId ?? null,
-              })
-              .eq("razorpay_order_id", rzpOrderId)
-              .neq("payment_status", "paid");
+            await db.update(orders).set({
+              paymentStatus: "failed",
+              status: "failed",
+              razorpayPaymentId: rzpPaymentId ?? null,
+            }).where(eq(orders.razorpayOrderId, rzpOrderId));
           }
         } catch (err) {
           console.error("Webhook DB update failed:", err);

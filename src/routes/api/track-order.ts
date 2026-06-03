@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { db } from "@server/db";
+import { orders } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export const Route = createFileRoute("/api/track-order")({
   server: {
@@ -11,23 +13,33 @@ export const Route = createFileRoute("/api/track-order")({
           return Response.json({ error: "Missing tracking_id" }, { status: 400 });
         }
 
-        const { data, error } = await supabaseAdmin
-          .from("orders")
-          .select("tracking_id, tracking_status, tracking_location, tracking_eta, tracking_updated_at, created_at, items, total")
-          .eq("tracking_id", trackingId)
-          .maybeSingle();
+        const rows = await db
+          .select({
+            trackingId: orders.trackingId,
+            trackingStatus: orders.trackingStatus,
+            trackingLocation: orders.trackingLocation,
+            trackingEta: orders.trackingEta,
+            trackingUpdatedAt: orders.trackingUpdatedAt,
+            createdAt: orders.createdAt,
+            items: orders.items,
+            total: orders.total,
+          })
+          .from(orders)
+          .where(eq(orders.trackingId, trackingId))
+          .limit(1);
 
-        if (error || !data) {
+        if (rows.length === 0) {
           return Response.json({ error: "Order not found" }, { status: 404 });
         }
 
+        const data = rows[0];
         return Response.json({
-          tracking_id: data.tracking_id,
-          status: data.tracking_status ?? "Order Placed",
-          location: data.tracking_location ?? null,
-          eta: data.tracking_eta ?? null,
-          updated_at: data.tracking_updated_at,
-          placed_at: data.created_at,
+          tracking_id: data.trackingId,
+          status: data.trackingStatus ?? "Order Placed",
+          location: data.trackingLocation ?? null,
+          eta: data.trackingEta ?? null,
+          updated_at: data.trackingUpdatedAt,
+          placed_at: data.createdAt,
           items: data.items,
           total: data.total,
         });

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { products as staticProducts, getProductBySlug, type Product } from "./products";
 import productPlaceholder from "@/assets/product-1.webp";
 
@@ -11,7 +10,7 @@ export type DbProduct = {
   price: number;
   mrp: number | null;
   stock: number;
-  image_url: string | null;
+  imageUrl: string | null;
   category: string | null;
   active: boolean;
 };
@@ -34,13 +33,12 @@ const DEFAULTS = {
   categories: [] as string[],
 };
 
-/** Merge a DB row over a matching static catalog entry. DB-only fields fall back to defaults. */
 export function mergeProduct(db: DbProduct, stat?: Product): Product {
   const base = stat ?? null;
   return {
     slug: db.slug,
     name: db.name,
-    image: db.image_url || base?.image || productPlaceholder,
+    image: db.imageUrl || base?.image || productPlaceholder,
     desc: db.description || base?.desc || "",
     longDesc: base?.longDesc || (db.description || ""),
     price: Number(db.price) || 0,
@@ -61,13 +59,10 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
 
 export async function fetchProductsFromDb(): Promise<Product[]> {
   try {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("active", true)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return (data as DbProduct[]).map((d) => mergeProduct(d, getProductBySlug(d.slug)));
+    const res = await fetch("/api/products");
+    if (!res.ok) throw new Error("Failed to fetch products");
+    const data = await res.json();
+    return (data.products as DbProduct[]).map((d) => mergeProduct(d, getProductBySlug(d.slug)));
   } catch {
     return staticProducts;
   }
@@ -75,16 +70,11 @@ export async function fetchProductsFromDb(): Promise<Product[]> {
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("slug", slug)
-      .maybeSingle();
-    if (error) throw error;
-    if (!data) {
-      return getProductBySlug(slug) ?? null;
-    }
-    return mergeProduct(data as DbProduct, getProductBySlug(slug));
+    const res = await fetch(`/api/products?slug=${encodeURIComponent(slug)}`);
+    if (!res.ok) return getProductBySlug(slug) ?? null;
+    const data = await res.json();
+    if (!data.product) return getProductBySlug(slug) ?? null;
+    return mergeProduct(data.product as DbProduct, getProductBySlug(slug));
   } catch {
     return getProductBySlug(slug) ?? null;
   }
@@ -104,16 +94,13 @@ export function useProducts() {
       } catch (e: any) {
         if (!cancelled) {
           setError(e?.message || "Failed to load products");
-          // Fallback to static so the site never goes blank
           setItems(staticProducts);
         }
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   return { items, loading, error };

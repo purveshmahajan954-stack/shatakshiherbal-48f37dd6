@@ -30,6 +30,8 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TrackTrackingIdRouteImport } from './routes/track.$trackingId'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
+import { Route as ApiProductsRouteImport } from './routes/api/products'
+import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
@@ -38,8 +40,27 @@ import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
+import { Route as ApiUserOrdersRouteImport } from './routes/api/user/orders'
 import { Route as ApiPublicWebhookUpdateRouteImport } from './routes/api/public/webhook-update'
-import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay.webhook'
+import { Route as ApiPaymentsVerifyRouteImport } from './routes/api/payments/verify'
+import { Route as ApiPaymentsRazorpayKeyRouteImport } from './routes/api/payments/razorpay-key'
+import { Route as ApiPaymentsMarkFailedRouteImport } from './routes/api/payments/mark-failed'
+import { Route as ApiPaymentsCreateOrderRouteImport } from './routes/api/payments/create-order'
+import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
+import { Route as ApiAuthSignoutRouteImport } from './routes/api/auth/signout'
+import { Route as ApiAuthSigninRouteImport } from './routes/api/auth/signin'
+import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
+import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
+import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
+import { Route as ApiAdminSigninRouteImport } from './routes/api/admin/signin'
+import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
+import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
+import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
+import { Route as ApiAdminMeRouteImport } from './routes/api/admin/me'
+import { Route as ApiAdminLeadsRouteImport } from './routes/api/admin/leads'
+import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
+import { Route as ApiAdminCustomersRouteImport } from './routes/api/admin/customers'
+import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay/webhook'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -146,6 +167,16 @@ const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
   path: '/api/track-order',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProductsRoute = ApiProductsRouteImport.update({
+  id: '/api/products',
+  path: '/api/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiContactRoute = ApiContactRouteImport.update({
+  id: '/api/contact',
+  path: '/api/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -186,9 +217,104 @@ const AdminCustomersRoute = AdminCustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiUserOrdersRoute = ApiUserOrdersRouteImport.update({
+  id: '/api/user/orders',
+  path: '/api/user/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhookUpdateRoute = ApiPublicWebhookUpdateRouteImport.update({
   id: '/api/public/webhook-update',
   path: '/api/public/webhook-update',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsVerifyRoute = ApiPaymentsVerifyRouteImport.update({
+  id: '/api/payments/verify',
+  path: '/api/payments/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsRazorpayKeyRoute = ApiPaymentsRazorpayKeyRouteImport.update({
+  id: '/api/payments/razorpay-key',
+  path: '/api/payments/razorpay-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsMarkFailedRoute = ApiPaymentsMarkFailedRouteImport.update({
+  id: '/api/payments/mark-failed',
+  path: '/api/payments/mark-failed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsCreateOrderRoute = ApiPaymentsCreateOrderRouteImport.update({
+  id: '/api/payments/create-order',
+  path: '/api/payments/create-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
+  id: '/api/auth/signup',
+  path: '/api/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSignoutRoute = ApiAuthSignoutRouteImport.update({
+  id: '/api/auth/signout',
+  path: '/api/auth/signout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSigninRoute = ApiAuthSigninRouteImport.update({
+  id: '/api/auth/signin',
+  path: '/api/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
+  id: '/api/auth/me',
+  path: '/api/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
+  id: '/api/admin/users',
+  path: '/api/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSignoutRoute = ApiAdminSignoutRouteImport.update({
+  id: '/api/admin/signout',
+  path: '/api/admin/signout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSigninRoute = ApiAdminSigninRouteImport.update({
+  id: '/api/admin/signin',
+  path: '/api/admin/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminReportsRoute = ApiAdminReportsRouteImport.update({
+  id: '/api/admin/reports',
+  path: '/api/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminProductsRoute = ApiAdminProductsRouteImport.update({
+  id: '/api/admin/products',
+  path: '/api/admin/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
+  id: '/api/admin/orders',
+  path: '/api/admin/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminMeRoute = ApiAdminMeRouteImport.update({
+  id: '/api/admin/me',
+  path: '/api/admin/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminLeadsRoute = ApiAdminLeadsRouteImport.update({
+  id: '/api/admin/leads',
+  path: '/api/admin/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminDashboardRoute = ApiAdminDashboardRouteImport.update({
+  id: '/api/admin/dashboard',
+  path: '/api/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminCustomersRoute = ApiAdminCustomersRouteImport.update({
+  id: '/api/admin/customers',
+  path: '/api/admin/customers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRazorpayWebhookRoute =
@@ -224,11 +350,32 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AdminProductsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
   '/track/$trackingId': typeof TrackTrackingIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/admin/customers': typeof ApiAdminCustomersRoute
+  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/leads': typeof ApiAdminLeadsRoute
+  '/api/admin/me': typeof ApiAdminMeRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
+  '/api/admin/products': typeof ApiAdminProductsRoute
+  '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/signin': typeof ApiAdminSigninRoute
+  '/api/admin/signout': typeof ApiAdminSignoutRoute
+  '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/auth/signin': typeof ApiAuthSigninRoute
+  '/api/auth/signout': typeof ApiAuthSignoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
+  '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
+  '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
+  '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
+  '/api/user/orders': typeof ApiUserOrdersRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -256,11 +403,32 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AdminProductsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
   '/track/$trackingId': typeof TrackTrackingIdRoute
   '/admin': typeof AdminIndexRoute
+  '/api/admin/customers': typeof ApiAdminCustomersRoute
+  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/leads': typeof ApiAdminLeadsRoute
+  '/api/admin/me': typeof ApiAdminMeRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
+  '/api/admin/products': typeof ApiAdminProductsRoute
+  '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/signin': typeof ApiAdminSigninRoute
+  '/api/admin/signout': typeof ApiAdminSignoutRoute
+  '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/auth/signin': typeof ApiAuthSigninRoute
+  '/api/auth/signout': typeof ApiAuthSignoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
+  '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
+  '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
+  '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
+  '/api/user/orders': typeof ApiUserOrdersRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesById {
@@ -290,11 +458,32 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
   '/track/$trackingId': typeof TrackTrackingIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/admin/customers': typeof ApiAdminCustomersRoute
+  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/leads': typeof ApiAdminLeadsRoute
+  '/api/admin/me': typeof ApiAdminMeRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
+  '/api/admin/products': typeof ApiAdminProductsRoute
+  '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/signin': typeof ApiAdminSigninRoute
+  '/api/admin/signout': typeof ApiAdminSignoutRoute
+  '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/auth/signin': typeof ApiAuthSigninRoute
+  '/api/auth/signout': typeof ApiAuthSignoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
+  '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
+  '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
+  '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
+  '/api/user/orders': typeof ApiUserOrdersRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRouteTypes {
@@ -325,11 +514,32 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/reports'
     | '/admin/users'
+    | '/api/contact'
+    | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
     | '/track/$trackingId'
     | '/admin/'
+    | '/api/admin/customers'
+    | '/api/admin/dashboard'
+    | '/api/admin/leads'
+    | '/api/admin/me'
+    | '/api/admin/orders'
+    | '/api/admin/products'
+    | '/api/admin/reports'
+    | '/api/admin/signin'
+    | '/api/admin/signout'
+    | '/api/admin/users'
+    | '/api/auth/me'
+    | '/api/auth/signin'
+    | '/api/auth/signout'
+    | '/api/auth/signup'
+    | '/api/payments/create-order'
+    | '/api/payments/mark-failed'
+    | '/api/payments/razorpay-key'
+    | '/api/payments/verify'
     | '/api/public/webhook-update'
+    | '/api/user/orders'
     | '/api/public/razorpay/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -357,11 +567,32 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/reports'
     | '/admin/users'
+    | '/api/contact'
+    | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
     | '/track/$trackingId'
     | '/admin'
+    | '/api/admin/customers'
+    | '/api/admin/dashboard'
+    | '/api/admin/leads'
+    | '/api/admin/me'
+    | '/api/admin/orders'
+    | '/api/admin/products'
+    | '/api/admin/reports'
+    | '/api/admin/signin'
+    | '/api/admin/signout'
+    | '/api/admin/users'
+    | '/api/auth/me'
+    | '/api/auth/signin'
+    | '/api/auth/signout'
+    | '/api/auth/signup'
+    | '/api/payments/create-order'
+    | '/api/payments/mark-failed'
+    | '/api/payments/razorpay-key'
+    | '/api/payments/verify'
     | '/api/public/webhook-update'
+    | '/api/user/orders'
     | '/api/public/razorpay/webhook'
   id:
     | '__root__'
@@ -390,11 +621,32 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/reports'
     | '/admin/users'
+    | '/api/contact'
+    | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
     | '/track/$trackingId'
     | '/admin/'
+    | '/api/admin/customers'
+    | '/api/admin/dashboard'
+    | '/api/admin/leads'
+    | '/api/admin/me'
+    | '/api/admin/orders'
+    | '/api/admin/products'
+    | '/api/admin/reports'
+    | '/api/admin/signin'
+    | '/api/admin/signout'
+    | '/api/admin/users'
+    | '/api/auth/me'
+    | '/api/auth/signin'
+    | '/api/auth/signout'
+    | '/api/auth/signup'
+    | '/api/payments/create-order'
+    | '/api/payments/mark-failed'
+    | '/api/payments/razorpay-key'
+    | '/api/payments/verify'
     | '/api/public/webhook-update'
+    | '/api/user/orders'
     | '/api/public/razorpay/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -416,10 +668,31 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   TermsRoute: typeof TermsRoute
   WishlistRoute: typeof WishlistRoute
+  ApiContactRoute: typeof ApiContactRoute
+  ApiProductsRoute: typeof ApiProductsRoute
   ApiTrackOrderRoute: typeof ApiTrackOrderRoute
   ProductSlugRoute: typeof ProductSlugRoute
   TrackTrackingIdRoute: typeof TrackTrackingIdRoute
+  ApiAdminCustomersRoute: typeof ApiAdminCustomersRoute
+  ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
+  ApiAdminLeadsRoute: typeof ApiAdminLeadsRoute
+  ApiAdminMeRoute: typeof ApiAdminMeRoute
+  ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
+  ApiAdminProductsRoute: typeof ApiAdminProductsRoute
+  ApiAdminReportsRoute: typeof ApiAdminReportsRoute
+  ApiAdminSigninRoute: typeof ApiAdminSigninRoute
+  ApiAdminSignoutRoute: typeof ApiAdminSignoutRoute
+  ApiAdminUsersRoute: typeof ApiAdminUsersRoute
+  ApiAuthMeRoute: typeof ApiAuthMeRoute
+  ApiAuthSigninRoute: typeof ApiAuthSigninRoute
+  ApiAuthSignoutRoute: typeof ApiAuthSignoutRoute
+  ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+  ApiPaymentsCreateOrderRoute: typeof ApiPaymentsCreateOrderRoute
+  ApiPaymentsMarkFailedRoute: typeof ApiPaymentsMarkFailedRoute
+  ApiPaymentsRazorpayKeyRoute: typeof ApiPaymentsRazorpayKeyRoute
+  ApiPaymentsVerifyRoute: typeof ApiPaymentsVerifyRoute
   ApiPublicWebhookUpdateRoute: typeof ApiPublicWebhookUpdateRoute
+  ApiUserOrdersRoute: typeof ApiUserOrdersRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
@@ -572,6 +845,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTrackOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/products': {
+      id: '/api/products'
+      path: '/api/products'
+      fullPath: '/api/products'
+      preLoaderRoute: typeof ApiProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/contact': {
+      id: '/api/contact'
+      path: '/api/contact'
+      fullPath: '/api/contact'
+      preLoaderRoute: typeof ApiContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -628,11 +915,144 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCustomersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/user/orders': {
+      id: '/api/user/orders'
+      path: '/api/user/orders'
+      fullPath: '/api/user/orders'
+      preLoaderRoute: typeof ApiUserOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhook-update': {
       id: '/api/public/webhook-update'
       path: '/api/public/webhook-update'
       fullPath: '/api/public/webhook-update'
       preLoaderRoute: typeof ApiPublicWebhookUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/verify': {
+      id: '/api/payments/verify'
+      path: '/api/payments/verify'
+      fullPath: '/api/payments/verify'
+      preLoaderRoute: typeof ApiPaymentsVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/razorpay-key': {
+      id: '/api/payments/razorpay-key'
+      path: '/api/payments/razorpay-key'
+      fullPath: '/api/payments/razorpay-key'
+      preLoaderRoute: typeof ApiPaymentsRazorpayKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/mark-failed': {
+      id: '/api/payments/mark-failed'
+      path: '/api/payments/mark-failed'
+      fullPath: '/api/payments/mark-failed'
+      preLoaderRoute: typeof ApiPaymentsMarkFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/create-order': {
+      id: '/api/payments/create-order'
+      path: '/api/payments/create-order'
+      fullPath: '/api/payments/create-order'
+      preLoaderRoute: typeof ApiPaymentsCreateOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signup': {
+      id: '/api/auth/signup'
+      path: '/api/auth/signup'
+      fullPath: '/api/auth/signup'
+      preLoaderRoute: typeof ApiAuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signout': {
+      id: '/api/auth/signout'
+      path: '/api/auth/signout'
+      fullPath: '/api/auth/signout'
+      preLoaderRoute: typeof ApiAuthSignoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signin': {
+      id: '/api/auth/signin'
+      path: '/api/auth/signin'
+      fullPath: '/api/auth/signin'
+      preLoaderRoute: typeof ApiAuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/me': {
+      id: '/api/auth/me'
+      path: '/api/auth/me'
+      fullPath: '/api/auth/me'
+      preLoaderRoute: typeof ApiAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/users': {
+      id: '/api/admin/users'
+      path: '/api/admin/users'
+      fullPath: '/api/admin/users'
+      preLoaderRoute: typeof ApiAdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/signout': {
+      id: '/api/admin/signout'
+      path: '/api/admin/signout'
+      fullPath: '/api/admin/signout'
+      preLoaderRoute: typeof ApiAdminSignoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/signin': {
+      id: '/api/admin/signin'
+      path: '/api/admin/signin'
+      fullPath: '/api/admin/signin'
+      preLoaderRoute: typeof ApiAdminSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/reports': {
+      id: '/api/admin/reports'
+      path: '/api/admin/reports'
+      fullPath: '/api/admin/reports'
+      preLoaderRoute: typeof ApiAdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/products': {
+      id: '/api/admin/products'
+      path: '/api/admin/products'
+      fullPath: '/api/admin/products'
+      preLoaderRoute: typeof ApiAdminProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/orders': {
+      id: '/api/admin/orders'
+      path: '/api/admin/orders'
+      fullPath: '/api/admin/orders'
+      preLoaderRoute: typeof ApiAdminOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/me': {
+      id: '/api/admin/me'
+      path: '/api/admin/me'
+      fullPath: '/api/admin/me'
+      preLoaderRoute: typeof ApiAdminMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/leads': {
+      id: '/api/admin/leads'
+      path: '/api/admin/leads'
+      fullPath: '/api/admin/leads'
+      preLoaderRoute: typeof ApiAdminLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/dashboard': {
+      id: '/api/admin/dashboard'
+      path: '/api/admin/dashboard'
+      fullPath: '/api/admin/dashboard'
+      preLoaderRoute: typeof ApiAdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/customers': {
+      id: '/api/admin/customers'
+      path: '/api/admin/customers'
+      fullPath: '/api/admin/customers'
+      preLoaderRoute: typeof ApiAdminCustomersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/razorpay/webhook': {
@@ -689,10 +1109,31 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   TermsRoute: TermsRoute,
   WishlistRoute: WishlistRoute,
+  ApiContactRoute: ApiContactRoute,
+  ApiProductsRoute: ApiProductsRoute,
   ApiTrackOrderRoute: ApiTrackOrderRoute,
   ProductSlugRoute: ProductSlugRoute,
   TrackTrackingIdRoute: TrackTrackingIdRoute,
+  ApiAdminCustomersRoute: ApiAdminCustomersRoute,
+  ApiAdminDashboardRoute: ApiAdminDashboardRoute,
+  ApiAdminLeadsRoute: ApiAdminLeadsRoute,
+  ApiAdminMeRoute: ApiAdminMeRoute,
+  ApiAdminOrdersRoute: ApiAdminOrdersRoute,
+  ApiAdminProductsRoute: ApiAdminProductsRoute,
+  ApiAdminReportsRoute: ApiAdminReportsRoute,
+  ApiAdminSigninRoute: ApiAdminSigninRoute,
+  ApiAdminSignoutRoute: ApiAdminSignoutRoute,
+  ApiAdminUsersRoute: ApiAdminUsersRoute,
+  ApiAuthMeRoute: ApiAuthMeRoute,
+  ApiAuthSigninRoute: ApiAuthSigninRoute,
+  ApiAuthSignoutRoute: ApiAuthSignoutRoute,
+  ApiAuthSignupRoute: ApiAuthSignupRoute,
+  ApiPaymentsCreateOrderRoute: ApiPaymentsCreateOrderRoute,
+  ApiPaymentsMarkFailedRoute: ApiPaymentsMarkFailedRoute,
+  ApiPaymentsRazorpayKeyRoute: ApiPaymentsRazorpayKeyRoute,
+  ApiPaymentsVerifyRoute: ApiPaymentsVerifyRoute,
   ApiPublicWebhookUpdateRoute: ApiPublicWebhookUpdateRoute,
+  ApiUserOrdersRoute: ApiUserOrdersRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport

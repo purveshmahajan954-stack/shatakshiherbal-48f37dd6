@@ -3,7 +3,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useState } from "react";
 import { Mail, Phone, MapPin, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/contact")({
@@ -24,15 +23,20 @@ function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.from("contact_messages").insert({
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim() || null,
-      message: form.message.trim(),
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim() || null,
+        message: form.message.trim(),
+      }),
     });
     setBusy(false);
-    if (error) {
-      console.error("contact_messages insert failed:", error);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error("contact submit failed:", data);
       toast.error("Failed to send message. Please try again.");
       return;
     }
@@ -58,22 +62,31 @@ function ContactPage() {
               { icon: MapPin, label: "Address", value: "By-pass Road, near Chitragupt school, Shivaji Ward, Gadarwara, Madhya Pradesh 487551" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="bg-white p-6 rounded-2xl shadow-card text-center">
-                <Icon className="w-6 h-6 text-primary mx-auto mb-3" />
-                <div className="font-semibold">{label}</div>
-                <div className="text-sm text-muted-foreground mt-1">{value}</div>
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
+                  <Icon className="w-6 h-6 text-primary" />
+                </div>
+                <div className="font-semibold text-sm mb-1">{label}</div>
+                <div className="text-sm text-muted-foreground">{value}</div>
               </div>
             ))}
           </div>
-          <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-card max-w-2xl mx-auto space-y-4">
-            <input required maxLength={200} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <input required type="email" maxLength={320} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email address" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <input maxLength={20} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="Phone (optional)" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <textarea required rows={5} maxLength={5000} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Your message" className="w-full border border-border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <button type="submit" disabled={busy} className="bg-primary text-primary-foreground px-8 py-3 rounded-md font-medium hover:bg-primary/90 transition disabled:opacity-50 inline-flex items-center gap-2">
-              {busy && <Loader2 className="w-4 h-4 animate-spin" />}{busy ? "Sending…" : "Send Message"}
-            </button>
-            {sent && <p className="text-primary text-sm">Thanks! We'll get back to you soon.</p>}
-          </form>
+
+          <div className="max-w-2xl mx-auto">
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-card p-8 space-y-4">
+              <h2 className="font-display text-2xl mb-2">Send a Message</h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email address" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Phone (optional)" className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              <textarea required rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Your message" className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+              {sent && <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-md px-3 py-2">Message sent! We'll get back to you shortly.</div>}
+              <button type="submit" disabled={busy} className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                {busy && <Loader2 className="w-4 h-4 animate-spin" />}
+                Send Message
+              </button>
+            </form>
+          </div>
         </div>
       </main>
       <Footer />

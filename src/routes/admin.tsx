@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tanstack/react-router";
-import { useAuth } from "@/lib/auth";
+import { useAdminAuth } from "@/lib/admin-auth";
 import { useTheme } from "@/lib/theme";
-import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import {
   Shield,
@@ -31,8 +30,6 @@ export const Route = createFileRoute("/admin")({
   }),
 });
 
-const ADMIN_EMAIL = "admin@shatakshiherbal.com";
-
 const NAV = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
@@ -45,7 +42,7 @@ const NAV = [
 ] as const;
 
 function AdminLayout() {
-  const { loading, user } = useAuth();
+  const { admin, loading, signOut } = useAdminAuth();
   const navigate = useNavigate();
   const { theme, toggle } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -53,10 +50,10 @@ function AdminLayout() {
 
   useEffect(() => {
     if (loading) return;
-    if (!user || user.email?.toLowerCase() !== ADMIN_EMAIL) {
+    if (!admin) {
       navigate({ to: "/admin-login", replace: true });
     }
-  }, [loading, user, navigate]);
+  }, [loading, admin, navigate]);
 
   useEffect(() => {
     if (currentPath === "/admin" || currentPath === "/admin/") {
@@ -64,7 +61,7 @@ function AdminLayout() {
     }
   }, [currentPath, navigate]);
 
-  if (loading || !user || user.email?.toLowerCase() !== ADMIN_EMAIL) {
+  if (loading || !admin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -73,7 +70,7 @@ function AdminLayout() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     navigate({ to: "/admin-login", replace: true });
   };
 

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Shield, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAdminAuth } from "@/lib/admin-auth";
 
 export const Route = createFileRoute("/admin-login")({
   component: AdminLoginPage,
@@ -17,41 +17,40 @@ const ADMIN_EMAIL = "admin@shatakshiherbal.com";
 
 function AdminLoginPage() {
   const navigate = useNavigate();
+  const { admin, loading } = useAdminAuth();
   const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // If already signed in as admin, jump to /admin
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email?.toLowerCase() === ADMIN_EMAIL) {
-        navigate({ to: "/admin", replace: true });
-      }
-    });
-  }, [navigate]);
+    if (!loading && admin) {
+      navigate({ to: "/admin", replace: true });
+    }
+  }, [loading, admin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setBusy(true);
     try {
-      const { data, error: signErr } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
+      const res = await fetch("/api/admin/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
-      if (signErr) throw new Error("Invalid email or password");
-      if (data.user?.email?.toLowerCase() !== ADMIN_EMAIL) {
-        await supabase.auth.signOut();
-        throw new Error("This account is not authorized.");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as any)?.error ?? "Invalid email or password");
       }
+      const data = await res.json();
+      localStorage.setItem("admin_token", data.token);
       navigate({ to: "/admin", replace: true });
     } catch (err: any) {
       setError(err?.message || "Invalid email or password");
       setBusy(false);
     }
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-cream to-primary/5 px-4 py-10">
