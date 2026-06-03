@@ -2,17 +2,23 @@
 
 import { createLovableAuth } from "@lovable.dev/cloud-auth-js";
 import { supabase } from "../supabase/client";
-const lovableAuth = createLovableAuth();
 
 type SignInOptions = {
   redirect_uri?: string;
   extraParams?: Record<string, string>;
 };
 
+// Lazy-initialize to avoid SSR crash on Cloudflare Workers (createLovableAuth uses browser APIs)
+let _lovableAuth: ReturnType<typeof createLovableAuth> | null = null;
+function getLovableAuth() {
+  if (!_lovableAuth) _lovableAuth = createLovableAuth();
+  return _lovableAuth;
+}
+
 export const lovable = {
   auth: {
     signInWithOAuth: async (provider: "google" | "apple" | "microsoft" | "lovable", opts?: SignInOptions) => {
-      const result = await lovableAuth.signInWithOAuth(provider, {
+      const result = await getLovableAuth().signInWithOAuth(provider, {
         redirect_uri: opts?.redirect_uri,
         extraParams: {
           ...opts?.extraParams,
