@@ -2,7 +2,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Leaf, Loader2, AlertTriangle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 
 type Method = "email" | "phone";
 
@@ -120,24 +119,16 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
 
   const handleGoogle = async () => {
     setBusy(true);
-    const timeout = window.setTimeout(() => {
-      setBusy(false);
-      toast.error("Google sign-in is taking too long. Please try again in a new tab.");
-    }, 45000);
     try {
-      const result = await Promise.race([
-        lovable.auth.signInWithOAuth("google", {
-          redirect_uri: window.location.origin,
-        }),
-        new Promise<never>((_, reject) => {
-          window.setTimeout(() => reject(new Error("Google sign-in timed out")), 45000);
-        }),
-      ]);
-      window.clearTimeout(timeout);
-      if (result.error) throw result.error;
-      if (!result.redirected) setBusy(false);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
+      // Browser will redirect to Google — keep busy spinner until navigation
     } catch (err: any) {
-      window.clearTimeout(timeout);
       toast.error(err.message || "Google sign-in failed");
       setBusy(false);
     }
