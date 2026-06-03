@@ -6,7 +6,7 @@ import crypto from "node:crypto";
  * Razorpay webhook endpoint.
  *
  * Configure in Razorpay Dashboard → Settings → Webhooks:
- *   URL:     https://<your-app>.lovable.app/api/public/razorpay/webhook
+ *   URL:     https://<your-replit-domain>/api/public/razorpay/webhook
  *   Secret:  RAZORPAY_WEBHOOK_SECRET (must match the env var)
  *   Events:  payment.captured, payment.failed, order.paid
  */
