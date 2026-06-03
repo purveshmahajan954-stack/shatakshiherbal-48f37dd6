@@ -1,0 +1,2 @@
+- [Cloudflare vs Replit Deploy](cloudflare-incompatible.md) — this app uses pg (TCP PostgreSQL) + Replit internal DB; Cloudflare Workers is incompatible; always use Replit Deploy.
+- [Admin provider setup](admin-provider.md) — AdminAuthProvider must be in __root.tsx RootComponent wrapping Outlet; missing it causes SSR crash on admin routes.
