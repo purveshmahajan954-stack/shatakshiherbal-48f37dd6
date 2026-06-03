@@ -60,27 +60,34 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
 }
 
 export async function fetchProductsFromDb(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("active", true)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data as DbProduct[]).map((d) => mergeProduct(d, getProductBySlug(d.slug)));
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("active", true)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data as DbProduct[]).map((d) => mergeProduct(d, getProductBySlug(d.slug)));
+  } catch {
+    return staticProducts;
+  }
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
-  if (error) throw error;
-  if (!data) {
-    const stat = getProductBySlug(slug);
-    return stat ?? null;
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) {
+      return getProductBySlug(slug) ?? null;
+    }
+    return mergeProduct(data as DbProduct, getProductBySlug(slug));
+  } catch {
+    return getProductBySlug(slug) ?? null;
   }
-  return mergeProduct(data as DbProduct, getProductBySlug(slug));
 }
 
 export function useProducts() {
