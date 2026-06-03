@@ -1,8 +1,8 @@
-import pg from "pg";
+import { neon } from "@neondatabase/serverless";
 import crypto from "node:crypto";
 
-const { Pool } = pg;
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const connectionString = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+const sql = neon(connectionString);
 
 const slugify = (s) =>
   s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -120,46 +120,31 @@ const base = [
 ];
 
 async function seed() {
-  const client = await pool.connect();
-  try {
-    let inserted = 0;
-    let skipped = 0;
-    for (const p of base) {
-      const slug = slugify(p.name);
-      const category = categoryMap[p.name] ?? "wellness-care";
+  let inserted = 0;
+  let skipped = 0;
 
-      const existing = await client.query(
-        "SELECT id FROM products WHERE slug = $1",
-        [slug]
-      );
+  for (const p of base) {
+    const slug = slugify(p.name);
+    const category = categoryMap[p.name] ?? "wellness-care";
 
-      if (existing.rows.length > 0) {
-        skipped++;
-        continue;
-      }
+    const existing = await sql`SELECT id FROM products WHERE slug = ${slug}`;
 
-      await client.query(
-        `INSERT INTO products (id, name, slug, description, price, mrp, stock, category, active, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, now(), now())`,
-        [
-          crypto.randomUUID(),
-          p.name,
-          slug,
-          p.desc,
-          p.price,
-          p.mrp,
-          100,
-          category,
-          true,
-        ]
-      );
-      inserted++;
+    if (existing.length > 0) {
+      skipped++;
+      continue;
     }
-    console.log(`✓ Seeded ${inserted} products (${skipped} already existed)`);
-  } finally {
-    client.release();
-    await pool.end();
+
+    await sql`
+      INSERT INTO products (id, name, slug, description, price, mrp, stock, category, active, created_at, updated_at)
+      VALUES (
+        ${crypto.randomUUID()}, ${p.name}, ${slug}, ${p.desc},
+        ${p.price}, ${p.mrp}, ${100}, ${category}, ${true}, now(), now()
+      )
+    `;
+    inserted++;
   }
+
+  console.log(`✓ Seeded ${inserted} products into Neon (${skipped} already existed)`);
 }
 
 seed().catch((err) => {
