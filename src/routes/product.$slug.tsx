@@ -1,6 +1,6 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck, Sparkles, Droplet, Sun, Moon, Heart, FlaskConical } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck, Sparkles, Droplet, Sun, Moon, Heart, FlaskConical, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -19,11 +19,10 @@ export const Route = createFileRoute("/product/$slug")({
   component: ProductDetailPage,
   loader: async ({ params }) => {
     const product = await fetchProductBySlug(params.slug);
-    if (!product) throw notFound();
-    return { product };
+    return { product: product ?? null };
   },
   head: ({ loaderData }) => ({
-    meta: loaderData
+    meta: loaderData?.product
       ? [
           { title: `${loaderData.product.name} — Shatakshi Herbal` },
           { name: "description", content: loaderData.product.desc },
@@ -51,15 +50,58 @@ export const Route = createFileRoute("/product/$slug")({
 });
 
 function ProductDetailPage() {
-  const { product } = Route.useLoaderData() as { product: Product };
+  const loaderData = Route.useLoaderData() as { product: Product | null };
+  const { slug } = Route.useParams();
+  const [product, setProduct] = useState<Product | null>(loaderData.product);
+  const [clientLoading, setClientLoading] = useState(!loaderData.product);
   const { add } = useCart();
   const wishlist = useWishlist();
-  const inWishlist = wishlist.has(product.slug);
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "reviews" | "info">("description");
-  const gallery = [product.image, badgeNoSugar, badgeGmp, badgeNoExtracts, badgeNoFlavours, badgeBpaFree];
   const [activeImg, setActiveImg] = useState(0);
+
+  useEffect(() => {
+    if (!loaderData.product) {
+      fetchProductBySlug(slug).then((p) => {
+        setProduct(p);
+        setClientLoading(false);
+      });
+    }
+  }, [slug, loaderData.product]);
+
+  if (clientLoading) {
+    return (
+      <div className="min-h-screen bg-cream flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-cream flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center text-center px-4">
+          <div>
+            <h1 className="font-display text-4xl mb-3">Product not found</h1>
+            <p className="text-muted-foreground mb-6">The product you're looking for doesn't exist.</p>
+            <Link to="/shop" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-md font-medium">
+              <ArrowLeft className="w-4 h-4" /> Back to Shop
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const inWishlist = wishlist.has(product.slug);
+  const gallery = [product.image, badgeNoSugar, badgeGmp, badgeNoExtracts, badgeNoFlavours, badgeBpaFree];
 
 
   const handleAdd = () => {
