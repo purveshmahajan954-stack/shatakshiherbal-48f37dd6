@@ -1,6 +1,6 @@
 import { defineConfig } from "drizzle-kit";
 
-const connectionString = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 
 export default defineConfig({
   out: "./drizzle",
