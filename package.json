@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "db:push": "drizzle-kit push",
+    "deploy": "vite build && CLOUDFLARE_ACCOUNT_ID=939eff0771f34232554e5155088faf84 wrangler deploy",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
