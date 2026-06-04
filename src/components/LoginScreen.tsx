@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Leaf, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
+  const { refreshUser } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,22 +15,24 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: name },
-          },
-        });
-        if (error) throw error;
-        toast.success("Account created! You're signed in.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Welcome back!");
-      }
+      const endpoint = mode === "signup" ? "/api/auth/signup" : "/api/auth/signin";
+      const body =
+        mode === "signup"
+          ? { email, password, fullName: name }
+          : { email, password };
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+
+      localStorage.setItem("auth_token", data.token);
+      await refreshUser();
+      toast.success(mode === "signup" ? "Account created! Welcome." : "Welcome back!");
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
     } finally {
