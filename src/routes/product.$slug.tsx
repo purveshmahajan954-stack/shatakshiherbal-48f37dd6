@@ -53,7 +53,7 @@ function ProductDetailPage() {
   const loaderData = Route.useLoaderData() as { product: Product | null };
   const { slug } = Route.useParams();
   const [product, setProduct] = useState<Product | null>(loaderData.product);
-  const [clientLoading, setClientLoading] = useState(!loaderData.product);
+  const [fetching, setFetching] = useState(false);
   const { add } = useCart();
   const wishlist = useWishlist();
   const navigate = useNavigate();
@@ -63,14 +63,15 @@ function ProductDetailPage() {
 
   useEffect(() => {
     if (!loaderData.product) {
+      setFetching(true);
       fetchProductBySlug(slug).then((p) => {
-        setProduct(p);
-        setClientLoading(false);
+        setProduct(p ?? null);
+        setFetching(false);
       });
     }
   }, [slug, loaderData.product]);
 
-  if (clientLoading) {
+  if (fetching) {
     return (
       <div className="min-h-screen bg-cream flex flex-col">
         <Header />
