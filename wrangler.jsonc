@@ -1,5 +1,6 @@
 {
   "name": "shatakshi-herbal",
+  "account_id": "939eff0771f34232554e5155088faf84",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "dist/server/server.js",
