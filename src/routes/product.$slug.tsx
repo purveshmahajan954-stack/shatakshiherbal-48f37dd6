@@ -180,7 +180,7 @@ function ProductDetailPage() {
                 <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-4xl text-foreground">₹{product.price}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mb-5">+ 5% GST · ₹150 courier on every order</p>
+                <p className="text-xs text-muted-foreground mb-5">+ ₹150 courier on every order</p>
 
 
                 <div className="flex items-center gap-4 mb-5">
