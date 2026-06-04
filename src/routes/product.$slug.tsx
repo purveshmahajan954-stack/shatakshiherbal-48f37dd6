@@ -8,6 +8,7 @@ import { sampleReviews, products as staticProducts, type Product } from "@/lib/p
 import { fetchProductBySlug } from "@/lib/use-products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
+
 const badgeNoSugar = "https://images.pexels.com/photos/4033148/pexels-photo-4033148.jpeg?auto=compress&cs=tinysrgb&w=200";
 const badgeGmp = "https://images.pexels.com/photos/3873209/pexels-photo-3873209.jpeg?auto=compress&cs=tinysrgb&w=200";
 const badgeNoExtracts = "https://images.pexels.com/photos/4033169/pexels-photo-4033169.jpeg?auto=compress&cs=tinysrgb&w=200";
