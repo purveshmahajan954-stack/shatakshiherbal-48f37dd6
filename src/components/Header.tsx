@@ -27,7 +27,7 @@ export function Header() {
   return (
     <>
       <header className="bg-cream/90 backdrop-blur sticky top-0 z-50 border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
+        <div className="max-w-7xl mx-auto pl-1 pr-4 sm:pl-2 sm:pr-6 lg:pl-3 lg:pr-8 flex items-center justify-between h-20">
           <Link to="/" className="flex items-center" onClick={() => setOpen(false)}>
             <img
               src={logoImg}
