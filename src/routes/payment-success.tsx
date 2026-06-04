@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
-import { CheckCircle2, Package, ArrowRight, Truck, Copy } from "lucide-react";
+import { CheckCircle2, Package, ArrowRight, Truck, Copy, FileDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { downloadInvoice } from "@/lib/invoice";
 
 export const Route = createFileRoute("/payment-success")({
   validateSearch: z.object({ o: z.string().uuid().optional() }),
@@ -19,6 +21,7 @@ export const Route = createFileRoute("/payment-success")({
 
 function SuccessPage() {
   const { o } = Route.useSearch();
+  const [downloading, setDownloading] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["order", o],
@@ -34,6 +37,19 @@ function SuccessPage() {
   });
 
   const order = data?.order;
+
+  const handleDownload = async () => {
+    if (!order) return;
+    setDownloading(true);
+    try {
+      await downloadInvoice(order);
+      toast.success("Invoice downloaded!");
+    } catch {
+      toast.error("Could not generate invoice");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-cream/40">
@@ -66,16 +82,24 @@ function SuccessPage() {
                   </div>
                 </div>
               )}
-              <div className="text-left bg-cream/50 rounded-xl p-5 space-y-2 text-sm border border-border">
+              <div className="text-left bg-cream/50 rounded-xl p-5 space-y-2 text-sm border border-border mb-4">
                 <div className="flex justify-between"><span className="text-muted-foreground">Order ID</span><span className="font-mono">#{order.id.slice(0, 8).toUpperCase()}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-semibold">₹{order.total}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Payment ID</span><span className="font-mono text-xs">{order.razorpayPaymentId ?? order.razorpay_payment_id}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Status</span><span className="text-primary font-semibold capitalize">{order.paymentStatus ?? order.payment_status}</span></div>
               </div>
+
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="w-full inline-flex items-center justify-center gap-2 border-2 border-primary text-primary px-6 py-3 rounded-full font-semibold hover:bg-primary hover:text-primary-foreground transition disabled:opacity-60 mb-2"
+              >
+                {downloading ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</> : <><FileDown className="w-4 h-4" /> Download Invoice</>}
+              </button>
             </>
           )}
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
             {(order?.trackingId ?? order?.tracking_id) && (
               <Link
                 to="/track/$trackingId"

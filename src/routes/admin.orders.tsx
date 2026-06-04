@@ -16,7 +16,6 @@ type Order = {
   subtotal: number;
   discount: number;
   deliveryCharge: number;
-  gst: number;
   total: number;
   email: string | null;
   shippingName: string | null;
@@ -134,9 +133,8 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
             </div>
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Billing breakdown</h4>
             <div className="text-sm border border-border rounded-lg bg-card divide-y divide-border">
-              <Row label="Base amount" value={`₹${Number(order.subtotal).toLocaleString("en-IN")}`} />
-              <Row label="GST (5%)" value={`₹${Number(order.gst).toLocaleString("en-IN")}`} accent />
-              <Row label="Delivery" value={`₹${Number(order.deliveryCharge).toLocaleString("en-IN")}`} />
+              <Row label="Product subtotal" value={`₹${Number(order.subtotal).toLocaleString("en-IN")}`} />
+              <Row label="Delivery charge" value={`₹${Number(order.deliveryCharge).toLocaleString("en-IN")}`} />
               {Number(order.discount) > 0 && <Row label="Discount" value={`−₹${Number(order.discount).toLocaleString("en-IN")}`} />}
               <Row label="Total bill" value={`₹${Number(order.total).toLocaleString("en-IN")}`} bold />
             </div>
@@ -176,11 +174,11 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
   );
 }
 
-function Row({ label, value, bold, accent }: { label: string; value: string; bold?: boolean; accent?: boolean }) {
+function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <div className="flex justify-between p-2.5">
       <span className="text-muted-foreground">{label}</span>
-      <span className={`${bold ? "font-semibold" : ""} ${accent ? "text-primary" : ""}`}>{value}</span>
+      <span className={bold ? "font-semibold" : ""}>{value}</span>
     </div>
   );
 }

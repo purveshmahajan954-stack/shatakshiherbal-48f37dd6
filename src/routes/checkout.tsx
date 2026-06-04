@@ -190,7 +190,6 @@ function CheckoutPage() {
             <h2 className="font-display text-xl mb-4">Order Summary</h2>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between"><dt>Product Subtotal</dt><dd>₹{totals.subtotal}</dd></div>
-              <div className="flex justify-between"><dt>GST (5%)</dt><dd>₹{totals.gst}</dd></div>
               <div className="flex justify-between"><dt>Courier Charges</dt><dd>₹{totals.delivery}</dd></div>
               <div className="border-t border-border pt-3 flex justify-between text-lg font-semibold">
                 <dt>Grand Total</dt><dd>₹{totals.total}</dd>

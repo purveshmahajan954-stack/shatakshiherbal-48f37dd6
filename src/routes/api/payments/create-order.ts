@@ -7,7 +7,6 @@ import { getProductBySlug } from "@/lib/products";
 import crypto from "node:crypto";
 
 const RAZORPAY_BASE = "https://api.razorpay.com/v1";
-const GST_RATE = 0.05;
 const COURIER_CHARGE = 150;
 
 function rzpAuthHeader() {
@@ -19,9 +18,8 @@ function rzpAuthHeader() {
 
 function computeTotals(subtotal: number) {
   const sub = Math.max(0, Math.round(subtotal));
-  const gst = Math.round(sub * GST_RATE);
   const delivery = sub === 0 ? 0 : COURIER_CHARGE;
-  return { subtotal: sub, gst, delivery, total: sub + gst + delivery };
+  return { subtotal: sub, gst: 0, delivery, total: sub + delivery };
 }
 
 const cartItemSchema = z.object({
@@ -111,7 +109,7 @@ export const Route = createFileRoute("/api/payments/create-order")({
           discount: "0",
           couponCode: null,
           deliveryCharge: String(totals.delivery),
-          gst: String(totals.gst),
+          gst: "0",
           total: String(totals.total),
           razorpayOrderId: rzpOrder.id,
           paymentStatus: "created",

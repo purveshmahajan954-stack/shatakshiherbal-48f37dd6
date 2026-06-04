@@ -8,7 +8,17 @@ export const Route = createFileRoute("/admin/reports")({
   component: ReportsPage,
 });
 
-type Order = { id: string; userId: string; total: number; gst: number; subtotal: number; paymentStatus: string; createdAt: string; shippingName: string | null; email: string | null; items: { name: string; qty: number; price: number; slug?: string }[] };
+type Order = {
+  id: string;
+  userId: string;
+  total: number;
+  subtotal: number;
+  paymentStatus: string;
+  createdAt: string;
+  shippingName: string | null;
+  email: string | null;
+  items: { name: string; qty: number; price: number; slug?: string }[];
+};
 
 function ReportsPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -70,7 +80,10 @@ function ReportsPage() {
     <div className="space-y-5">
       <div className="bg-card border border-border rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
-          <div><h3 className="font-display text-lg flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" /> Sales</h3><p className="text-xs text-muted-foreground">Revenue from paid orders</p></div>
+          <div>
+            <h3 className="font-display text-lg flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" /> Sales</h3>
+            <p className="text-xs text-muted-foreground">Revenue from paid orders</p>
+          </div>
           <div className="flex gap-1">{(["daily", "monthly"] as const).map((r) => <button key={r} onClick={() => setRange(r)} className={`px-3 py-1.5 text-xs rounded-lg capitalize ${range === r ? "bg-primary text-primary-foreground" : "bg-background border border-border hover:bg-muted"}`}>{r}</button>)}</div>
         </div>
         <div className="h-72">

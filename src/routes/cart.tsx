@@ -17,9 +17,8 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, total, setQty, remove, clear, count } = useCart();
-  const gst = Math.round(total * 0.05);
   const delivery = total === 0 ? 0 : 150;
-  const grand = total + gst + delivery;
+  const grand = total + delivery;
 
   return (
     <div className="min-h-screen flex flex-col bg-cream/40">
@@ -70,7 +69,6 @@ function CartPage() {
               <h2 className="font-display text-xl mb-4">Order Summary</h2>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between"><dt>Product Subtotal</dt><dd>₹{total}</dd></div>
-                <div className="flex justify-between"><dt>GST (5%)</dt><dd>₹{gst}</dd></div>
                 <div className="flex justify-between"><dt>Courier Charges</dt><dd>₹{delivery}</dd></div>
                 <div className="border-t border-border pt-3 flex justify-between text-base font-semibold">
                   <dt>Grand Total</dt><dd>₹{grand}</dd>

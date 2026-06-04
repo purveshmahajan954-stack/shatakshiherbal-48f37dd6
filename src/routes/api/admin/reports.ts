@@ -1,20 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
-import { orders, profiles, adminSessions } from "@shared/schema";
-import { eq, and, gt, desc } from "drizzle-orm";
-
-async function requireAdmin(request: Request) {
-  const token = request.headers.get("x-admin-token");
-  if (!token) return null;
-  const now = new Date();
-  const rows = await db
-    .select({ profile: profiles })
-    .from(adminSessions)
-    .innerJoin(profiles, eq(adminSessions.profileId, profiles.id))
-    .where(and(eq(adminSessions.token, token), gt(adminSessions.expiresAt, now)))
-    .limit(1);
-  return rows[0]?.profile ?? null;
-}
+import { orders } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
+import { requireAdmin } from "@server/admin-auth";
 
 export const Route = createFileRoute("/api/admin/reports")({
   server: {
@@ -28,7 +16,7 @@ export const Route = createFileRoute("/api/admin/reports")({
           .from(orders)
           .where(eq(orders.paymentStatus, "paid"))
           .orderBy(desc(orders.createdAt))
-          .limit(2000);
+          .limit(1000);
 
         return Response.json({ orders: rows });
       },
