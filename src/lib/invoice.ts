@@ -1,180 +1,144 @@
-export interface InvoiceOrder {
+type InvoiceItem = { name: string; qty: number; price: number };
+
+type InvoiceData = {
   id: string;
-  shippingName: string | null;
-  email: string | null;
-  shippingPhone: string | null;
-  shippingAddress: string | null;
-  items: { name: string; qty: number; price: number }[];
-  subtotal: number | string;
-  deliveryCharge: number | string;
-  total: number | string;
-  razorpayPaymentId?: string | null;
+  shipping_name?: string | null;
+  email?: string | null;
+  shipping_address?: string | null;
+  items: InvoiceItem[];
+  subtotal: number;
+  delivery_charge: number;
+  total: number;
+  payment_status: string;
   razorpay_payment_id?: string | null;
-  paymentStatus?: string | null;
-  payment_status?: string | null;
-  createdAt?: string | null;
-  created_at?: string | null;
-}
+  created_at: string;
+};
 
-export async function downloadInvoice(order: InvoiceOrder) {
-  const { jsPDF } = await import("jspdf");
-
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const W = doc.internal.pageSize.getWidth();
-  const margin = 40;
-  let y = 40;
-
-  const primary = [45, 80, 22] as [number, number, number];
-  const dark = [30, 30, 30] as [number, number, number];
-  const muted = [100, 100, 100] as [number, number, number];
-  const light = [245, 240, 230] as [number, number, number];
-
-  doc.setFillColor(...primary);
-  doc.rect(0, 0, W, 80, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.text("Shatakshi Herbal", margin, 35);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text("Ayurvedic & Herbal Products", margin, 52);
-  doc.text("INVOICE", W - margin, 35, { align: "right" });
-  doc.setFontSize(9);
-  doc.text(`Order ID: #${order.id.slice(0, 8).toUpperCase()}`, W - margin, 52, { align: "right" });
-  const createdAt = order.createdAt ?? order.created_at;
-  doc.text(
-    createdAt ? new Date(createdAt).toLocaleDateString("en-IN", { dateStyle: "long" }) : new Date().toLocaleDateString("en-IN", { dateStyle: "long" }),
-    W - margin,
-    64,
-    { align: "right" }
-  );
-
-  y = 110;
-  doc.setTextColor(...dark);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.text("BILL TO", margin, y);
-  doc.setDrawColor(...primary);
-  doc.setLineWidth(1.5);
-  doc.line(margin, y + 4, margin + 60, y + 4);
-  y += 18;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(...dark);
-  doc.text(order.shippingName ?? "Customer", margin, y);
-  y += 14;
-  if (order.email) { doc.setTextColor(...muted); doc.text(order.email, margin, y); y += 14; }
-  if (order.shippingPhone) { doc.setTextColor(...muted); doc.text(order.shippingPhone, margin, y); y += 14; }
-  if (order.shippingAddress) {
-    doc.setTextColor(...muted);
-    const lines = doc.splitTextToSize(order.shippingAddress, 200);
-    doc.text(lines, margin, y);
-    y += lines.length * 14;
-  }
-
-  const paymentId = order.razorpayPaymentId ?? order.razorpay_payment_id;
-  const payStatus = order.paymentStatus ?? order.payment_status ?? "—";
-  const rightCol = W - margin - 160;
-  let ry = 110;
-  doc.setTextColor(...dark);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.text("PAYMENT DETAILS", rightCol, ry);
-  doc.line(rightCol, ry + 4, rightCol + 120, ry + 4);
-  ry += 18;
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...muted);
-  const details = [
-    ["Method:", paymentId ? "Online (Razorpay)" : "—"],
-    ["Status:", payStatus.charAt(0).toUpperCase() + payStatus.slice(1)],
-    ...(paymentId ? [["Payment ID:", paymentId.slice(0, 20)]] : []),
-  ] as [string, string][];
-  for (const [label, value] of details) {
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...dark);
-    doc.text(label, rightCol, ry);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...muted);
-    doc.text(value, rightCol + 72, ry);
-    ry += 14;
-  }
-
-  y = Math.max(y, ry) + 24;
-
-  doc.setFillColor(...light);
-  doc.rect(margin, y, W - margin * 2, 22, "F");
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(...dark);
-  doc.text("ITEM", margin + 8, y + 15);
-  doc.text("QTY", W - margin - 140, y + 15, { align: "right" });
-  doc.text("UNIT PRICE", W - margin - 70, y + 15, { align: "right" });
-  doc.text("AMOUNT", W - margin, y + 15, { align: "right" });
-  y += 22;
-
+export function downloadInvoice(order: InvoiceData) {
   const items = Array.isArray(order.items) ? order.items : [];
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    if (i % 2 === 1) {
-      doc.setFillColor(250, 248, 244);
-      doc.rect(margin, y, W - margin * 2, 20, "F");
-    }
-    doc.setTextColor(...dark);
-    const nameLines = doc.splitTextToSize(item.name, 220);
-    doc.text(nameLines, margin + 8, y + 13);
-    doc.setTextColor(...muted);
-    doc.text(String(item.qty), W - margin - 140, y + 13, { align: "right" });
-    doc.text(`Rs.${Number(item.price).toLocaleString("en-IN")}`, W - margin - 70, y + 13, { align: "right" });
-    doc.setTextColor(...dark);
-    doc.text(`Rs.${(Number(item.price) * Number(item.qty)).toLocaleString("en-IN")}`, W - margin, y + 13, { align: "right" });
-    y += Math.max(20, nameLines.length * 12 + 8);
+  const date = new Date(order.created_at).toLocaleString("en-IN", {
+    dateStyle: "long",
+    timeStyle: "short",
+  });
+  const orderId = `#${order.id.slice(0, 8).toUpperCase()}`;
+
+  const rows = items
+    .map(
+      (it) => `
+    <tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;">${it.name}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:center;">${it.qty}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;">₹${Number(it.price).toLocaleString("en-IN")}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:600;">₹${(Number(it.price) * it.qty).toLocaleString("en-IN")}</td>
+    </tr>`
+    )
+    .join("");
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Invoice ${orderId} — Shatakshi Herbal</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#222;background:#fff;padding:40px;max-width:800px;margin:0 auto}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;border-bottom:3px solid #2D5016;padding-bottom:24px}
+  .brand h1{font-size:22px;font-weight:800;color:#2D5016;letter-spacing:-0.5px}
+  .brand p{font-size:11px;color:#666;margin-top:4px}
+  .invoice-meta{text-align:right}
+  .invoice-meta h2{font-size:24px;color:#2D5016;font-weight:700;letter-spacing:2px}
+  .invoice-meta p{font-size:12px;color:#666;margin-top:4px}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+  .info-box{background:#f7f7f2;border-radius:8px;padding:14px 16px}
+  .info-box .label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:6px;font-weight:600}
+  .info-box .value{font-size:13px;color:#222;line-height:1.6}
+  .section-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:10px;font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-bottom:20px}
+  thead{background:#2D5016;color:#fff}
+  thead th{padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;text-align:left;font-weight:600}
+  thead th:nth-child(2){text-align:center}
+  thead th:nth-child(3),thead th:nth-child(4){text-align:right}
+  .totals{margin-left:auto;width:280px;border:1px solid #eee;border-radius:8px;overflow:hidden}
+  .totals .row{display:flex;justify-content:space-between;padding:9px 14px;font-size:13px;border-bottom:1px solid #eee}
+  .totals .row:last-child{background:#2D5016;color:#fff;font-weight:700;font-size:15px;border-bottom:none;padding:12px 14px}
+  .footer{margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;line-height:1.6}
+  @media print{body{padding:20px}@page{margin:1cm}}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <h1>🌿 SHATAKSHI HERBAL</h1>
+      <p>Pure Ayurvedic · AYUSH Certified · 100% Natural</p>
+      <p style="margin-top:2px">www.shatakshiherbal.com</p>
+    </div>
+    <div class="invoice-meta">
+      <h2>INVOICE</h2>
+      <p><strong>Order:</strong> ${orderId}</p>
+      <p><strong>Date:</strong> ${date}</p>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-box">
+      <div class="label">Billed To</div>
+      <div class="value">
+        <strong>${order.shipping_name || "—"}</strong><br>
+        ${order.email || "—"}<br>
+        ${(order.shipping_address || "").replace(/\n/g, "<br>")}
+      </div>
+    </div>
+    <div class="info-box">
+      <div class="label">Payment Details</div>
+      <div class="value">
+        <strong>Method:</strong> ${order.razorpay_payment_id ? "Online (Razorpay)" : "—"}<br>
+        <strong>Status:</strong> <span style="color:#2D5016;font-weight:600;text-transform:capitalize">${order.payment_status}</span><br>
+        ${order.razorpay_payment_id ? `<strong>Payment ID:</strong><br><span style="font-size:11px;font-family:monospace">${order.razorpay_payment_id}</span>` : ""}
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Order Items</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th style="text-align:center">Qty</th>
+          <th style="text-align:right">Unit Price</th>
+          <th style="text-align:right">Amount</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+
+  <div class="totals">
+    <div class="row"><span>Subtotal</span><span>₹${Number(order.subtotal).toLocaleString("en-IN")}</span></div>
+    <div class="row"><span>Delivery Charges</span><span>₹${Number(order.delivery_charge).toLocaleString("en-IN")}</span></div>
+    <div class="row"><span>Total Amount</span><span>₹${Number(order.total).toLocaleString("en-IN")}</span></div>
+  </div>
+
+  <div class="footer">
+    Thank you for shopping with Shatakshi Herbal!<br>
+    For queries, contact us at support@shatakshiherbal.com<br>
+    This is a computer-generated invoice and does not require a physical signature.
+  </div>
+
+  <script>window.onload=function(){setTimeout(function(){window.print()},500)}</script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, "_blank");
+  if (!win) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `shatakshi-herbal-invoice-${order.id.slice(0, 8)}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
-
-  y += 10;
-  doc.setDrawColor(220, 215, 205);
-  doc.setLineWidth(0.5);
-  doc.line(margin, y, W - margin, y);
-  y += 14;
-
-  const summaryLeft = W - margin - 200;
-  function summaryRow(label: string, value: string, bold = false) {
-    doc.setFont("helvetica", bold ? "bold" : "normal");
-    doc.setFontSize(bold ? 10 : 9);
-    if (bold) doc.setTextColor(...dark); else doc.setTextColor(...muted);
-    doc.text(label, summaryLeft, y);
-    doc.setTextColor(...dark);
-    doc.text(value, W - margin, y, { align: "right" });
-    y += 16;
-  }
-
-  const sub = Number(order.subtotal);
-  const delivery = Number(order.deliveryCharge);
-  const total = Number(order.total);
-
-  summaryRow("Subtotal", `Rs.${sub.toLocaleString("en-IN")}`);
-  summaryRow("Delivery Charge", `Rs.${delivery.toLocaleString("en-IN")}`);
-
-  y += 2;
-  doc.setFillColor(...primary);
-  doc.rect(summaryLeft - 8, y - 2, W - margin - summaryLeft + 8 + margin, 22, "F");
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(255, 255, 255);
-  doc.text("TOTAL", summaryLeft, y + 14);
-  doc.text(`Rs.${total.toLocaleString("en-IN")}`, W - margin, y + 14, { align: "right" });
-  y += 30;
-
-  y = doc.internal.pageSize.getHeight() - 50;
-  doc.setDrawColor(...primary);
-  doc.setLineWidth(0.5);
-  doc.line(margin, y, W - margin, y);
-  y += 14;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(...muted);
-  doc.text("Thank you for choosing Shatakshi Herbal! For any queries, contact us at shatakshiherbal@gmail.com", W / 2, y, { align: "center" });
-
-  doc.save(`Invoice_${order.id.slice(0, 8).toUpperCase()}.pdf`);
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
