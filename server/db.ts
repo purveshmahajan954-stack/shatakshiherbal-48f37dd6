@@ -1,14 +1,16 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "@shared/schema";
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.NEON_DATABASE_URL;
 
 if (!connectionString) {
   throw new Error(
-    "DATABASE_URL is not set. Make sure the PostgreSQL database is provisioned."
+    "NEON_DATABASE_URL is not set. " +
+      "Create a free Neon project at https://neon.tech, copy your connection string, " +
+      "and set it as the NEON_DATABASE_URL environment variable."
   );
 }
 
-const pool = new Pool({ connectionString });
-export const db = drizzle(pool, { schema });
+const sql = neon(connectionString);
+export const db = drizzle(sql, { schema });

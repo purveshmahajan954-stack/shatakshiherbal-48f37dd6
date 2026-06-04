@@ -1,12 +1,15 @@
 ---
-name: Cloudflare Workers incompatibility
-description: Why this app cannot be deployed to Cloudflare Workers and what to use instead
+name: Cloudflare Workers — DB driver setup
+description: DB driver choice for Cloudflare Workers vs Replit dev environment
 ---
 
-This app uses `pg` (Node.js PostgreSQL client) which requires TCP connections. Cloudflare Workers runs in V8 isolates — TCP is not supported.
+The app supports **both** Replit dev (TCP PostgreSQL) and Cloudflare Workers (Neon HTTP) through two separate connection strings:
 
-Additionally, Replit's built-in PostgreSQL (DATABASE_URL) is on Replit's internal network and is not reachable from outside (Cloudflare, Vercel, etc.).
+- **Development (Replit):** Uses `DATABASE_URL` (Replit internal PostgreSQL, `pg` + `drizzle-orm/node-postgres`)
+- **Production (Cloudflare Workers):** Uses `NEON_DATABASE_URL` (Neon external PostgreSQL, `@neondatabase/serverless` + `drizzle-orm/neon-http`)
 
-**Why:** The migration was from Supabase to Replit's built-in PostgreSQL specifically for Replit hosting. The database is intentionally internal-only.
+**Current state:** `server/db.ts` now uses the **Neon HTTP driver** (`@neondatabase/serverless`) with `NEON_DATABASE_URL`. This is required for Cloudflare Workers (V8 isolates have no TCP support).
 
-**How to apply:** Always use Replit Deploy (`.replit.app`). If the user asks about Cloudflare / Vercel / Netlify deployment, explain that the database is not externally accessible and `pg` won't work on edge runtimes. To deploy elsewhere, they'd need to migrate the database to an external provider (Neon, Supabase, etc.) and switch to an HTTP-based PostgreSQL driver.
+**Why:** The Neon HTTP driver works on both edge runtimes and Node.js. The Replit built-in PostgreSQL (`DATABASE_URL`) is only reachable from within Replit's network — not from Cloudflare.
+
+**How to apply:** Always use `NEON_DATABASE_URL` with the Neon HTTP driver for any code that must run on CF Workers. The `drizzle.config.ts` falls back to `DATABASE_URL` if `NEON_DATABASE_URL` is absent so `db:push` still works in Replit dev. Secrets on Cloudflare must be set via `wrangler secret put` or the CF dashboard.

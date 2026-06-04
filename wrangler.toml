@@ -14,13 +14,10 @@ binding = "ASSETS"
 # Required secrets — set via Cloudflare dashboard or `wrangler secret put`
 # Dashboard → Workers & Pages → shatakshi-herbal → Settings → Variables
 # ─────────────────────────────────────────────
-#   SUPABASE_URL                (your Supabase project URL)
-#   SUPABASE_ANON_KEY           (your Supabase anon/public key)
-#   SUPABASE_SERVICE_ROLE_KEY   (your Supabase service role key)
+#   NEON_DATABASE_URL           (Neon postgres connection string — https://neon.tech)
 #   RAZORPAY_KEY_ID             (Razorpay key ID)
 #   RAZORPAY_KEY_SECRET         (Razorpay key secret)
 #   RAZORPAY_WEBHOOK_SECRET     (Razorpay webhook secret)
-#   NEON_DATABASE_URL           (Neon postgres connection string — if using Neon directly)
 # ─────────────────────────────────────────────
 
 [vars]
