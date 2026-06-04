@@ -5,7 +5,7 @@ import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import logoImg from "@/assets/logo.png";
+const logoImg = "";
 
 const navItems = [
   { label: "Home", to: "/" },

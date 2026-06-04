@@ -1,4 +1,4 @@
-import heroImg from "@/assets/hero-product.webp";
+const heroImg = "https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg?auto=compress&cs=tinysrgb&w=800";
 import { Leaf, FlaskConical, Sprout, Trophy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
