@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Loader2, Mail } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { Leaf, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
-  const { refreshUser } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,25 +14,22 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
     e.preventDefault();
     setBusy(true);
     try {
-      const endpoint = mode === "signup" ? "/api/auth/signup" : "/api/auth/signin";
-      const body: Record<string, string> = { email: email.trim().toLowerCase(), password };
-      if (mode === "signup") body.fullName = name.trim();
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as any)?.error ?? (mode === "signup" ? "Could not create account" : "Invalid email or password"));
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { full_name: name },
+          },
+        });
+        if (error) throw error;
+        toast.success("Account created! You're signed in.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("Welcome back!");
       }
-
-      const data = await res.json();
-      localStorage.setItem("auth_token", data.token);
-      await refreshUser();
-      toast.success(mode === "signup" ? "Account created! Welcome!" : "Welcome back!");
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
     } finally {
@@ -88,7 +84,6 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
               className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
             >
               {busy && <Loader2 className="w-4 h-4 animate-spin" />}
-              <Mail className="w-4 h-4" />
               {mode === "signin" ? "Sign In" : "Create Account"}
             </button>
           </form>
