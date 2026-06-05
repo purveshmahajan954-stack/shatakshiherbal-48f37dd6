@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
 import { orders } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import crypto from "node:crypto";
+import { hmacSha256, timingSafeEqual } from "@server/password";
 
 export const Route = createFileRoute("/api/public/razorpay/webhook")({
   server: {
@@ -19,10 +19,8 @@ export const Route = createFileRoute("/api/public/razorpay/webhook")({
 
         if (!signature) return new Response("Missing signature", { status: 401 });
 
-        const expected = crypto.createHmac("sha256", secret).update(body).digest("hex");
-        const sigBuf = Buffer.from(signature);
-        const expBuf = Buffer.from(expected);
-        if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+        const expected = await hmacSha256(secret, body);
+        if (!timingSafeEqual(expected, signature)) {
           return new Response("Invalid signature", { status: 401 });
         }
 

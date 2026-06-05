@@ -2,8 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
 import { profiles, userRoles, userSessions } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import crypto from "node:crypto";
-import bcrypt from "bcryptjs";
+import { hashPassword, generateToken } from "@server/password";
 
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -21,7 +20,7 @@ export const Route = createFileRoute("/api/auth/signup")({
         const existing = await db.select({ id: profiles.id }).from(profiles).where(eq(profiles.email, email.toLowerCase().trim())).limit(1);
         if (existing.length > 0) return Response.json({ error: "An account with this email already exists" }, { status: 409 });
 
-        const passwordHash = await bcrypt.hash(password, 12);
+        const passwordHash = await hashPassword(password);
         const [profile] = await db.insert(profiles).values({
           email: email.toLowerCase().trim(),
           fullName: fullName?.trim() ?? null,
@@ -30,7 +29,7 @@ export const Route = createFileRoute("/api/auth/signup")({
 
         await db.insert(userRoles).values({ userId: profile.id, role: "user" });
 
-        const token = crypto.randomBytes(32).toString("hex");
+        const token = generateToken();
         const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
         await db.insert(userSessions).values({ token, profileId: profile.id, expiresAt });
 

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getProductBySlug } from "@/lib/products";
-import crypto from "node:crypto";
+import { randomHex, hmacSha256, timingSafeEqual } from "@server/password";
 
 /**
  * Razorpay integration via REST API (fetch-based for Cloudflare Workers compatibility).
@@ -16,7 +16,7 @@ function rzpAuthHeader() {
   const id = process.env.RAZORPAY_KEY_ID;
   const secret = process.env.RAZORPAY_KEY_SECRET;
   if (!id || !secret) throw new Error("Razorpay keys not configured");
-  return "Basic " + Buffer.from(`${id}:${secret}`).toString("base64");
+  return "Basic " + btoa(`${id}:${secret}`);
 }
 
 // Publishable Key ID — safe to expose to the browser (used to open Checkout)
@@ -119,7 +119,7 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
     const rzpOrder = (await rzpRes.json()) as { id: string; amount: number; currency: string };
 
     // Generate unique tracking ID (SHIP-XXXXXX)
-    const trackingId = `SHIP-${crypto.randomBytes(4).toString("hex").toUpperCase().slice(0, 6)}`;
+    const trackingId = `SHIP-${randomHex(4).toUpperCase().slice(0, 6)}`;
 
     // Persist draft order
     const { data: orderRow, error } = await supabaseAdmin
@@ -176,14 +176,8 @@ export const verifyRazorpayPayment = createServerFn({ method: "POST" })
     const secret = process.env.RAZORPAY_KEY_SECRET;
     if (!secret) throw new Error("Razorpay not configured");
 
-    const expected = crypto
-      .createHmac("sha256", secret)
-      .update(`${data.razorpay_order_id}|${data.razorpay_payment_id}`)
-      .digest("hex");
-
-    const valid =
-      expected.length === data.razorpay_signature.length &&
-      crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(data.razorpay_signature));
+    const expected = await hmacSha256(secret, `${data.razorpay_order_id}|${data.razorpay_payment_id}`);
+    const valid = timingSafeEqual(expected, data.razorpay_signature);
 
     if (!valid) {
       await supabaseAdmin

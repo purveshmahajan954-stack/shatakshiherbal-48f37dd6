@@ -3,7 +3,7 @@ import { db } from "@server/db";
 import { orders, userSessions, profiles } from "@shared/schema";
 import { eq, and, gt } from "drizzle-orm";
 import { z } from "zod";
-import crypto from "node:crypto";
+import { hmacSha256, timingSafeEqual } from "@server/password";
 
 async function requireUser(request: Request) {
   const auth = request.headers.get("authorization");
@@ -42,9 +42,8 @@ export const Route = createFileRoute("/api/payments/verify")({
         const secret = process.env.RAZORPAY_KEY_SECRET;
         if (!secret) return Response.json({ error: "Razorpay not configured" }, { status: 500 });
 
-        const expected = crypto.createHmac("sha256", secret).update(`${razorpay_order_id}|${razorpay_payment_id}`).digest("hex");
-        const valid = expected.length === razorpay_signature.length &&
-          crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(razorpay_signature));
+        const expected = await hmacSha256(secret, `${razorpay_order_id}|${razorpay_payment_id}`);
+        const valid = timingSafeEqual(expected, razorpay_signature);
 
         if (!valid) {
           await db.update(orders).set({ paymentStatus: "signature_failed", status: "failed" })

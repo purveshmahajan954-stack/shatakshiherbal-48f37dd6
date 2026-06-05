@@ -2,8 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
 import { profiles, adminSessions } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import crypto from "node:crypto";
-import bcrypt from "bcryptjs";
+import { verifyPassword, generateToken } from "@server/password";
 
 const ADMIN_EMAIL = "admin@shatakshiherbal.com";
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -25,10 +24,15 @@ export const Route = createFileRoute("/api/admin/signin")({
         const profile = rows[0] as any;
         if (!profile.passwordHash) return Response.json({ error: "Invalid email or password" }, { status: 401 });
 
-        const valid = await bcrypt.compare(password, profile.passwordHash);
+        let valid = false;
+        try {
+          valid = await verifyPassword(password, profile.passwordHash);
+        } catch {
+          return Response.json({ error: "Invalid email or password" }, { status: 401 });
+        }
         if (!valid) return Response.json({ error: "Invalid email or password" }, { status: 401 });
 
-        const token = crypto.randomBytes(32).toString("hex");
+        const token = generateToken();
         const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
         await db.insert(adminSessions).values({ token, profileId: profile.id, expiresAt });
 

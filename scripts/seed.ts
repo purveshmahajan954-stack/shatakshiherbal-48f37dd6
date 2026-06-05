@@ -2,8 +2,17 @@ import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { profiles, userRoles, products } from "../shared/schema";
 import { eq } from "drizzle-orm";
-import bcrypt from "bcryptjs";
 import * as schema from "../shared/schema";
+
+async function hashPassword(password: string): Promise<string> {
+  const buf2hex = (buf: ArrayBuffer) =>
+    Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  const saltBuf = crypto.getRandomValues(new Uint8Array(16));
+  const salt = buf2hex(saltBuf.buffer);
+  const keyMaterial = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const derived = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: saltBuf, iterations: 100_000, hash: "SHA-256" }, keyMaterial, 32 * 8);
+  return `${salt}:${buf2hex(derived)}`;
+}
 
 const connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL not set");
@@ -142,7 +151,7 @@ async function seed() {
 
   if (existing.length === 0) {
     console.log("Creating admin account...");
-    const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
+    const passwordHash = await hashPassword(ADMIN_PASSWORD);
     const [admin] = await db.insert(profiles).values({
       email: ADMIN_EMAIL,
       fullName: "Admin",
@@ -155,7 +164,10 @@ async function seed() {
     ]);
     console.log("Admin account created.");
   } else {
-    console.log("Admin account already exists, skipping.");
+    console.log("Admin exists — updating password hash to Web Crypto format...");
+    const passwordHash = await hashPassword(ADMIN_PASSWORD);
+    await db.update(profiles).set({ passwordHash } as any).where(eq(profiles.email, ADMIN_EMAIL));
+    console.log("Admin password hash updated.");
   }
 
   const existingProducts = await db.select({ id: products.id }).from(products).limit(1);

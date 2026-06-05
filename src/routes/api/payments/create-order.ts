@@ -4,7 +4,7 @@ import { orders, userSessions, profiles } from "@shared/schema";
 import { eq, and, gt } from "drizzle-orm";
 import { z } from "zod";
 import { getProductBySlug } from "@/lib/products";
-import crypto from "node:crypto";
+import { randomHex } from "@server/password";
 
 const RAZORPAY_BASE = "https://api.razorpay.com/v1";
 const COURIER_CHARGE = 150;
@@ -13,7 +13,7 @@ function rzpAuthHeader() {
   const id = process.env.RAZORPAY_KEY_ID;
   const secret = process.env.RAZORPAY_KEY_SECRET;
   if (!id || !secret) throw new Error("Razorpay keys not configured");
-  return "Basic " + Buffer.from(`${id}:${secret}`).toString("base64");
+  return "Basic " + btoa(`${id}:${secret}`);
 }
 
 function computeTotals(subtotal: number) {
@@ -96,7 +96,7 @@ export const Route = createFileRoute("/api/payments/create-order")({
         }
 
         const rzpOrder = (await rzpRes.json()) as { id: string; amount: number; currency: string };
-        const trackingId = `SHIP-${crypto.randomBytes(4).toString("hex").toUpperCase().slice(0, 6)}`;
+        const trackingId = `SHIP-${randomHex(4).toUpperCase().slice(0, 6)}`;
 
         const [orderRow] = await db.insert(orders).values({
           userId: user.id,

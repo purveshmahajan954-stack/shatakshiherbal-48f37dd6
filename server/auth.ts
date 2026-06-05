@@ -1,15 +1,10 @@
 import { db } from "./db";
 import { profiles, userRoles, userSessions, adminSessions } from "../shared/schema";
 import { eq, and, gt } from "drizzle-orm";
-import crypto from "node:crypto";
-import bcrypt from "bcryptjs";
+import { hashPassword, verifyPassword, generateToken } from "./password";
 
 const ADMIN_EMAIL = "admin@shatakshiherbal.com";
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
-
-function generateToken(): string {
-  return crypto.randomBytes(32).toString("hex");
-}
 
 export async function createOrGetProfile(email: string, fullName?: string) {
   const existing = await db
@@ -76,10 +71,4 @@ export async function isAdminEmail(email: string) {
   return email.toLowerCase() === ADMIN_EMAIL;
 }
 
-export async function hashPassword(password: string) {
-  return bcrypt.hash(password, 12);
-}
-
-export async function verifyPassword(password: string, hash: string) {
-  return bcrypt.compare(password, hash);
-}
+export { hashPassword, verifyPassword };
