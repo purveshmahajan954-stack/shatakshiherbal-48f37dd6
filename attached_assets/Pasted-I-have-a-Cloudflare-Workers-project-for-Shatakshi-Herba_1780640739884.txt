@@ -1,0 +1,124 @@
+I have a Cloudflare Workers project for Shatakshi Herbal website deployed at:
+https://shatakshi-herbal.purveshmahajan954.workers.dev/
+
+Fix these issues and deploy to Cloudflare. Account ID: 939eff0771f34232554e5155088faf84
+
+## PROBLEMS TO FIX:
+
+### 1. No Products Found
+- Products are not displaying on the website
+- Fix the products API endpoint to return data correctly
+- Make sure GET /api/products returns JSON array properly
+
+### 2. Create Account JSON Error
+- User registration/create account is failing with JSON error
+- Fix POST /api/register or /api/auth/register endpoint
+- Ensure request body is parsed as JSON correctly
+- Return proper JSON response with status codes
+
+### 3. Admin Login Fix
+- Admin login not working
+- Set admin credentials:
+  - Email: admin@shatakshiherbal.com
+  - Password: shatakshiherbal
+- Fix POST /api/admin/login endpoint
+- Hash password with bcrypt or use direct comparison if already stored
+
+### 4. Admin Product Image Upload
+- Admin should be able to update product images
+- Add image upload functionality in admin panel
+- Store images as base64 OR use Cloudflare Images / R2 bucket
+- When admin updates product image, it should reflect on live site immediately
+- Add PUT /api/admin/products/:id endpoint with image field
+
+### 5. Neon Database (HTTP Driver for Cloudflare Workers)
+- Replace any PostgreSQL TCP connection (pg, postgres packages) with Neon HTTP driver
+- Install: @neondatabase/serverless
+- Use this connection pattern:
+
+import { neon } from '@neondatabase/serverless';
+const sql = neon(process.env.DATABASE_URL);
+
+- Remove any pool.connect() or client.connect() TCP calls
+- All queries should use: await sql`SELECT * FROM table`
+
+### 6. Cloudflare Workers Setup with Wrangler
+- Create/update wrangler.toml:
+
+name = "shatakshi-herbal"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+
+- Add DATABASE_URL as Cloudflare secret (not in wrangler.toml)
+- Make sure worker exports default { fetch } handler
+- No Node.js TCP modules (no net, tls, pg with TCP)
+
+### 7. CORS Fix
+- Add CORS headers to all API responses:
+
+headers: {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+}
+
+- Handle OPTIONS preflight requests
+
+### 8. Deploy to Cloudflare
+Run these commands:
+npx wrangler login
+npx wrangler secret put DATABASE_URL
+npx wrangler deploy
+
+## DATABASE SETUP:
+Run this SQL in Neon dashboard to seed admin and fix tables:
+
+-- Admin user
+INSERT INTO users (email, password, role, name) 
+VALUES ('admin@shatakshiherbal.com', 'shatakshiherbal', 'admin', 'Admin')
+ON CONFLICT (email) DO UPDATE SET password = 'shatakshiherbal', role = 'admin';
+
+-- Make sure products table exists
+CREATE TABLE IF NOT EXISTS products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2),
+  image_url TEXT,
+  category VARCHAR(100),
+  stock INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Insert sample products if empty
+INSERT INTO products (name, description, price, image_url, category, stock)
+SELECT 'Herbal Tea', 'Pure herbal tea blend', 299.00, '/images/tea.jpg', 'Tea', 100
+WHERE NOT EXISTS (SELECT 1 FROM products LIMIT 1);
+
+## COMPLETE WORKER STRUCTURE NEEDED:
+
+src/worker.js should handle these routes:
+- GET  /api/products          → return all products
+- GET  /api/products/:id      → return single product
+- POST /api/auth/register     → create user account
+- POST /api/auth/login        → user login
+- POST /api/admin/login       → admin login (check role='admin')
+- GET  /api/admin/products    → admin get all products
+- PUT  /api/admin/products/:id → admin update product with image
+- POST /api/admin/products    → admin add new product
+- DELETE /api/admin/products/:id → admin delete product
+
+## IMPORTANT RULES:
+1. Use @neondatabase/serverless ONLY - no pg, mysql2 TCP packages
+2. All responses must be JSON with proper Content-Type header
+3. Worker must export: export default { fetch }
+4. Parse request body with: await request.json()
+5. Use try/catch on every database call
+6. Admin routes need Authorization header check with JWT or simple token
+
+Please fix all issues, show me the complete worker.js code, and run wrangler deploy.
