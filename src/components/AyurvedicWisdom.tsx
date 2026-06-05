@@ -1,7 +1,6 @@
+import heroImg from "@/assets/hero-product.webp";
 import { Leaf, FlaskConical, Sprout, Trophy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-
-const heroImg = "https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg?auto=compress&cs=tinysrgb&w=800";
 
 const stats = [
   { value: "5000+", label: "Years of Wisdom" },

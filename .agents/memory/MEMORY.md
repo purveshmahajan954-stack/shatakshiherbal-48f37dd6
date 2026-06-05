@@ -1,2 +1,0 @@
-- [Cloudflare Workers DB setup](cloudflare-incompatible.md) — app uses Neon HTTP driver (NEON_DATABASE_URL) for CF Workers; Replit built-in DB is TCP-only and unreachable from edge.
-- [Admin provider setup](admin-provider.md) — AdminAuthProvider must be in __root.tsx RootComponent wrapping Outlet; missing it causes SSR crash on admin routes.

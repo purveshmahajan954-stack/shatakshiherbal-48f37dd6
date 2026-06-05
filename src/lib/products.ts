@@ -1,113 +1,56 @@
+import img1 from "@/assets/product-1.webp";
+import img2 from "@/assets/product-2.webp";
+import img3 from "@/assets/product-3_new.webp";
+import img4 from "@/assets/product-4_new.webp";
+import img5 from "@/assets/product-5_new.webp";
+import img6 from "@/assets/product-6_new.webp";
+import img7 from "@/assets/product-7_new.webp";
+import img8 from "@/assets/product-8_new.webp";
+import img9 from "@/assets/product-9_new.webp";
+import img10 from "@/assets/product-10_new.webp";
+import img11 from "@/assets/product-11_new.webp";
 import img12 from "@/assets/product-12_new.webp";
 import img13 from "@/assets/product-13_new.webp";
+import img14 from "@/assets/product-14_new.webp";
 import img15 from "@/assets/product-15_new.webp";
-
-const HERB_IMGS = [
-  "https://images.pexels.com/photos/6692133/pexels-photo-6692133.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033148/pexels-photo-4033148.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3873209/pexels-photo-3873209.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033169/pexels-photo-4033169.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3873218/pexels-photo-3873218.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/906150/pexels-photo-906150.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938370/pexels-photo-5938370.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692111/pexels-photo-6692111.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033318/pexels-photo-4033318.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/7298859/pexels-photo-7298859.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938384/pexels-photo-5938384.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3873218/pexels-photo-3873218.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033168/pexels-photo-4033168.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3735219/pexels-photo-3735219.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3683080/pexels-photo-3683080.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692114/pexels-photo-6692114.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/7298888/pexels-photo-7298888.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938376/pexels-photo-5938376.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033157/pexels-photo-4033157.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3873215/pexels-photo-3873215.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692127/pexels-photo-6692127.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938372/pexels-photo-5938372.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/7298878/pexels-photo-7298878.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033327/pexels-photo-4033327.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3683054/pexels-photo-3683054.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692118/pexels-photo-6692118.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033162/pexels-photo-4033162.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938380/pexels-photo-5938380.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3873212/pexels-photo-3873212.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/7298860/pexels-photo-7298860.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692122/pexels-photo-6692122.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033175/pexels-photo-4033175.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938390/pexels-photo-5938390.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3683058/pexels-photo-3683058.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692130/pexels-photo-6692130.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033183/pexels-photo-4033183.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/7298892/pexels-photo-7298892.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938396/pexels-photo-5938396.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692136/pexels-photo-6692136.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3873221/pexels-photo-3873221.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033191/pexels-photo-4033191.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/7298896/pexels-photo-7298896.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938402/pexels-photo-5938402.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/6692140/pexels-photo-6692140.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3683062/pexels-photo-3683062.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4033199/pexels-photo-4033199.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/7298900/pexels-photo-7298900.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/5938408/pexels-photo-5938408.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/3873224/pexels-photo-3873224.jpeg?auto=compress&cs=tinysrgb&w=600",
-];
-
-const img1 = HERB_IMGS[0];
-const img2 = HERB_IMGS[1];
-const img3 = img12;
-const img4 = HERB_IMGS[3];
-const img5 = HERB_IMGS[4];
-const img6 = HERB_IMGS[5];
-const img7 = HERB_IMGS[6];
-const img8 = HERB_IMGS[7];
-const img9 = HERB_IMGS[8];
-const img10 = HERB_IMGS[9];
-const img11 = HERB_IMGS[10];
-const img14 = HERB_IMGS[11];
-const img16 = HERB_IMGS[12];
-const img17 = HERB_IMGS[13];
-const img18 = HERB_IMGS[14];
-const img19 = HERB_IMGS[15];
-const img20 = HERB_IMGS[16];
-const img21 = HERB_IMGS[17];
-const img22 = HERB_IMGS[18];
-const img23 = HERB_IMGS[19];
-const img24 = HERB_IMGS[20];
-const img25 = HERB_IMGS[21];
-const img26 = HERB_IMGS[22];
-const img27 = HERB_IMGS[23];
-const img28 = HERB_IMGS[24];
-const img29 = HERB_IMGS[25];
-const img30 = HERB_IMGS[26];
-const img31 = HERB_IMGS[27];
-const img32 = HERB_IMGS[28];
-const img33 = HERB_IMGS[29];
-const img34 = HERB_IMGS[30];
-const img35 = HERB_IMGS[31];
-const img36 = HERB_IMGS[32];
-const img37 = HERB_IMGS[33];
-const img38 = HERB_IMGS[34];
-const img39 = HERB_IMGS[35];
-const img40 = HERB_IMGS[36];
-const img41 = HERB_IMGS[37];
-const img42 = HERB_IMGS[38];
-const img43 = HERB_IMGS[39];
-const img44 = HERB_IMGS[40];
-const img45 = HERB_IMGS[41];
-const img46 = HERB_IMGS[42];
-const img47 = HERB_IMGS[43];
-const img48 = HERB_IMGS[44];
-const img49 = HERB_IMGS[45];
-const img50 = HERB_IMGS[46];
-const img51 = HERB_IMGS[47];
-const img52 = HERB_IMGS[48];
-const img53 = HERB_IMGS[49];
+import img16 from "@/assets/product-16_new.webp";
+import img17 from "@/assets/product-17_new.webp";
+import img18 from "@/assets/product-18_new.webp";
+import img19 from "@/assets/product-19_new.webp";
+import img20 from "@/assets/product-20_new.webp";
+import img21 from "@/assets/product-21_new.webp";
+import img22 from "@/assets/product-22_new.webp";
+import img23 from "@/assets/product-23_new.webp";
+import img24 from "@/assets/product-24_new.webp";
+import img25 from "@/assets/product-25_new.webp";
+import img26 from "@/assets/product-26_new.webp";
+import img27 from "@/assets/product-27_new.webp";
+import img28 from "@/assets/product-28_new.webp";
+import img29 from "@/assets/product-29.webp";
+import img30 from "@/assets/product-30.webp";
+import img31 from "@/assets/product-31.webp";
+import img32 from "@/assets/product-32.webp";
+import img33 from "@/assets/product-33.webp";
+import img34 from "@/assets/product-34.webp";
+import img35 from "@/assets/product-35.webp";
+import img36 from "@/assets/product-36.webp";
+import img37 from "@/assets/product-37.webp";
+import img38 from "@/assets/product-38.webp";
+import img39 from "@/assets/product-39.webp";
+import img40 from "@/assets/product-40.webp";
+import img41 from "@/assets/product-41.webp";
+import img42 from "@/assets/product-42.webp";
+import img43 from "@/assets/product-43.webp";
+import img44 from "@/assets/product-44.webp";
+import img45 from "@/assets/product-45.webp";
+import img46 from "@/assets/product-46.webp";
+import img47 from "@/assets/product-47.webp";
+import img48 from "@/assets/product-48.webp";
+import img49 from "@/assets/product-49.webp";
+import img50 from "@/assets/product-50.webp";
+import img51 from "@/assets/product-51.webp";
+import img52 from "@/assets/product-52.webp";
+import img53 from "@/assets/product-53.webp";
 
 export type Product = {
   slug: string;

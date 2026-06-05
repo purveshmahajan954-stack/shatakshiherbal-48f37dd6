@@ -1,9 +1,8 @@
+import heroImg from "@/assets/hero-slide-1.webp";
+import heroImg2 from "@/assets/hero-slide-2.webp";
+import heroImg3 from "@/assets/hero-slide-3.webp";
+import heroImg4 from "@/assets/hero-slide-4.webp";
 import { ArrowRight, Leaf, Sparkles, Star } from "lucide-react";
-
-const heroImg = "https://images.pexels.com/photos/5938370/pexels-photo-5938370.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750";
-const heroImg2 = "https://images.pexels.com/photos/4033148/pexels-photo-4033148.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750";
-const heroImg3 = "https://images.pexels.com/photos/3873209/pexels-photo-3873209.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750";
-const heroImg4 = "https://images.pexels.com/photos/6692133/pexels-photo-6692133.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";

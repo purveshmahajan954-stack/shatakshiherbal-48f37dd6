@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { products as staticProducts, getProductBySlug, type Product } from "./products";
-
-const productPlaceholder = "https://images.pexels.com/photos/6692133/pexels-photo-6692133.jpeg?auto=compress&cs=tinysrgb&w=600";
+import productPlaceholder from "@/assets/product-1.webp";
 
 export type DbProduct = {
   id: string;
