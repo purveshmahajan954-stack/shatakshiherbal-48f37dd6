@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Search, ShoppingBag, Menu, X, Trash2, LogOut, Shield, Package, ArrowRight, Heart } from "lucide-react";
+import { ShoppingBag, Menu, X, Trash2, LogOut, Shield, Package, ArrowRight, Heart } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
@@ -49,7 +49,6 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/shop" aria-label="Search products" className="p-2 hover:text-primary transition-colors"><Search className="w-5 h-5" /></Link>
             <Link to="/wishlist" aria-label="Wishlist" className="relative p-2 hover:text-primary transition-colors">
               <Heart className="w-5 h-5" />
               {wishCount > 0 && <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{wishCount}</span>}
