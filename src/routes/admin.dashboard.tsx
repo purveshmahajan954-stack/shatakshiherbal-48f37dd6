@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { adminGet } from "@/lib/api-client";
 import {
   IndianRupee,
   ShoppingBag,
@@ -24,98 +24,49 @@ export const Route = createFileRoute("/admin/dashboard")({
   component: Dashboard,
 });
 
-type Order = {
-  id: string;
-  subtotal: number;
-  total: number;
-  payment_status: string;
-  status: string;
-  created_at: string;
-  shipping_name: string | null;
-  email: string | null;
+type DashStats = {
+  orderCount: number;
+  paidCount: number;
+  pendingCount: number;
+  deliveredCount: number;
+  today: { subtotal: number; total: number; count: number };
+  month: { subtotal: number; total: number; count: number };
+  year: { subtotal: number; total: number; count: number };
+  allTime: { subtotal: number; total: number };
 };
+type ChartPoint = { date: string; revenue: number };
 
-// Module-level cache so navigating away and back doesn't re-fetch immediately
-let _cache: { orders: Order[]; userCount: number; ts: number } | null = null;
-const CACHE_TTL_MS = 60_000; // 60 seconds
-
-function inRange(d: Date, start: Date) {
-  return d.getTime() >= start.getTime();
-}
+let _cache: { stats: DashStats; chartData: ChartPoint[]; userCount: number; ts: number } | null = null;
+const CACHE_TTL_MS = 60_000;
 
 function Dashboard() {
-  const [orders, setOrders] = useState<Order[]>(_cache?.orders ?? []);
+  const [stats, setStats] = useState<DashStats | null>(_cache?.stats ?? null);
+  const [chartData, setChartData] = useState<ChartPoint[]>(_cache?.chartData ?? []);
   const [userCount, setUserCount] = useState(_cache?.userCount ?? 0);
   const [busy, setBusy] = useState(!_cache || Date.now() - _cache.ts > CACHE_TTL_MS);
 
   useEffect(() => {
-    if (_cache && Date.now() - _cache.ts < CACHE_TTL_MS) return; // serve from cache
+    if (_cache && Date.now() - _cache.ts < CACHE_TTL_MS) return;
     let cancelled = false;
     (async () => {
       setBusy(true);
-      const [ordersRes, profilesRes] = await Promise.all([
-        supabase
-          .from("orders")
-          .select("id,subtotal,total,payment_status,status,created_at,shipping_name,email")
-          .order("created_at", { ascending: false })
-          .limit(500),
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-      ]);
-      if (cancelled) return;
-      const o = (ordersRes.data as Order[]) || [];
-      const uc = profilesRes.count || 0;
-      _cache = { orders: o, userCount: uc, ts: Date.now() };
-      setOrders(o);
-      setUserCount(uc);
-      setBusy(false);
+      try {
+        const data = await adminGet<{ stats: DashStats; chartData: ChartPoint[]; userCount: number }>(
+          "/api/admin/dashboard"
+        );
+        if (cancelled) return;
+        _cache = { stats: data.stats, chartData: data.chartData, userCount: data.userCount, ts: Date.now() };
+        setStats(data.stats);
+        setChartData(data.chartData);
+        setUserCount(data.userCount);
+      } catch {
+        // show empty state on error
+      } finally {
+        if (!cancelled) setBusy(false);
+      }
     })();
     return () => { cancelled = true; };
   }, []);
-
-  const stats = useMemo(() => {
-    const now = new Date();
-    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const startYear = new Date(now.getFullYear(), 0, 1);
-
-    const paid = orders.filter((o) => o.payment_status === "paid");
-
-    const sum = (arr: Order[]) => arr.reduce((s, o) => s + Number(o.total || 0), 0);
-
-    const todayOrders = paid.filter((o) => inRange(new Date(o.created_at), startToday));
-    const monthOrders = paid.filter((o) => inRange(new Date(o.created_at), startMonth));
-    const yearOrders = paid.filter((o) => inRange(new Date(o.created_at), startYear));
-
-    return {
-      orderCount: orders.length,
-      paidCount: paid.length,
-      pendingCount: orders.filter((o) => ["pending", "processing", "confirmed", "shipped"].includes(o.status)).length,
-      deliveredCount: orders.filter((o) => o.status === "delivered").length,
-      today: { total: sum(todayOrders), count: todayOrders.length },
-      month: { total: sum(monthOrders), count: monthOrders.length },
-      year:  { total: sum(yearOrders),  count: yearOrders.length  },
-      allTime: { total: sum(paid) },
-    };
-  }, [orders]);
-
-  const chartData = useMemo(() => {
-    const days = 30;
-    const map = new Map<string, number>();
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      map.set(d.toISOString().slice(0, 10), 0);
-    }
-    for (const o of orders) {
-      if (o.payment_status !== "paid") continue;
-      const key = o.created_at.slice(0, 10);
-      if (map.has(key)) map.set(key, map.get(key)! + Number(o.total || 0));
-    }
-    return Array.from(map.entries()).map(([date, revenue]) => ({
-      date: date.slice(5),
-      revenue,
-    }));
-  }, [orders]);
 
   if (busy) {
     return (
@@ -125,35 +76,39 @@ function Dashboard() {
     );
   }
 
+  const s = stats ?? {
+    orderCount: 0, paidCount: 0, pendingCount: 0, deliveredCount: 0,
+    today: { subtotal: 0, total: 0, count: 0 },
+    month: { subtotal: 0, total: 0, count: 0 },
+    year: { subtotal: 0, total: 0, count: 0 },
+    allTime: { subtotal: 0, total: 0 },
+  };
+
   return (
     <div className="space-y-6">
-      {/* Top stat strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Stat icon={ShoppingBag} label="Total orders" value={String(stats.orderCount)} />
+        <Stat icon={ShoppingBag} label="Total orders" value={String(s.orderCount)} />
         <Stat icon={UsersIcon} label="Total customers" value={String(userCount)} />
-        <Stat icon={Clock} label="Pending orders" value={String(stats.pendingCount)} accent="amber" />
-        <Stat icon={CheckCircle2} label="Delivered orders" value={String(stats.deliveredCount)} accent="green" />
+        <Stat icon={Clock} label="Pending orders" value={String(s.pendingCount)} accent="amber" />
+        <Stat icon={CheckCircle2} label="Delivered orders" value={String(s.deliveredCount)} accent="green" />
       </div>
 
-      {/* Revenue blocks */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <RevenueCard title="Today" data={stats.today} />
-        <RevenueCard title="This month" data={stats.month} />
-        <RevenueCard title="This year" data={stats.year} />
+        <RevenueCard title="Today" data={s.today} />
+        <RevenueCard title="This month" data={s.month} />
+        <RevenueCard title="This year" data={s.year} />
       </div>
 
-      {/* All-time revenue */}
       <div className="bg-card border border-border rounded-xl p-5 flex flex-wrap items-center gap-6">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
           <TrendingUp className="w-6 h-6" />
         </div>
         <div className="flex-1 min-w-[200px]">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">All-time revenue (paid orders)</div>
-          <div className="text-2xl font-bold mt-1">₹{stats.allTime.total.toLocaleString("en-IN")}</div>
+          <div className="text-2xl font-bold mt-1">₹{Number(s.allTime.total).toLocaleString("en-IN")}</div>
         </div>
       </div>
 
-      {/* Chart */}
       <div className="bg-card border border-border rounded-xl p-4">
         <h3 className="font-display text-lg mb-1">Revenue — last 30 days</h3>
         <p className="text-xs text-muted-foreground mb-4">Paid order revenue per day</p>
@@ -170,12 +125,7 @@ function Dashboard() {
               <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={12} />
               <YAxis stroke="var(--muted-foreground)" fontSize={12} />
               <Tooltip
-                contentStyle={{
-                  background: "var(--card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  color: "var(--foreground)",
-                }}
+                contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--foreground)" }}
                 formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Revenue"]}
               />
               <Area type="monotone" dataKey="revenue" stroke="var(--primary)" fill="url(#rev)" strokeWidth={2} />
@@ -194,7 +144,7 @@ function RevenueCard({ title, data }: { title: string; data: { total: number; co
         <h4 className="font-display text-base">{title}</h4>
         <span className="text-xs text-muted-foreground">{data.count} order{data.count === 1 ? "" : "s"}</span>
       </div>
-      <div className="text-3xl font-bold text-foreground">₹{data.total.toLocaleString("en-IN")}</div>
+      <div className="text-3xl font-bold text-foreground">₹{Number(data.total).toLocaleString("en-IN")}</div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { adminGet } from "@/lib/api-client";
 import { Loader2, Search, CheckCircle2, Clock, XCircle, CreditCard, Copy } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,14 +13,14 @@ type PaymentRow = {
   total: number;
   subtotal: number;
   gst: number;
-  payment_status: string;
+  paymentStatus: string;
   status: string;
-  created_at: string;
-  shipping_name: string | null;
-  shipping_phone: string | null;
+  createdAt: string;
+  shippingName: string | null;
+  shippingPhone: string | null;
   email: string | null;
-  razorpay_order_id: string | null;
-  razorpay_payment_id: string | null;
+  razorpayOrderId: string | null;
+  razorpayPaymentId: string | null;
 };
 
 const FILTERS = [
@@ -39,20 +39,21 @@ function PaymentsPage() {
   useEffect(() => {
     (async () => {
       setBusy(true);
-      const { data } = await supabase
-        .from("orders")
-        .select("id,total,subtotal,gst,payment_status,status,created_at,shipping_name,shipping_phone,email,razorpay_order_id,razorpay_payment_id")
-        .order("created_at", { ascending: false })
-        .limit(1000);
-      setRows((data as PaymentRow[]) || []);
-      setBusy(false);
+      try {
+        const data = await adminGet<{ orders: PaymentRow[] }>("/api/admin/orders");
+        setRows(data.orders || []);
+      } catch {
+        toast.error("Failed to load payments");
+      } finally {
+        setBusy(false);
+      }
     })();
   }, []);
 
   const stats = useMemo(() => {
-    const paid = rows.filter((r) => r.payment_status === "paid");
-    const pending = rows.filter((r) => r.payment_status === "created");
-    const failed = rows.filter((r) => ["failed", "signature_failed"].includes(r.payment_status));
+    const paid = rows.filter((r) => r.paymentStatus === "paid");
+    const pending = rows.filter((r) => r.paymentStatus === "created");
+    const failed = rows.filter((r) => ["failed", "signature_failed"].includes(r.paymentStatus));
     const sum = (arr: PaymentRow[]) => arr.reduce((s, r) => s + Number(r.total || 0), 0);
     return {
       paid: { count: paid.length, value: sum(paid) },
@@ -64,16 +65,16 @@ function PaymentsPage() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter((r) => {
-      if (filter === "paid" && r.payment_status !== "paid") return false;
-      if (filter === "created" && r.payment_status !== "created") return false;
-      if (filter === "failed" && !["failed", "signature_failed"].includes(r.payment_status)) return false;
+      if (filter === "paid" && r.paymentStatus !== "paid") return false;
+      if (filter === "created" && r.paymentStatus !== "created") return false;
+      if (filter === "failed" && !["failed", "signature_failed"].includes(r.paymentStatus)) return false;
       if (!q) return true;
       return (
         r.id.toLowerCase().includes(q) ||
-        (r.razorpay_payment_id || "").toLowerCase().includes(q) ||
-        (r.razorpay_order_id || "").toLowerCase().includes(q) ||
-        (r.shipping_name || "").toLowerCase().includes(q) ||
-        (r.shipping_phone || "").toLowerCase().includes(q) ||
+        (r.razorpayPaymentId || "").toLowerCase().includes(q) ||
+        (r.razorpayOrderId || "").toLowerCase().includes(q) ||
+        (r.shippingName || "").toLowerCase().includes(q) ||
+        (r.shippingPhone || "").toLowerCase().includes(q) ||
         (r.email || "").toLowerCase().includes(q)
       );
     });
@@ -83,7 +84,6 @@ function PaymentsPage() {
 
   return (
     <div className="space-y-5">
-      {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <PStat icon={CheckCircle2} label="Paid" count={stats.paid.count} value={stats.paid.value} color="green" />
         <PStat icon={Clock} label="Pending" count={stats.pending.count} value={stats.pending.value} color="amber" />
@@ -138,24 +138,24 @@ function PaymentsPage() {
                 <tr><td colSpan={6} className="p-10 text-center text-muted-foreground">No payments found.</td></tr>
               ) : filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/30">
-                  <td className="p-3 whitespace-nowrap">{new Date(r.created_at).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" })}</td>
+                  <td className="p-3 whitespace-nowrap">{new Date(r.createdAt).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" })}</td>
                   <td className="p-3">
-                    <div className="font-medium">{r.shipping_name || "—"}</div>
-                    <div className="text-xs text-muted-foreground">{r.shipping_phone || r.email}</div>
+                    <div className="font-medium">{r.shippingName || "—"}</div>
+                    <div className="text-xs text-muted-foreground">{r.shippingPhone || r.email}</div>
                   </td>
                   <td className="p-3">
-                    {r.razorpay_payment_id ? (
+                    {r.razorpayPaymentId ? (
                       <button
-                        onClick={() => { navigator.clipboard?.writeText(r.razorpay_payment_id!); toast.success("Copied"); }}
+                        onClick={() => { navigator.clipboard?.writeText(r.razorpayPaymentId!); toast.success("Copied"); }}
                         className="font-mono text-xs inline-flex items-center gap-1 hover:text-primary"
                       >
-                        {r.razorpay_payment_id.slice(0, 16)}… <Copy className="w-3 h-3" />
+                        {r.razorpayPaymentId.slice(0, 16)}… <Copy className="w-3 h-3" />
                       </button>
                     ) : <span className="text-muted-foreground text-xs">—</span>}
                   </td>
-                  <td className="p-3 text-xs">{r.razorpay_payment_id ? "Online" : "—"}</td>
+                  <td className="p-3 text-xs">{r.razorpayPaymentId ? "Online" : "—"}</td>
                   <td className="p-3 text-right whitespace-nowrap font-semibold">₹{Number(r.total).toLocaleString("en-IN")}</td>
-                  <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge(r.payment_status)}`}>{r.payment_status}</span></td>
+                  <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge(r.paymentStatus)}`}>{r.paymentStatus}</span></td>
                 </tr>
               ))}
             </tbody>
@@ -179,7 +179,7 @@ function PStat({ icon: Icon, label, count, value, color }: { icon: typeof Credit
         <Icon className="w-4 h-4" />
       </div>
       <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="text-xl font-semibold mt-0.5">₹{value.toLocaleString("en-IN")}</div>
+      <div className="text-xl font-semibold mt-0.5">₹{Number(value).toLocaleString("en-IN")}</div>
       <div className="text-xs text-muted-foreground mt-0.5">{count} order{count === 1 ? "" : "s"}</div>
     </div>
   );
