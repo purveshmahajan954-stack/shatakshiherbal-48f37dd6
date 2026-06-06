@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { products as staticProducts, getProductBySlug, type Product } from "./products";
 import productPlaceholder from "@/assets/product-1.webp";
 
@@ -58,14 +58,10 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
 }
 
 export async function fetchProductsFromDb(): Promise<Product[]> {
-  try {
-    const res = await fetch("/api/products");
-    if (!res.ok) throw new Error("Failed to fetch products");
-    const data = await res.json();
-    return (data.products as DbProduct[]).map((d) => mergeProduct(d, getProductBySlug(d.slug)));
-  } catch {
-    return staticProducts;
-  }
+  const res = await fetch("/api/products");
+  if (!res.ok) throw new Error("Failed to fetch products");
+  const data = await res.json();
+  return (data.products as DbProduct[]).map((d) => mergeProduct(d, getProductBySlug(d.slug)));
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
@@ -81,27 +77,27 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
 }
 
 export function useProducts() {
-  const [items, setItems] = useState<Product[]>([]);
+  const [items, setItems] = useState<Product[]>(staticProducts);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const list = await fetchProductsFromDb();
-        if (!cancelled) setItems(list);
-      } catch (e: any) {
-        if (!cancelled) {
-          setError(e?.message || "Failed to load products");
-          setItems(staticProducts);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const list = await fetchProductsFromDb();
+      setItems(list);
+    } catch (e: any) {
+      setError(e?.message || "Failed to load products");
+      setItems(staticProducts);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { items, loading, error };
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { items, loading, error, retry: load };
 }

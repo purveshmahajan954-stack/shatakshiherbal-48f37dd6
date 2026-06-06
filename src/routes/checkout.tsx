@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
@@ -14,7 +14,7 @@ import {
   getRazorpayKeyId,
   computeTotals,
 } from "@/lib/payments.functions";
-import { Loader2, ShieldCheck, MapPin, Wallet } from "lucide-react";
+import { Loader2, ShieldCheck, MapPin, Wallet, Search } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -44,8 +44,15 @@ function CheckoutPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeError, setPincodeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const pincodeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -54,6 +61,47 @@ function CheckoutPage() {
     }
   }, [user]);
 
+  const fetchPincodeData = async (pin: string) => {
+    if (pin.length !== 6) return;
+    setPincodeLoading(true);
+    setPincodeError(null);
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || data[0]?.Status !== "Success") {
+        setPincodeError("Invalid pincode. Please check and try again.");
+        setCity("");
+        setState("");
+        setDistrict("");
+        return;
+      }
+      const po = data[0].PostOffice?.[0];
+      if (po) {
+        setCity(po.Division || po.Name || "");
+        setState(po.State || "");
+        setDistrict(po.District || "");
+      }
+    } catch {
+      setPincodeError("Could not fetch pincode data. Please fill manually.");
+    } finally {
+      setPincodeLoading(false);
+    }
+  };
+
+  const handlePincodeChange = (val: string) => {
+    const digits = val.replace(/\D/g, "").slice(0, 6);
+    setPincode(digits);
+    setPincodeError(null);
+    if (pincodeTimeout.current) clearTimeout(pincodeTimeout.current);
+    if (digits.length === 6) {
+      pincodeTimeout.current = setTimeout(() => fetchPincodeData(digits), 400);
+    } else {
+      setCity("");
+      setState("");
+      setDistrict("");
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
   );
@@ -61,13 +109,22 @@ function CheckoutPage() {
 
   const totals = computeTotals(total);
 
+  const buildFullAddress = () => {
+    const parts = [streetAddress.trim(), district ? district : "", city.trim(), state.trim(), pincode].filter(Boolean);
+    return parts.join(", ");
+  };
 
   const handlePay = async () => {
     if (items.length === 0) return toast.error("Your cart is empty");
     if (name.trim().length < 2) return toast.error("Please enter your name");
     if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Please enter a valid email");
     if (phone.replace(/\D/g, "").length < 10) return toast.error("Please enter a valid phone number");
-    if (address.trim().length < 10) return toast.error("Please enter your full shipping address");
+    if (streetAddress.trim().length < 5) return toast.error("Please enter your street address");
+    if (pincode.length !== 6) return toast.error("Please enter a valid 6-digit pincode");
+    if (!city.trim()) return toast.error("Please enter your city");
+    if (!state.trim()) return toast.error("Please enter your state");
+
+    const fullAddress = buildFullAddress();
 
     setBusy(true);
     try {
@@ -76,7 +133,7 @@ function CheckoutPage() {
         createOrder({
           data: {
             items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty, image: i.image, slug: i.slug })),
-            shipping: { name, email, phone, address },
+            shipping: { name, email, phone, address: fullAddress },
           },
         }),
       ]);
@@ -89,7 +146,7 @@ function CheckoutPage() {
         description: `Order #${order.orderId.slice(0, 8)}`,
         order_id: order.razorpayOrderId,
         prefill: { name, email, contact: phone },
-        notes: { address },
+        notes: { address: fullAddress },
         theme: { color: "#2D5016" },
         method: { upi: true, card: true, netbanking: true, wallet: true },
         handler: async (resp: any) => {
@@ -152,8 +209,31 @@ function CheckoutPage() {
                 <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone (10 digits)" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" type="email" className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="House no., street, city, state, PIN" rows={3} className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+                <textarea value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="House no., street, landmark" rows={2} className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+
+                {/* Pincode with auto-detect */}
+                <div className="relative">
+                  <input
+                    value={pincode}
+                    onChange={(e) => handlePincodeChange(e.target.value)}
+                    placeholder="6-digit Pincode"
+                    inputMode="numeric"
+                    maxLength={6}
+                    className={`w-full border rounded-md px-4 py-2.5 text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-primary ${pincodeError ? "border-red-400" : "border-border"}`}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {pincodeLoading ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Search className="w-4 h-4 text-muted-foreground" />}
+                  </div>
+                  {pincodeError && <p className="text-xs text-red-500 mt-1">{pincodeError}</p>}
+                </div>
+
+                <input value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="District" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City / Division" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                <input value={state} onChange={(e) => setState(e.target.value)} placeholder="State" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
+              {pincode.length === 6 && city && state && !pincodeLoading && (
+                <p className="text-xs text-primary mt-3 font-medium">📍 Auto-detected: {city}, {state}</p>
+              )}
             </section>
 
             {/* Items */}
@@ -172,7 +252,6 @@ function CheckoutPage() {
                 ))}
               </ul>
             </section>
-
           </div>
 
           {/* Summary */}
@@ -185,7 +264,6 @@ function CheckoutPage() {
                 <dt>Grand Total</dt><dd>₹{totals.total}</dd>
               </div>
             </dl>
-
 
             <button onClick={handlePay} disabled={busy} className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60">
               {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</> : <><Wallet className="w-4 h-4" /> Pay ₹{totals.total}</>}

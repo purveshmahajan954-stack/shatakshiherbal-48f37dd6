@@ -13,12 +13,10 @@ export const Route = createFileRoute("/admin-login")({
   }),
 });
 
-const ADMIN_EMAIL = "admin@shatakshiherbal.com";
-
 function AdminLoginPage() {
   const navigate = useNavigate();
   const { admin, loading } = useAdminAuth();
-  const [email, setEmail] = useState(ADMIN_EMAIL);
+  const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,20 +32,21 @@ function AdminLoginPage() {
     setError(null);
     setBusy(true);
     try {
+      const emailOrUsername = username.trim().toLowerCase();
       const res = await fetch("/api/admin/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+        body: JSON.stringify({ email: emailOrUsername, password }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error((data as any)?.error ?? "Invalid email or password");
+        throw new Error((data as any)?.error ?? "Invalid credentials");
       }
       const data = await res.json();
       localStorage.setItem("admin_token", data.token);
       navigate({ to: "/admin", replace: true });
     } catch (err: any) {
-      setError(err?.message || "Invalid email or password");
+      setError(err?.message || "Invalid credentials");
       setBusy(false);
     }
   };
@@ -68,16 +67,16 @@ function AdminLoginPage() {
           className="bg-white rounded-2xl shadow-card p-7 border border-border/50 space-y-4"
         >
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1.5">
-              Email
+            <label htmlFor="username" className="block text-sm font-medium mb-1.5">
+              Username or Email
             </label>
             <input
-              id="email"
-              type="email"
+              id="username"
+              type="text"
               autoComplete="username"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
