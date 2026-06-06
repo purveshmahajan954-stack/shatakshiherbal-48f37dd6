@@ -1,14 +1,18 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "@shared/schema";
 
-const connectionString = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error(
-    "NEON_DATABASE_URL is not set. Add your Neon connection string as a secret."
+    "DATABASE_URL is not set. The Replit PostgreSQL database should provide this automatically."
   );
 }
 
-const sql = neon(connectionString);
-export const db = drizzle(sql, { schema });
+const pool = new Pool({
+  connectionString,
+  ssl: connectionString.includes("ssl") ? { rejectUnauthorized: false } : false,
+});
+
+export const db = drizzle(pool, { schema });
