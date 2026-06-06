@@ -1,0 +1,74 @@
+I have a Cloudflare Workers e-commerce website for "Shatakshi Herbal" deployed at:
+https://shatakshi-herbal.purveshmahajan954.workers.dev/
+
+Cloudflare Account ID: 939eff0771f34232554e5155088faf84
+
+Fix and update the following 5 issues in the existing codebase, then deploy to Cloudflare:
+
+---
+
+## ISSUE 1: Products Not Loading
+- Fix product fetching logic — ensure products load from KV storage or D1 database on page load
+- Add loading spinner while products fetch
+- Add error handling with retry button if fetch fails
+- Make sure products display in a responsive grid (3 cols desktop, 2 cols tablet, 1 col mobile)
+
+---
+
+## ISSUE 2: Admin Panel Not Loading
+- Fix admin panel route (/admin) — ensure it loads correctly
+- Add basic auth protection (username: admin, password: shatakshi@2024)
+- Admin panel must show: product list, add/edit/delete product, view orders
+- Fix any routing issues causing blank screen
+
+---
+
+## ISSUE 3: Product Search Not Working
+- Add a working search bar on the products page
+- Search should filter products by name, category, and description in real-time
+- Add category filter dropdown alongside search
+- Show "No products found" message when search returns empty
+
+---
+
+## ISSUE 4: Pincode-Based Address Detection in Shipping
+- In the checkout/shipping address form, add a Pincode field
+- When user enters a 6-digit pincode, auto-fetch city, state, district using this free API:
+  https://api.postalpincode.in/pincode/{PINCODE}
+- Auto-fill City and State fields from the API response
+- Show a loader while fetching, and error message if pincode is invalid
+
+---
+
+## ISSUE 5: Invoice/Bill Download After Payment
+- After successful payment/order placement, show a "Download Invoice" button
+- Generate a clean PDF invoice containing:
+  * Shatakshi Herbal logo/name and address
+  * Invoice number (auto-generated: INV-YYYYMMDD-XXXX)
+  * Customer name, address, phone
+  * Order items table: product name, quantity, price, subtotal
+  * Subtotal, shipping charges, GST (18%), Total amount
+  * Payment method and date
+- Use jsPDF or similar library to generate PDF in browser
+- Also show invoice in a modal/popup before download
+
+---
+
+## DEPLOYMENT INSTRUCTIONS:
+After all fixes are done:
+1. Run: npm run build (or wrangler build)
+2. Deploy using: npx wrangler deploy
+3. Make sure all changes are pushed to GitHub before deploying
+4. Cloudflare Account ID: 939eff0771f34232554e5155088faf84
+5. Ensure the live site at https://shatakshi-herbal.purveshmahajan954.workers.dev/ reflects all changes
+
+---
+
+## TECH STACK (use whatever is already in the project, or use):
+- Frontend: React or plain HTML/CSS/JS
+- Backend: Cloudflare Workers (wrangler)
+- Storage: Cloudflare KV or D1
+- PDF: jsPDF
+- Pincode API: https://api.postalpincode.in/pincode/{PINCODE} (free, no key needed)
+
+Please fix all 5 issues, test them, push to GitHub, and deploy to Cloudflare.
