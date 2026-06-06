@@ -86,9 +86,8 @@ export function useProducts() {
     setError(null);
     try {
       const list = await fetchProductsFromDb();
-      setItems(list);
-    } catch (e: any) {
-      setError(e?.message || "Failed to load products");
+      setItems(list.length > 0 ? list : staticProducts);
+    } catch {
       setItems(staticProducts);
     } finally {
       setLoading(false);
