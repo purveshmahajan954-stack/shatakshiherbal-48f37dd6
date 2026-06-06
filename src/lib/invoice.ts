@@ -35,7 +35,7 @@ export function getInvoiceHtml(order: InvoiceData): string {
   const invoiceNumber = generateInvoiceNumber(order.id, order.created_at);
 
   const subtotal = Number(order.subtotal) || 0;
-  const gstAmount = Math.round(subtotal * 0.18);
+  const gstAmount = Math.round(subtotal * 0.05);
   const delivery = Number(order.delivery_charge) || 0;
   const grandTotal = subtotal + gstAmount + delivery;
 
@@ -137,7 +137,7 @@ export function getInvoiceHtml(order: InvoiceData): string {
   <div class="totals">
     <div class="row"><span>Subtotal</span><span>₹${subtotal.toLocaleString("en-IN")}</span></div>
     <div class="row"><span>Delivery Charges</span><span>₹${delivery.toLocaleString("en-IN")}</span></div>
-    <div class="row gst"><span>GST (18%)</span><span>₹${gstAmount.toLocaleString("en-IN")}</span></div>
+    <div class="row gst"><span>GST (5%)</span><span>₹${gstAmount.toLocaleString("en-IN")}</span></div>
     <div class="row"><span>Total Amount</span><span>₹${grandTotal.toLocaleString("en-IN")}</span></div>
   </div>
 

@@ -35,7 +35,7 @@ function InvoiceModal({ order, onClose, onDownload }: { order: any; onClose: () 
   const items: { name: string; qty: number; price: number }[] = Array.isArray(order.items) ? order.items : [];
   const subtotal = Number(order.subtotal) || 0;
   const delivery = Number(order.delivery_charge) || 0;
-  const gst = Math.round(subtotal * 0.18);
+  const gst = Math.round(subtotal * 0.05);
   const grandTotal = subtotal + delivery + gst;
   const invoiceNumber = generateInvoiceNumber(order.id, order.created_at);
   const date = new Date(order.created_at).toLocaleDateString("en-IN", { dateStyle: "long" });
@@ -128,7 +128,7 @@ function InvoiceModal({ order, onClose, onDownload }: { order: any; onClose: () 
               <span>Delivery Charges</span><span>₹{delivery.toLocaleString("en-IN")}</span>
             </div>
             <div className="flex justify-between px-4 py-2.5 text-sm text-muted-foreground border-b border-border">
-              <span>GST (18%)</span><span>₹{gst.toLocaleString("en-IN")}</span>
+              <span>GST (5%)</span><span>₹{gst.toLocaleString("en-IN")}</span>
             </div>
             <div className="flex justify-between px-4 py-3 text-base font-bold bg-primary text-primary-foreground">
               <span>Total Amount</span><span>₹{grandTotal.toLocaleString("en-IN")}</span>
