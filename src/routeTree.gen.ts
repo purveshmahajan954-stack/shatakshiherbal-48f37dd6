@@ -11,14 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ShippingRouteImport } from './routes/shipping'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as ProductInfoRouteImport } from './routes/product-info'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
 import { Route as PaymentFailedRouteImport } from './routes/payment-failed'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
@@ -72,6 +75,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -80,6 +88,11 @@ const ShopRoute = ShopRouteImport.update({
 const ShippingRoute = ShippingRouteImport.update({
   id: '/shipping',
   path: '/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundRoute = RefundRouteImport.update({
@@ -110,6 +123,11 @@ const PaymentFailedRoute = PaymentFailedRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -332,14 +350,17 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
   '/refund': typeof RefundRoute
+  '/search': typeof SearchRoute
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
@@ -385,14 +406,17 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
   '/refund': typeof RefundRoute
+  '/search': typeof SearchRoute
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
@@ -440,14 +464,17 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
   '/refund': typeof RefundRoute
+  '/search': typeof SearchRoute
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
@@ -496,14 +523,17 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/login'
     | '/orders'
     | '/payment-failed'
     | '/payment-success'
     | '/privacy'
     | '/product-info'
     | '/refund'
+    | '/search'
     | '/shipping'
     | '/shop'
+    | '/signup'
     | '/terms'
     | '/wishlist'
     | '/admin/customers'
@@ -549,14 +579,17 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/login'
     | '/orders'
     | '/payment-failed'
     | '/payment-success'
     | '/privacy'
     | '/product-info'
     | '/refund'
+    | '/search'
     | '/shipping'
     | '/shop'
+    | '/signup'
     | '/terms'
     | '/wishlist'
     | '/admin/customers'
@@ -603,14 +636,17 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/login'
     | '/orders'
     | '/payment-failed'
     | '/payment-success'
     | '/privacy'
     | '/product-info'
     | '/refund'
+    | '/search'
     | '/shipping'
     | '/shop'
+    | '/signup'
     | '/terms'
     | '/wishlist'
     | '/admin/customers'
@@ -658,14 +694,17 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  LoginRoute: typeof LoginRoute
   OrdersRoute: typeof OrdersRoute
   PaymentFailedRoute: typeof PaymentFailedRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductInfoRoute: typeof ProductInfoRoute
   RefundRoute: typeof RefundRoute
+  SearchRoute: typeof SearchRoute
   ShippingRoute: typeof ShippingRoute
   ShopRoute: typeof ShopRoute
+  SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
   WishlistRoute: typeof WishlistRoute
   ApiContactRoute: typeof ApiContactRoute
@@ -712,6 +751,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -724,6 +770,13 @@ declare module '@tanstack/react-router' {
       path: '/shipping'
       fullPath: '/shipping'
       preLoaderRoute: typeof ShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refund': {
@@ -766,6 +819,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1099,14 +1159,17 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  LoginRoute: LoginRoute,
   OrdersRoute: OrdersRoute,
   PaymentFailedRoute: PaymentFailedRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
   PrivacyRoute: PrivacyRoute,
   ProductInfoRoute: ProductInfoRoute,
   RefundRoute: RefundRoute,
+  SearchRoute: SearchRoute,
   ShippingRoute: ShippingRoute,
   ShopRoute: ShopRoute,
+  SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
   WishlistRoute: WishlistRoute,
   ApiContactRoute: ApiContactRoute,

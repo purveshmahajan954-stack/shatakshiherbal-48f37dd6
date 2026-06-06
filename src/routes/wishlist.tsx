@@ -1,10 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Heart, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { Heart, Trash2, ShoppingBag, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/wishlist")({
   component: WishlistPage,
@@ -19,12 +21,34 @@ export const Route = createFileRoute("/wishlist")({
 function WishlistPage() {
   const { items, remove, clear } = useWishlist();
   const { add } = useCart();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/login", search: { redirect: "/wishlist" } });
+    }
+  }, [user, loading, navigate]);
 
   const moveToCart = (i: { name: string; price: number; image?: string; slug: string }) => {
     add({ name: i.name, price: i.price, image: i.image, slug: i.slug });
     remove(i.slug);
     toast.success(`${i.name} moved to cart`);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cream flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-cream flex flex-col">

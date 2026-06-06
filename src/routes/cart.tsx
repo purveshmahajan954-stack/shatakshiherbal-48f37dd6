@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useCart } from "@/lib/cart";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -17,8 +19,30 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, total, setQty, remove, clear, count } = useCart();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const delivery = total === 0 ? 0 : 150;
   const grand = total + delivery;
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/login", search: { redirect: "/cart" } });
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-cream/40">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-cream/40">
