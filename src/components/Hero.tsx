@@ -106,7 +106,6 @@ export function Hero() {
                 width={1024}
                 height={1024}
                 loading={slide === 0 ? "eager" : "lazy"}
-                fetchPriority={slide === 0 ? "high" : "low"}
                 decoding="async"
                 onLoad={() => markLoaded(slide)}
                 initial={{ opacity: 0, scale: 1.02 }}
