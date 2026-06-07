@@ -16,9 +16,12 @@ export const appRoleEnum = pgEnum("app_role", ["admin", "manager", "user"]);
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").notNull().unique(),
+  email: text("email").unique(),
+  phone: text("phone").unique(),
   fullName: text("full_name"),
   passwordHash: text("password_hash"),
+  googleId: text("google_id").unique(),
+  avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -62,6 +65,20 @@ export const adminSessions = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => [index("admin_sessions_token_idx").on(t.token)],
+);
+
+export const otpCodes = pgTable(
+  "otp_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    phone: text("phone").notNull(),
+    code: text("code").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    used: boolean("used").notNull().default(false),
+    attempts: integer("attempts").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("otp_codes_phone_idx").on(t.phone)],
 );
 
 export const products = pgTable("products", {

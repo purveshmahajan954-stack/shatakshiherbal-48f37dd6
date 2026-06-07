@@ -25,6 +25,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
@@ -53,7 +54,11 @@ import { Route as ApiPaymentsCreateOrderRouteImport } from './routes/api/payment
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAuthSignoutRouteImport } from './routes/api/auth/signout'
 import { Route as ApiAuthSigninRouteImport } from './routes/api/auth/signin'
+import { Route as ApiAuthOtpVerifyRouteImport } from './routes/api/auth/otp-verify'
+import { Route as ApiAuthOtpSendRouteImport } from './routes/api/auth/otp-send'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
+import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google-callback'
+import { Route as ApiAuthGoogleRouteImport } from './routes/api/auth/google'
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
 import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
 import { Route as ApiAdminSigninRouteImport } from './routes/api/admin/signin'
@@ -145,6 +150,11 @@ const CheckoutRoute = CheckoutRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth-callback',
+  path: '/auth-callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -287,9 +297,29 @@ const ApiAuthSigninRoute = ApiAuthSigninRouteImport.update({
   path: '/api/auth/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthOtpVerifyRoute = ApiAuthOtpVerifyRouteImport.update({
+  id: '/api/auth/otp-verify',
+  path: '/api/auth/otp-verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthOtpSendRoute = ApiAuthOtpSendRouteImport.update({
+  id: '/api/auth/otp-send',
+  path: '/api/auth/otp-send',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
   id: '/api/auth/me',
   path: '/api/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
+  id: '/api/auth/google-callback',
+  path: '/api/auth/google-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthGoogleRoute = ApiAuthGoogleRouteImport.update({
+  id: '/api/auth/google',
+  path: '/api/auth/google',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
@@ -359,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -401,7 +432,11 @@ export interface FileRoutesByFullPath {
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/google': typeof ApiAuthGoogleRoute
+  '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
   '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/auth/otp-send': typeof ApiAuthOtpSendRoute
+  '/api/auth/otp-verify': typeof ApiAuthOtpVerifyRoute
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -417,6 +452,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin-login': typeof AdminLoginRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -459,7 +495,11 @@ export interface FileRoutesByTo {
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/google': typeof ApiAuthGoogleRoute
+  '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
   '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/auth/otp-send': typeof ApiAuthOtpSendRoute
+  '/api/auth/otp-verify': typeof ApiAuthOtpVerifyRoute
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -477,6 +517,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -519,7 +560,11 @@ export interface FileRoutesById {
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/google': typeof ApiAuthGoogleRoute
+  '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
   '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/auth/otp-send': typeof ApiAuthOtpSendRoute
+  '/api/auth/otp-verify': typeof ApiAuthOtpVerifyRoute
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -538,6 +583,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/admin-login'
+    | '/auth-callback'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -580,7 +626,11 @@ export interface FileRouteTypes {
     | '/api/admin/signin'
     | '/api/admin/signout'
     | '/api/admin/users'
+    | '/api/auth/google'
+    | '/api/auth/google-callback'
     | '/api/auth/me'
+    | '/api/auth/otp-send'
+    | '/api/auth/otp-verify'
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
@@ -596,6 +646,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin-login'
+    | '/auth-callback'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -638,7 +689,11 @@ export interface FileRouteTypes {
     | '/api/admin/signin'
     | '/api/admin/signout'
     | '/api/admin/users'
+    | '/api/auth/google'
+    | '/api/auth/google-callback'
     | '/api/auth/me'
+    | '/api/auth/otp-send'
+    | '/api/auth/otp-verify'
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
@@ -655,6 +710,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/admin-login'
+    | '/auth-callback'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -697,7 +753,11 @@ export interface FileRouteTypes {
     | '/api/admin/signin'
     | '/api/admin/signout'
     | '/api/admin/users'
+    | '/api/auth/google'
+    | '/api/auth/google-callback'
     | '/api/auth/me'
+    | '/api/auth/otp-send'
+    | '/api/auth/otp-verify'
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
@@ -715,6 +775,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
@@ -747,7 +808,11 @@ export interface RootRouteChildren {
   ApiAdminSigninRoute: typeof ApiAdminSigninRoute
   ApiAdminSignoutRoute: typeof ApiAdminSignoutRoute
   ApiAdminUsersRoute: typeof ApiAdminUsersRoute
+  ApiAuthGoogleRoute: typeof ApiAuthGoogleRoute
+  ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
+  ApiAuthOtpSendRoute: typeof ApiAuthOtpSendRoute
+  ApiAuthOtpVerifyRoute: typeof ApiAuthOtpVerifyRoute
   ApiAuthSigninRoute: typeof ApiAuthSigninRoute
   ApiAuthSignoutRoute: typeof ApiAuthSignoutRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
@@ -872,6 +937,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth-callback': {
+      id: '/auth-callback'
+      path: '/auth-callback'
+      fullPath: '/auth-callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-login': {
@@ -1070,11 +1142,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSigninRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/otp-verify': {
+      id: '/api/auth/otp-verify'
+      path: '/api/auth/otp-verify'
+      fullPath: '/api/auth/otp-verify'
+      preLoaderRoute: typeof ApiAuthOtpVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/otp-send': {
+      id: '/api/auth/otp-send'
+      path: '/api/auth/otp-send'
+      fullPath: '/api/auth/otp-send'
+      preLoaderRoute: typeof ApiAuthOtpSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/me': {
       id: '/api/auth/me'
       path: '/api/auth/me'
       fullPath: '/api/auth/me'
       preLoaderRoute: typeof ApiAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google-callback': {
+      id: '/api/auth/google-callback'
+      path: '/api/auth/google-callback'
+      fullPath: '/api/auth/google-callback'
+      preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google': {
+      id: '/api/auth/google'
+      path: '/api/auth/google'
+      fullPath: '/api/auth/google'
+      preLoaderRoute: typeof ApiAuthGoogleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/users': {
@@ -1197,6 +1297,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
@@ -1229,7 +1330,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminSigninRoute: ApiAdminSigninRoute,
   ApiAdminSignoutRoute: ApiAdminSignoutRoute,
   ApiAdminUsersRoute: ApiAdminUsersRoute,
+  ApiAuthGoogleRoute: ApiAuthGoogleRoute,
+  ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
+  ApiAuthOtpSendRoute: ApiAuthOtpSendRoute,
+  ApiAuthOtpVerifyRoute: ApiAuthOtpVerifyRoute,
   ApiAuthSigninRoute: ApiAuthSigninRoute,
   ApiAuthSignoutRoute: ApiAuthSignoutRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,

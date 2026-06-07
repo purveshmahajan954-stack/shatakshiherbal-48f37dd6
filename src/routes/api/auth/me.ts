@@ -15,8 +15,7 @@ export const Route = createFileRoute("/api/auth/me")({
             const match = cookieHeader.match(/(?:^|;\s*)auth_token=([^;]+)/);
             token = match?.[1] ?? null;
           }
-          if (!token)
-            return Response.json({ error: "Unauthorized" }, { status: 401 });
+          if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
           const now = new Date();
           const rows = await db
@@ -26,8 +25,7 @@ export const Route = createFileRoute("/api/auth/me")({
             .where(and(eq(userSessions.token, token), gt(userSessions.expiresAt, now)))
             .limit(1);
 
-          if (rows.length === 0)
-            return Response.json({ error: "Unauthorized" }, { status: 401 });
+          if (rows.length === 0) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
           const profile = rows[0].profile as any;
           const roleRows = await db
@@ -37,7 +35,13 @@ export const Route = createFileRoute("/api/auth/me")({
           const isAdmin = roleRows.some((r) => r.role === "admin");
 
           return Response.json({
-            user: { id: profile.id, email: profile.email, fullName: profile.fullName },
+            user: {
+              id: profile.id,
+              email: profile.email,
+              phone: profile.phone,
+              fullName: profile.fullName,
+              avatarUrl: profile.avatarUrl,
+            },
             isAdmin,
           });
         } catch (err: any) {

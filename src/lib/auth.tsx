@@ -3,7 +3,9 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 export type AppUser = {
   id: string;
   email: string | null;
+  phone: string | null;
   fullName: string | null;
+  avatarUrl: string | null;
 };
 
 type AuthCtx = {
@@ -68,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }).catch(() => {});
     }
     localStorage.removeItem("auth_token");
+    document.cookie = "auth_token=; path=/; max-age=0";
     setUser(null);
     setIsAdmin(false);
   };
