@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Search, ShoppingBag, ArrowRight, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { products } from "@/lib/products";
+import { products, CATEGORY_LABELS } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
 
@@ -34,13 +34,19 @@ function SearchPage() {
   const query = (q ?? "").trim().toLowerCase();
 
   const results = query
-    ? products.filter(
-        (p) =>
+    ? products.filter((p) => {
+        const categoryLabelMatch = p.categories.some((slug) => {
+          const label = CATEGORY_LABELS[slug] ?? "";
+          return label.toLowerCase().includes(query);
+        });
+        return (
           p.name.toLowerCase().includes(query) ||
           p.desc.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query) ||
-          p.categories.some((c) => c.toLowerCase().includes(query))
-      )
+          p.longDesc.toLowerCase().includes(query) ||
+          p.categories.some((c) => c.toLowerCase().includes(query)) ||
+          categoryLabelMatch
+        );
+      })
     : [];
 
   const handleSearch = (e: React.FormEvent) => {
