@@ -35,12 +35,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (!res.ok) {
         localStorage.removeItem("auth_token");
+        document.cookie = "auth_token=; path=/; max-age=0";
         setUser(null);
         setIsAdmin(false);
       } else {
         const data = await res.json();
         setUser(data.user);
         setIsAdmin(data.isAdmin ?? false);
+        const maxAge = 7 * 24 * 60 * 60;
+        document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
       }
     } catch {
       setUser(null);
