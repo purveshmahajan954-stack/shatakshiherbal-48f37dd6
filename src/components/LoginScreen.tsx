@@ -1,43 +1,93 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Loader2 } from "lucide-react";
+import { Leaf, Loader2, Phone, Mail, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { OtpInput } from "@/components/OtpInput";
+
+type Tab = "otp" | "email";
+type OtpStep = "phone" | "verify";
 
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
   const { refreshUser } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [tab, setTab] = useState<Tab>("otp");
+
+  const [phone, setPhone] = useState("");
+  const [otpStep, setOtpStep] = useState<OtpStep>("phone");
+  const [otp, setOtp] = useState("");
+  const [otpBusy, setOtpBusy] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [emailBusy, setEmailBusy] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBusy(true);
+    setOtpBusy(true);
     try {
-      const endpoint = mode === "signup" ? "/api/auth/signup" : "/api/auth/signin";
-      const body =
-        mode === "signup"
-          ? { email, password, fullName: name }
-          : { email, password };
-
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/auth/otp-send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ phone }),
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Something went wrong");
-
-      localStorage.setItem("auth_token", data.token);
-      await refreshUser();
-      toast.success(mode === "signup" ? "Account created! Welcome." : "Welcome back!");
+      if (!res.ok) throw new Error(data.error || "Failed to send OTP");
+      toast.success("OTP sent to your mobile number");
+      setOtpStep("verify");
     } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+      toast.error(err.message || "Failed to send OTP");
     } finally {
-      setBusy(false);
+      setOtpBusy(false);
     }
+  };
+
+  const handleVerifyOtp = async (code: string) => {
+    if (code.length < 6) return;
+    setOtpBusy(true);
+    try {
+      const res = await fetch("/api/auth/otp-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, code, context: "login" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Invalid OTP");
+      localStorage.setItem("auth_token", data.token);
+      document.cookie = `auth_token=${data.token}; path=/; max-age=${7 * 24 * 3600}; SameSite=Lax`;
+      await refreshUser();
+      toast.success("Signed in successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Invalid OTP");
+      setOtp("");
+    } finally {
+      setOtpBusy(false);
+    }
+  };
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailBusy(true);
+    try {
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Sign in failed");
+      localStorage.setItem("auth_token", data.token);
+      document.cookie = `auth_token=${data.token}; path=/; max-age=${7 * 24 * 3600}; SameSite=Lax`;
+      await refreshUser();
+      toast.success("Welcome back!");
+    } catch (err: any) {
+      toast.error(err.message || "Sign in failed");
+    } finally {
+      setEmailBusy(false);
+    }
+  };
+
+  const handleGoogle = () => {
+    window.location.href = "/api/auth/google";
   };
 
   return (
@@ -47,60 +97,171 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
             <Leaf className="w-7 h-7 text-primary" />
           </div>
-          <h1 className="font-display text-3xl text-foreground">{title ?? "Shatakshi Herbal"}</h1>
+          <h1 className="font-display text-3xl text-foreground">{title ?? "Welcome Back"}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {subtitle ?? (mode === "signin" ? "Sign in to continue" : "Create your account")}
+            {subtitle ?? "Sign in to your account"}
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-card p-7 border border-border/50">
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "signup" && (
-              <input
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full name"
-                className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            )}
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <input
-              required
-              minLength={6}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (min 6 chars)"
-              className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+        <div className="bg-white rounded-2xl shadow-card border border-border/50 overflow-hidden">
+          <div className="flex border-b border-border/50">
             <button
-              type="submit"
-              disabled={busy}
-              className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              onClick={() => { setTab("otp"); setOtpStep("phone"); setOtp(""); }}
+              className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-sm font-medium transition-colors ${
+                tab === "otp"
+                  ? "text-primary border-b-2 border-primary bg-primary/5"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {busy && <Loader2 className="w-4 h-4 animate-spin" />}
-              {mode === "signin" ? "Sign In" : "Create Account"}
+              <Phone className="w-4 h-4" /> Mobile OTP
             </button>
-          </form>
+            <button
+              onClick={() => setTab("email")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-sm font-medium transition-colors ${
+                tab === "email"
+                  ? "text-primary border-b-2 border-primary bg-primary/5"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Mail className="w-4 h-4" /> Email & Password
+            </button>
+          </div>
 
-          <p className="text-center text-sm text-muted-foreground mt-5">
-            {mode === "signin" ? "New here? " : "Already have an account? "}
+          <div className="p-6 space-y-4">
+            {tab === "otp" && (
+              <>
+                {otpStep === "phone" ? (
+                  <form onSubmit={handleSendOtp} className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1.5 block">
+                        Mobile Number
+                      </label>
+                      <div className="flex gap-2">
+                        <span className="inline-flex items-center px-3 border border-border rounded-md bg-accent/40 text-sm text-muted-foreground select-none">
+                          +91
+                        </span>
+                        <input
+                          required
+                          type="tel"
+                          inputMode="numeric"
+                          maxLength={10}
+                          value={phone}
+                          onChange={(e) =>
+                            setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                          }
+                          placeholder="9876543210"
+                          className="flex-1 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={otpBusy || phone.length !== 10}
+                      className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                    >
+                      {otpBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      Send OTP
+                    </button>
+                  </form>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-center text-sm text-muted-foreground">
+                      OTP sent to{" "}
+                      <span className="font-semibold text-foreground">+91 {phone}</span>
+                    </p>
+                    <OtpInput
+                      value={otp}
+                      onChange={(val) => {
+                        setOtp(val);
+                        if (val.length === 6) handleVerifyOtp(val);
+                      }}
+                      disabled={otpBusy}
+                    />
+                    {otpBusy && (
+                      <div className="flex justify-center">
+                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => { setOtpStep("phone"); setOtp(""); }}
+                      className="w-full text-sm text-muted-foreground hover:text-primary transition"
+                    >
+                      ← Change number
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+
+            {tab === "email" && (
+              <form onSubmit={handleEmailSignIn} className="space-y-3">
+                <input
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  className="w-full border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <div className="relative">
+                  <input
+                    required
+                    minLength={6}
+                    type={showPw ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full border border-border rounded-md px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw(!showPw)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  >
+                    {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <button
+                  type="submit"
+                  disabled={emailBusy}
+                  className="w-full bg-primary text-primary-foreground py-2.5 rounded-md font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                >
+                  {emailBusy && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Sign In
+                </button>
+              </form>
+            )}
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-3 text-xs text-muted-foreground">or</span>
+              </div>
+            </div>
+
             <button
-              type="button"
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="text-primary font-medium hover:underline"
+              onClick={handleGoogle}
+              className="w-full flex items-center justify-center gap-3 border border-border rounded-md py-2.5 text-sm font-medium hover:bg-accent/40 transition"
             >
-              {mode === "signin" ? "Create account" : "Sign in"}
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Continue with Google
             </button>
-          </p>
+
+            <p className="text-center text-xs text-muted-foreground pt-1">
+              Don't have an account?{" "}
+              <a href="/signup" className="text-primary font-medium hover:underline">
+                Create account
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
