@@ -1,19 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
-import {
-  createRazorpayOrder,
-  verifyRazorpayPayment,
-  markPaymentFailed,
-  getRazorpayKeyId,
-  computeTotals,
-} from "@/lib/payments.functions";
+import { computeTotals } from "@/lib/payments.functions";
 import { Loader2, ShieldCheck, MapPin, Wallet, Search } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
@@ -32,14 +25,24 @@ declare global {
   interface Window { Razorpay: any }
 }
 
+async function apiPost(path: string, body: unknown, token: string) {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error ?? `Request failed (${res.status})`);
+  return data;
+}
+
 function CheckoutPage() {
   const navigate = useNavigate();
   const { items, total, clear } = useCart();
   const { user, loading } = useAuth();
-  const createOrder = useServerFn(createRazorpayOrder);
-  const verify = useServerFn(verifyRazorpayPayment);
-  const markFailed = useServerFn(markPaymentFailed);
-  const fetchKeyId = useServerFn(getRazorpayKeyId);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,7 +60,7 @@ function CheckoutPage() {
   useEffect(() => {
     if (user) {
       setEmail(user.email ?? "");
-      setName((user.user_metadata as any)?.full_name ?? "");
+      setName(user.fullName ?? "");
     }
   }, [user]);
 
@@ -70,9 +73,7 @@ function CheckoutPage() {
       const data = await res.json();
       if (!Array.isArray(data) || data[0]?.Status !== "Success") {
         setPincodeError("Invalid pincode. Please check and try again.");
-        setCity("");
-        setState("");
-        setDistrict("");
+        setCity(""); setState(""); setDistrict("");
         return;
       }
       const po = data[0].PostOffice?.[0];
@@ -96,21 +97,21 @@ function CheckoutPage() {
     if (digits.length === 6) {
       pincodeTimeout.current = setTimeout(() => fetchPincodeData(digits), 400);
     } else {
-      setCity("");
-      setState("");
-      setDistrict("");
+      setCity(""); setState(""); setDistrict("");
     }
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+    </div>
   );
   if (!user) return <LoginScreen title="Sign in to checkout" subtitle="Your cart is saved — sign in to complete your order securely" />;
 
   const totals = computeTotals(total);
 
   const buildFullAddress = () => {
-    const parts = [streetAddress.trim(), district ? district : "", city.trim(), state.trim(), pincode].filter(Boolean);
+    const parts = [streetAddress.trim(), district || "", city.trim(), state.trim(), pincode].filter(Boolean);
     return parts.join(", ");
   };
 
@@ -124,26 +125,27 @@ function CheckoutPage() {
     if (!city.trim()) return toast.error("Please enter your city");
     if (!state.trim()) return toast.error("Please enter your state");
 
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    const token = localStorage.getItem("auth_token");
     if (!token) return toast.error("Please sign in first");
-    document.cookie = `auth_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
 
     const fullAddress = buildFullAddress();
-
     setBusy(true);
+
     try {
-      const [{ keyId }, order] = await Promise.all([
-        fetchKeyId(),
-        createOrder({
-          data: {
-            items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty, image: i.image, slug: i.slug })),
-            shipping: { name, email, phone, address: fullAddress },
-          },
+      const [keyData, order] = await Promise.all([
+        fetch("/api/payments/razorpay-key").then(async (r) => {
+          const d = await r.json();
+          if (!r.ok) throw new Error(d?.error ?? "Razorpay not configured");
+          return d as { keyId: string };
         }),
+        apiPost("/api/payments/create-order", {
+          items: items.map((i) => ({ slug: i.slug, qty: i.qty, name: i.name, price: i.price, image: i.image })),
+          shipping: { name, email, phone, address: fullAddress },
+        }, token) as Promise<{ razorpayOrderId: string; amount: number; currency: string; orderId: string; totals: any }>,
       ]);
 
       const rzp = new window.Razorpay({
-        key: keyId,
+        key: keyData.keyId,
         amount: order.amount,
         currency: order.currency,
         name: "Shatakshi Herbal",
@@ -155,11 +157,11 @@ function CheckoutPage() {
         method: { upi: true, card: true, netbanking: true, wallet: true },
         handler: async (resp: any) => {
           try {
-            await verify({ data: {
+            await apiPost("/api/payments/verify", {
               razorpay_order_id: resp.razorpay_order_id,
               razorpay_payment_id: resp.razorpay_payment_id,
               razorpay_signature: resp.razorpay_signature,
-            }});
+            }, token);
             clear();
             navigate({ to: "/payment-success", search: { o: order.orderId } });
           } catch (e: any) {
@@ -168,19 +170,29 @@ function CheckoutPage() {
         },
         modal: {
           ondismiss: async () => {
-            await markFailed({ data: { razorpay_order_id: order.razorpayOrderId, reason: "dismissed" } }).catch(() => {});
+            await fetch("/api/payments/mark-failed", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ razorpay_order_id: order.razorpayOrderId }),
+            }).catch(() => {});
             setBusy(false);
             navigate({ to: "/payment-failed", search: { r: order.razorpayOrderId, reason: "dismissed" } });
           },
         },
       });
+
       rzp.on("payment.failed", async (resp: any) => {
-        await markFailed({ data: { razorpay_order_id: order.razorpayOrderId, reason: resp?.error?.description ?? "failed" } }).catch(() => {});
+        await fetch("/api/payments/mark-failed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ razorpay_order_id: order.razorpayOrderId }),
+        }).catch(() => {});
         navigate({ to: "/payment-failed", search: { r: order.razorpayOrderId, reason: resp?.error?.description ?? "failed" } });
       });
+
       rzp.open();
     } catch (e: any) {
-      toast.error(e?.message ?? "Could not start payment");
+      toast.error(e?.message ?? "Could not start payment. Please try again.");
       setBusy(false);
     }
   };
@@ -206,16 +218,16 @@ function CheckoutPage() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            {/* Address */}
             <section className="bg-white rounded-2xl shadow-card p-6">
-              <h2 className="flex items-center gap-2 font-display text-xl mb-4"><MapPin className="w-5 h-5 text-primary" /> Shipping Address</h2>
+              <h2 className="flex items-center gap-2 font-display text-xl mb-4">
+                <MapPin className="w-5 h-5 text-primary" /> Shipping Address
+              </h2>
               <div className="grid sm:grid-cols-2 gap-3">
                 <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone (10 digits)" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" type="email" className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <textarea value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="House no., street, landmark" rows={2} className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
 
-                {/* Pincode with auto-detect */}
                 <div className="relative">
                   <input
                     value={pincode}
@@ -240,7 +252,6 @@ function CheckoutPage() {
               )}
             </section>
 
-            {/* Items */}
             <section className="bg-white rounded-2xl shadow-card p-6">
               <h2 className="font-display text-xl mb-4">Order Items ({items.length})</h2>
               <ul className="divide-y divide-border">
@@ -258,7 +269,6 @@ function CheckoutPage() {
             </section>
           </div>
 
-          {/* Summary */}
           <aside className="bg-white rounded-2xl shadow-card p-6 h-fit lg:sticky lg:top-24">
             <h2 className="font-display text-xl mb-4">Order Summary</h2>
             <dl className="space-y-2 text-sm">
@@ -269,13 +279,20 @@ function CheckoutPage() {
               </div>
             </dl>
 
-            <button onClick={handlePay} disabled={busy} className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60">
-              {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</> : <><Wallet className="w-4 h-4" /> Pay ₹{totals.total}</>}
+            <button
+              onClick={handlePay}
+              disabled={busy}
+              className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60"
+            >
+              {busy
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
+                : <><Wallet className="w-4 h-4" /> Pay ₹{totals.total}</>
+              }
             </button>
 
             <div className="mt-4 flex items-start gap-2 text-xs text-muted-foreground">
               <ShieldCheck className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-              <span>256-bit secure payment by Razorpay. Supports UPI, Cards, Netbanking & Wallets.</span>
+              <span>256-bit secure payment by Razorpay. Supports UPI, Cards, Netbanking &amp; Wallets.</span>
             </div>
           </aside>
         </div>
