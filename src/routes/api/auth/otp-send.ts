@@ -126,7 +126,8 @@ export const Route = createFileRoute("/api/auth/otp-send")({
           return Response.json({ ok: true, phone });
         } catch (err: any) {
           console.error("[otp-send]", err);
-          return Response.json({ error: err?.message ?? "Failed to send OTP" }, { status: 500 });
+          const detail = err?.cause?.message || err?.message || "Failed to send OTP";
+          return Response.json({ error: detail }, { status: 500 });
         }
       },
     },
