@@ -118,7 +118,7 @@ export const Route = createFileRoute("/api/auth/otp-send")({
           } catch (err: any) {
             console.error("[otp-send] Twilio error:", err);
             return Response.json(
-              { error: "Failed to send OTP. Please check the phone number and try again." },
+              { error: err?.message || "Failed to send OTP. Please check the phone number and try again." },
               { status: 500 }
             );
           }
