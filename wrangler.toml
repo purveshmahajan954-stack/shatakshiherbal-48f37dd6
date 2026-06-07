@@ -19,6 +19,11 @@ binding = "ASSETS"
 #   RAZORPAY_KEY_ID             (Razorpay key ID)
 #   RAZORPAY_KEY_SECRET         (Razorpay key secret)
 #   RAZORPAY_WEBHOOK_SECRET     (Razorpay webhook secret)
+#   TWILIO_ACCOUNT_SID          (Twilio account SID for OTP SMS)
+#   TWILIO_AUTH_TOKEN           (Twilio auth token)
+#   TWILIO_PHONE_NUMBER         (Twilio sender phone number e.g. +1XXXXXXXXXX)
+#   GOOGLE_CLIENT_ID            (Google OAuth client ID)
+#   GOOGLE_CLIENT_SECRET        (Google OAuth client secret)
 # ─────────────────────────────────────────────
 
 [vars]

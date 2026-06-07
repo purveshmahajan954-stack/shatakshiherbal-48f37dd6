@@ -7,7 +7,7 @@ const patch = `
 // CF Workers: copy secrets from env binding to process.env before handler runs
 function patchEnv(env) {
   if (!env || typeof env !== "object") return;
-  const keys = ["NEON_DATABASE_URL","RAZORPAY_KEY_ID","RAZORPAY_KEY_SECRET","RAZORPAY_WEBHOOK_SECRET","NODE_ENV"];
+  const keys = ["NEON_DATABASE_URL","RAZORPAY_KEY_ID","RAZORPAY_KEY_SECRET","RAZORPAY_WEBHOOK_SECRET","TWILIO_ACCOUNT_SID","TWILIO_AUTH_TOKEN","TWILIO_PHONE_NUMBER","GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET","NODE_ENV"];
   for (const k of keys) {
     if (env[k] !== undefined && process.env[k] === undefined) {
       process.env[k] = env[k];

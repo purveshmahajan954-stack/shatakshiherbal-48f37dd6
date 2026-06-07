@@ -40,13 +40,30 @@ async function sendViaTwilio(phone: string, otp: string) {
   if (!sid || !token || !from) {
     throw new Error("SMS service not configured");
   }
-  const { default: twilio } = await import("twilio");
-  const client = twilio(sid, token);
-  await client.messages.create({
-    body: `Your Shatakshi Herbal verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`,
-    from,
-    to: phone,
+
+  const formBody = new URLSearchParams({
+    Body: `Your Shatakshi Herbal verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`,
+    From: from,
+    To: phone,
   });
+
+  const credentials = btoa(`${sid}:${token}`);
+  const res = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formBody.toString(),
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Twilio API error ${res.status}: ${text}`);
+  }
 }
 
 export const Route = createFileRoute("/api/auth/otp-send")({
