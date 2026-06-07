@@ -106,6 +106,13 @@ export const orders = pgTable(
     trackingLocation: text("tracking_location"),
     trackingEta: text("tracking_eta"),
     trackingUpdatedAt: timestamp("tracking_updated_at").defaultNow().notNull(),
+    ckshipShipmentId: text("ckship_shipment_id"),
+    ckshipOrderNumber: text("ckship_order_number"),
+    awbNumber: text("awb_number"),
+    courierName: text("courier_name"),
+    shippingCost: numeric("shipping_cost"),
+    labelUrl: text("label_url"),
+    shipmentStatus: text("shipment_status").notNull().default("Not Created"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => [

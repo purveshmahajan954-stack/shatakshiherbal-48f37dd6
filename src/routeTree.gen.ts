@@ -36,6 +36,7 @@ import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
 import { Route as ApiProductsRouteImport } from './routes/api/products'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminShippingRouteImport } from './routes/admin.shipping'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
@@ -56,6 +57,7 @@ import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
 import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
 import { Route as ApiAdminSigninRouteImport } from './routes/api/admin/signin'
+import { Route as ApiAdminShipmentsRouteImport } from './routes/api/admin/shipments'
 import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
 import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
 import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
@@ -200,6 +202,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminShippingRoute = AdminShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -300,6 +307,11 @@ const ApiAdminSigninRoute = ApiAdminSigninRouteImport.update({
   path: '/api/admin/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminShipmentsRoute = ApiAdminShipmentsRouteImport.update({
+  id: '/api/admin/shipments',
+  path: '/api/admin/shipments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminReportsRoute = ApiAdminReportsRouteImport.update({
   id: '/api/admin/reports',
   path: '/api/admin/reports',
@@ -370,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/shipping': typeof AdminShippingRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/api/products': typeof ApiProductsRoute
@@ -384,6 +397,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
@@ -426,6 +440,7 @@ export interface FileRoutesByTo {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/shipping': typeof AdminShippingRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/api/products': typeof ApiProductsRoute
@@ -440,6 +455,7 @@ export interface FileRoutesByTo {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
@@ -484,6 +500,7 @@ export interface FileRoutesById {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/shipping': typeof AdminShippingRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/api/products': typeof ApiProductsRoute
@@ -498,6 +515,7 @@ export interface FileRoutesById {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
@@ -543,6 +561,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/products'
     | '/admin/reports'
+    | '/admin/shipping'
     | '/admin/users'
     | '/api/contact'
     | '/api/products'
@@ -557,6 +576,7 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
+    | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
     | '/api/admin/users'
@@ -599,6 +619,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/products'
     | '/admin/reports'
+    | '/admin/shipping'
     | '/admin/users'
     | '/api/contact'
     | '/api/products'
@@ -613,6 +634,7 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
+    | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
     | '/api/admin/users'
@@ -656,6 +678,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/products'
     | '/admin/reports'
+    | '/admin/shipping'
     | '/admin/users'
     | '/api/contact'
     | '/api/products'
@@ -670,6 +693,7 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
+    | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
     | '/api/admin/users'
@@ -719,6 +743,7 @@ export interface RootRouteChildren {
   ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
   ApiAdminProductsRoute: typeof ApiAdminProductsRoute
   ApiAdminReportsRoute: typeof ApiAdminReportsRoute
+  ApiAdminShipmentsRoute: typeof ApiAdminShipmentsRoute
   ApiAdminSigninRoute: typeof ApiAdminSigninRoute
   ApiAdminSignoutRoute: typeof ApiAdminSignoutRoute
   ApiAdminUsersRoute: typeof ApiAdminUsersRoute
@@ -926,6 +951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/shipping': {
+      id: '/admin/shipping'
+      path: '/shipping'
+      fullPath: '/admin/shipping'
+      preLoaderRoute: typeof AdminShippingRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -1066,6 +1098,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminSigninRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/shipments': {
+      id: '/api/admin/shipments'
+      path: '/api/admin/shipments'
+      fullPath: '/api/admin/shipments'
+      preLoaderRoute: typeof ApiAdminShipmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/reports': {
       id: '/api/admin/reports'
       path: '/api/admin/reports'
@@ -1133,6 +1172,7 @@ interface AdminRouteChildren {
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminShippingRoute: typeof AdminShippingRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -1145,6 +1185,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminShippingRoute: AdminShippingRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -1184,6 +1225,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminOrdersRoute: ApiAdminOrdersRoute,
   ApiAdminProductsRoute: ApiAdminProductsRoute,
   ApiAdminReportsRoute: ApiAdminReportsRoute,
+  ApiAdminShipmentsRoute: ApiAdminShipmentsRoute,
   ApiAdminSigninRoute: ApiAdminSigninRoute,
   ApiAdminSignoutRoute: ApiAdminSignoutRoute,
   ApiAdminUsersRoute: ApiAdminUsersRoute,
