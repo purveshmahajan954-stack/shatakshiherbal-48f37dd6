@@ -124,6 +124,10 @@ function CheckoutPage() {
     if (!city.trim()) return toast.error("Please enter your city");
     if (!state.trim()) return toast.error("Please enter your state");
 
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    if (!token) return toast.error("Please sign in first");
+    document.cookie = `auth_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+
     const fullAddress = buildFullAddress();
 
     setBusy(true);
