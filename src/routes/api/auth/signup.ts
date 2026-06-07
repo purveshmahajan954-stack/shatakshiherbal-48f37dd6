@@ -33,9 +33,16 @@ export const Route = createFileRoute("/api/auth/signup")({
         const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
         await db.insert(userSessions).values({ token, profileId: profile.id, expiresAt });
 
-        return Response.json({
+        const cookieMaxAge = Math.floor(SESSION_DURATION_MS / 1000);
+        return new Response(JSON.stringify({
           token,
           user: { id: profile.id, email: profile.email, fullName: profile.fullName },
+        }), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Set-Cookie": `auth_token=${token}; Path=/; Max-Age=${cookieMaxAge}; SameSite=Lax`,
+          },
         });
       },
     },

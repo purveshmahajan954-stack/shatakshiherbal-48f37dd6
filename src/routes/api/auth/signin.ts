@@ -37,10 +37,17 @@ export const Route = createFileRoute("/api/auth/signin")({
         const roleRows = await db.select({ role: userRoles.role }).from(userRoles).where(eq(userRoles.userId, profile.id));
         const isAdmin = roleRows.some((r) => r.role === "admin");
 
-        return Response.json({
+        const cookieMaxAge = Math.floor(SESSION_DURATION_MS / 1000);
+        return new Response(JSON.stringify({
           token,
           user: { id: profile.id, email: profile.email, fullName: profile.fullName },
           isAdmin,
+        }), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Set-Cookie": `auth_token=${token}; Path=/; Max-Age=${cookieMaxAge}; SameSite=Lax`,
+          },
         });
       },
     },

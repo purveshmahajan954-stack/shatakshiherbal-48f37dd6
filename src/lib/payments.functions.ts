@@ -1,14 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { eq, and, desc } from "drizzle-orm";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { db } from "@server/db";
+import { orders } from "@shared/schema";
 import { getProductBySlug } from "@/lib/products";
 import { randomHex, hmacSha256, timingSafeEqual } from "@server/password";
-
-/**
- * Razorpay integration via REST API (fetch-based for Cloudflare Workers compatibility).
- * Docs: https://razorpay.com/docs/api/
- */
 
 const RAZORPAY_BASE = "https://api.razorpay.com/v1";
 
@@ -19,19 +16,15 @@ function rzpAuthHeader() {
   return "Basic " + btoa(`${id}:${secret}`);
 }
 
-// Publishable Key ID — safe to expose to the browser (used to open Checkout)
 export const getRazorpayKeyId = createServerFn({ method: "GET" }).handler(async () => {
   const id = process.env.RAZORPAY_KEY_ID;
   if (!id) throw new Error("Razorpay not configured");
   return { keyId: id };
 });
 
-// ---------- Pricing constants ----------
-export const GST_RATE = 0; // GST removed — prices are inclusive
-export const COURIER_CHARGE = 150; // Flat ₹150 courier on every order
+export const GST_RATE = 0;
+export const COURIER_CHARGE = 150;
 
-// Pricing helpers shared with the UI.
-// No discounts, no coupons — simple flat structure.
 export function computeTotals(subtotal: number) {
   const sub = Math.max(0, Math.round(subtotal));
   const gst = 0;
@@ -40,11 +33,6 @@ export function computeTotals(subtotal: number) {
   return { subtotal: sub, gst, delivery, total };
 }
 
-
-// ---------- Schemas ----------
-// Note: client-supplied `price`, `name`, `image` are IGNORED on the server.
-// The slug is the only trusted identifier; price/name/image are resolved
-// from the canonical product catalog to prevent payment tampering.
 const cartItemSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   price: z.number().min(0).max(1_000_000).optional(),
@@ -63,9 +51,6 @@ const createOrderInput = z.object({
   }),
 });
 
-// ---------- Server-side price recomputation (NEVER trust client totals) ----------
-// Resolves each cart item against the canonical product catalog by slug.
-// Returns trusted items (with server-authoritative price/name/image) plus totals.
 function recomputeFromItems(items: z.infer<typeof cartItemSchema>[]) {
   const trustedItems = items.map((i) => {
     const product = getProductBySlug(i.slug);
@@ -82,18 +67,15 @@ function recomputeFromItems(items: z.infer<typeof cartItemSchema>[]) {
   return { trustedItems, ...computeTotals(subtotal) };
 }
 
-// ---------- Create Razorpay order + persist draft order row ----------
 export const createRazorpayOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => createOrderInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { userId } = context;
+    const { userId } = context as { userId: string };
     const { trustedItems, ...totals } = recomputeFromItems(data.items);
-
 
     if (totals.total < 1) throw new Error("Order total must be at least ₹1");
 
-    // Create Razorpay order
     const rzpRes = await fetch(`${RAZORPAY_BASE}/orders`, {
       method: "POST",
       headers: {
@@ -101,13 +83,10 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        amount: totals.total * 100, // paise
+        amount: totals.total * 100,
         currency: "INR",
-        receipt: `rcpt_${Date.now()}_${userId.slice(0, 8)}`,
-        notes: {
-          user_id: userId,
-          email: data.shipping.email,
-        },
+        receipt: `rcpt_${Date.now()}`,
+        notes: { user_id: userId, email: data.shipping.email },
       }),
     });
 
@@ -118,39 +97,33 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
     }
     const rzpOrder = (await rzpRes.json()) as { id: string; amount: number; currency: string };
 
-    // Generate unique tracking ID (SHIP-XXXXXX)
     const trackingId = `SHIP-${randomHex(4).toUpperCase().slice(0, 6)}`;
 
-    // Persist draft order
-    const { data: orderRow, error } = await supabaseAdmin
-      .from("orders")
-      .insert({
-        user_id: userId,
+    const [orderRow] = await db
+      .insert(orders)
+      .values({
+        userId,
         items: trustedItems,
         email: data.shipping.email,
-        shipping_name: data.shipping.name,
-        shipping_phone: data.shipping.phone,
-        shipping_address: data.shipping.address,
-        subtotal: totals.subtotal,
-        discount: 0,
-        coupon_code: null,
-        delivery_charge: totals.delivery,
-        gst: totals.gst,
-        total: totals.total,
-        razorpay_order_id: rzpOrder.id,
-        payment_status: "created",
+        shippingName: data.shipping.name,
+        shippingPhone: data.shipping.phone,
+        shippingAddress: data.shipping.address,
+        subtotal: String(totals.subtotal),
+        discount: "0",
+        couponCode: null,
+        deliveryCharge: String(totals.delivery),
+        gst: String(totals.gst),
+        total: String(totals.total),
+        razorpayOrderId: rzpOrder.id,
+        paymentStatus: "created",
         status: "pending",
-        tracking_id: trackingId,
-        tracking_status: "Order Placed",
-        tracking_eta: "3-5 days",
+        trackingId,
+        trackingStatus: "Order Placed",
+        trackingEta: "3-5 days",
       })
-      .select("id")
-      .single();
+      .returning({ id: orders.id });
 
-    if (error) {
-      console.error("Order insert failed:", error);
-      throw new Error("Could not save order");
-    }
+    if (!orderRow) throw new Error("Could not save order");
 
     return {
       razorpayOrderId: rzpOrder.id,
@@ -161,7 +134,6 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
     };
   });
 
-// ---------- Verify signature & mark paid ----------
 const verifyInput = z.object({
   razorpay_order_id: z.string().min(5).max(80),
   razorpay_payment_id: z.string().min(5).max(80),
@@ -172,7 +144,7 @@ export const verifyRazorpayPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => verifyInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { userId } = context;
+    const { userId } = context as { userId: string };
     const secret = process.env.RAZORPAY_KEY_SECRET;
     if (!secret) throw new Error("Razorpay not configured");
 
@@ -180,77 +152,60 @@ export const verifyRazorpayPayment = createServerFn({ method: "POST" })
     const valid = timingSafeEqual(expected, data.razorpay_signature);
 
     if (!valid) {
-      await supabaseAdmin
-        .from("orders")
-        .update({ payment_status: "signature_failed", status: "failed" })
-        .eq("razorpay_order_id", data.razorpay_order_id)
-        .eq("user_id", userId);
+      await db
+        .update(orders)
+        .set({ paymentStatus: "signature_failed", status: "failed" })
+        .where(and(eq(orders.razorpayOrderId, data.razorpay_order_id), eq(orders.userId, userId)));
       throw new Error("Payment verification failed. Invalid signature.");
     }
 
-    const { data: order, error } = await supabaseAdmin
-      .from("orders")
-      .update({
-        payment_status: "paid",
-        status: "confirmed",
-        razorpay_payment_id: data.razorpay_payment_id,
-      })
-      .eq("razorpay_order_id", data.razorpay_order_id)
-      .eq("user_id", userId)
-      .select("id")
-      .single();
+    const [updated] = await db
+      .update(orders)
+      .set({ paymentStatus: "paid", status: "confirmed", razorpayPaymentId: data.razorpay_payment_id })
+      .where(and(eq(orders.razorpayOrderId, data.razorpay_order_id), eq(orders.userId, userId)))
+      .returning({ id: orders.id });
 
-    if (error || !order) {
-      console.error("Order update failed:", error);
-      throw new Error("Could not finalize order");
-    }
+    if (!updated) throw new Error("Could not finalize order");
 
-    return { success: true, orderId: order.id };
+    return { success: true, orderId: updated.id };
   });
 
-// ---------- Mark failed (called from Checkout modal on dismiss/error) ----------
 export const markPaymentFailed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z.object({ razorpay_order_id: z.string().min(5).max(80), reason: z.string().max(500).optional() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await supabaseAdmin
-      .from("orders")
-      .update({ payment_status: "failed", status: "failed" })
-      .eq("razorpay_order_id", data.razorpay_order_id)
-      .eq("user_id", context.userId);
+    const { userId } = context as { userId: string };
+    await db
+      .update(orders)
+      .set({ paymentStatus: "failed", status: "failed" })
+      .where(and(eq(orders.razorpayOrderId, data.razorpay_order_id), eq(orders.userId, userId)));
     return { ok: true };
   });
 
-// ---------- User's order history ----------
 export const getMyOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false })
+    const { userId } = context as { userId: string };
+    const orderList = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .orderBy(desc(orders.createdAt))
       .limit(50);
-    if (error) {
-      console.error("[getMyOrders]", error);
-      throw new Error("Could not load your orders. Please try again.");
-    }
-    return { orders: data ?? [] };
+    return { orders: orderList };
   });
 
 export const getMyOrder = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { data: order, error } = await context.supabase
-      .from("orders")
-      .select("*")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (error) {
-      console.error("[getMyOrder]", error);
-      throw new Error("Could not load this order. Please try again.");
-    }
-    return { order };
+    const { userId } = context as { userId: string };
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(and(eq(orders.id, data.id), eq(orders.userId, userId)))
+      .limit(1);
+    return { order: order ?? null };
   });
