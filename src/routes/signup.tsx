@@ -37,7 +37,7 @@ function SignupPage() {
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
-  }, [user]);
+  }, [user, navigate]);
 
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
@@ -189,7 +189,7 @@ function SignupPage() {
                 </div>
               </div>
             ) : (
-              <div className="p-7 space-y-4">
+              <form className="p-7 space-y-4" onSubmit={(e) => { e.preventDefault(); handleSendOtp(); }}>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
                   <input
@@ -223,6 +223,7 @@ function SignupPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Min. 6 characters"
+                      autoComplete="new-password"
                       className="w-full border border-border rounded-xl px-4 py-2.5 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                     <button
@@ -238,7 +239,7 @@ function SignupPage() {
                   )}
                 </div>
                 <button
-                  onClick={handleSendOtp}
+                  type="submit"
                   disabled={busy}
                   className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
                 >
@@ -277,7 +278,7 @@ function SignupPage() {
                     Sign in
                   </Link>
                 </p>
-              </div>
+              </form>
             )}
           </div>
         </div>

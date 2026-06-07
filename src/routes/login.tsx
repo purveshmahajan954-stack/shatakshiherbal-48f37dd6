@@ -86,7 +86,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (user) navigate({ to: (redirect as any) || "/" });
-  }, [user]);
+  }, [user, redirect]);
 
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
