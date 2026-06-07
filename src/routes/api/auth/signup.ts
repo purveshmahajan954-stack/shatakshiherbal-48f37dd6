@@ -10,40 +10,55 @@ export const Route = createFileRoute("/api/auth/signup")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        let body: any;
-        try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON" }, { status: 400 }); }
+        try {
+          let body: any;
+          try { body = await request.json(); } catch {
+            return Response.json({ error: "Invalid JSON" }, { status: 400 });
+          }
 
-        const { email, password, fullName } = body ?? {};
-        if (!email || !password) return Response.json({ error: "Email and password required" }, { status: 400 });
-        if (password.length < 6) return Response.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+          const { email, password, fullName } = body ?? {};
+          if (!email || !password)
+            return Response.json({ error: "Email and password required" }, { status: 400 });
+          if (password.length < 6)
+            return Response.json({ error: "Password must be at least 6 characters" }, { status: 400 });
 
-        const existing = await db.select({ id: profiles.id }).from(profiles).where(eq(profiles.email, email.toLowerCase().trim())).limit(1);
-        if (existing.length > 0) return Response.json({ error: "An account with this email already exists" }, { status: 409 });
+          const emailNorm = email.toLowerCase().trim();
+          const existing = await db
+            .select({ id: profiles.id })
+            .from(profiles)
+            .where(eq(profiles.email, emailNorm))
+            .limit(1);
+          if (existing.length > 0)
+            return Response.json({ error: "An account with this email already exists" }, { status: 409 });
 
-        const passwordHash = await hashPassword(password);
-        const [profile] = await db.insert(profiles).values({
-          email: email.toLowerCase().trim(),
-          fullName: fullName?.trim() ?? null,
-          passwordHash,
-        } as any).returning();
+          const passwordHash = await hashPassword(password);
 
-        await db.insert(userRoles).values({ userId: profile.id, role: "user" });
+          const [profile] = await db
+            .insert(profiles)
+            .values({ email: emailNorm, fullName: fullName?.trim() ?? null, passwordHash })
+            .returning();
 
-        const token = generateToken();
-        const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
-        await db.insert(userSessions).values({ token, profileId: profile.id, expiresAt });
+          await db.insert(userRoles).values({ userId: profile.id, role: "user" });
 
-        const cookieMaxAge = Math.floor(SESSION_DURATION_MS / 1000);
-        return new Response(JSON.stringify({
-          token,
-          user: { id: profile.id, email: profile.email, fullName: profile.fullName },
-        }), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-            "Set-Cookie": `auth_token=${token}; Path=/; Max-Age=${cookieMaxAge}; SameSite=Lax`,
-          },
-        });
+          const token = generateToken();
+          const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
+          await db.insert(userSessions).values({ token, profileId: profile.id, expiresAt });
+
+          const cookieMaxAge = Math.floor(SESSION_DURATION_MS / 1000);
+          return new Response(
+            JSON.stringify({ token, user: { id: profile.id, email: profile.email, fullName: profile.fullName } }),
+            {
+              status: 200,
+              headers: {
+                "Content-Type": "application/json",
+                "Set-Cookie": `auth_token=${token}; Path=/; Max-Age=${cookieMaxAge}; SameSite=Lax`,
+              },
+            },
+          );
+        } catch (err: any) {
+          console.error("[signup]", err);
+          return Response.json({ error: err?.message ?? "Signup failed" }, { status: 500 });
+        }
       },
     },
   },
