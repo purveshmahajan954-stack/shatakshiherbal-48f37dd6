@@ -35,6 +35,7 @@ import { Route as TrackTrackingIdRouteImport } from './routes/track.$trackingId'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
 import { Route as ApiProductsRouteImport } from './routes/api/products'
+import { Route as ApiDeliveryWebhookRouteImport } from './routes/api/delivery-webhook'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminShippingRouteImport } from './routes/admin.shipping'
@@ -200,6 +201,11 @@ const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
 const ApiProductsRoute = ApiProductsRouteImport.update({
   id: '/api/products',
   path: '/api/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDeliveryWebhookRoute = ApiDeliveryWebhookRouteImport.update({
+  id: '/api/delivery-webhook',
+  path: '/api/delivery-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiContactRoute = ApiContactRouteImport.update({
@@ -416,6 +422,7 @@ export interface FileRoutesByFullPath {
   '/admin/shipping': typeof AdminShippingRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
+  '/api/delivery-webhook': typeof ApiDeliveryWebhookRoute
   '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -479,6 +486,7 @@ export interface FileRoutesByTo {
   '/admin/shipping': typeof AdminShippingRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
+  '/api/delivery-webhook': typeof ApiDeliveryWebhookRoute
   '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -544,6 +552,7 @@ export interface FileRoutesById {
   '/admin/shipping': typeof AdminShippingRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
+  '/api/delivery-webhook': typeof ApiDeliveryWebhookRoute
   '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -610,6 +619,7 @@ export interface FileRouteTypes {
     | '/admin/shipping'
     | '/admin/users'
     | '/api/contact'
+    | '/api/delivery-webhook'
     | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
@@ -673,6 +683,7 @@ export interface FileRouteTypes {
     | '/admin/shipping'
     | '/admin/users'
     | '/api/contact'
+    | '/api/delivery-webhook'
     | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
@@ -737,6 +748,7 @@ export interface FileRouteTypes {
     | '/admin/shipping'
     | '/admin/users'
     | '/api/contact'
+    | '/api/delivery-webhook'
     | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
@@ -793,6 +805,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   WishlistRoute: typeof WishlistRoute
   ApiContactRoute: typeof ApiContactRoute
+  ApiDeliveryWebhookRoute: typeof ApiDeliveryWebhookRoute
   ApiProductsRoute: typeof ApiProductsRoute
   ApiTrackOrderRoute: typeof ApiTrackOrderRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -1007,6 +1020,13 @@ declare module '@tanstack/react-router' {
       path: '/api/products'
       fullPath: '/api/products'
       preLoaderRoute: typeof ApiProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/delivery-webhook': {
+      id: '/api/delivery-webhook'
+      path: '/api/delivery-webhook'
+      fullPath: '/api/delivery-webhook'
+      preLoaderRoute: typeof ApiDeliveryWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/contact': {
@@ -1315,6 +1335,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   WishlistRoute: WishlistRoute,
   ApiContactRoute: ApiContactRoute,
+  ApiDeliveryWebhookRoute: ApiDeliveryWebhookRoute,
   ApiProductsRoute: ApiProductsRoute,
   ApiTrackOrderRoute: ApiTrackOrderRoute,
   ProductSlugRoute: ProductSlugRoute,

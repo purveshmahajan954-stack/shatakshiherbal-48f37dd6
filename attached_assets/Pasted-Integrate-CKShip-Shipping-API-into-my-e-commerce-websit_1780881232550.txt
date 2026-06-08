@@ -1,0 +1,129 @@
+Integrate CKShip Shipping API into my e-commerce website.
+
+Requirements:
+
+1. Secure Integration
+- Store CKShip Auth Token in Replit Secrets/Environment Variables.
+- Never expose the token on the frontend.
+- All CKShip API calls must be made from the backend.
+
+2. Automatic Shipment Creation
+- When a customer places an order and payment is successful (or COD order is confirmed), automatically create a shipment in CKShip.
+- Send:
+  - Customer Name
+  - Mobile Number
+  - Full Address
+  - Pincode
+  - State
+  - City
+  - Product Details
+  - Quantity
+  - Weight
+  - Order Value
+  - Payment Method (Prepaid/COD)
+
+3. Save Shipping Data
+- Store in database:
+  - CKShip Shipment ID
+  - AWB / Tracking Number
+  - Courier Name
+  - Shipping Cost
+  - Shipment Status
+  - Label URL
+
+4. Shipping Label
+- Automatically fetch shipping label from CKShip.
+- Add "Print Label" button in Admin Panel.
+- Allow PDF label download.
+
+5. Tracking System
+- Sync shipment status from CKShip.
+- Update order statuses automatically:
+  - Pending
+  - Processing
+  - Packed
+  - Shipped
+  - In Transit
+  - Out For Delivery
+  - Delivered
+  - Returned
+  - Cancelled
+
+6. Admin Dashboard
+Create a complete Shipping Management section.
+
+Display:
+- Order ID
+- Customer Name
+- Mobile Number
+- Courier Name
+- Tracking Number
+- Shipment Status
+- Payment Status
+- Order Amount
+- Shipping Cost
+- Created Date
+
+Admin Actions:
+- View Order
+- Print Label
+- Track Shipment
+- Refresh Status
+- Cancel Shipment
+- Recreate Shipment
+
+7. Customer Tracking Page
+- Create a Track Order page.
+- Customer can enter Order ID or Tracking Number.
+- Show:
+  - Current Status
+  - Courier Partner
+  - Tracking Number
+  - Shipment Timeline
+
+8. Notifications
+Send notifications automatically:
+
+Order Confirmed
+Shipment Created
+Shipped
+Out For Delivery
+Delivered
+
+Support:
+- Email Notifications
+- WhatsApp Notifications (API-ready structure)
+
+9. Error Handling
+- Handle invalid addresses.
+- Handle API failures.
+- Retry failed shipment creation.
+- Log all CKShip API responses.
+
+10. Security
+- Backend-only API access.
+- Server-side validation.
+- Secure admin routes.
+- Protect all shipping APIs.
+
+11. Admin Analytics
+Show:
+- Total Shipments
+- Pending Shipments
+- Shipped Orders
+- Delivered Orders
+- Returned Orders
+- Total Shipping Cost
+- Courier-wise Performance
+
+12. Testing
+Create test workflow:
+- Place Test Order
+- Generate Shipment
+- Generate Tracking Number
+- Generate Shipping Label
+- Verify Database Entries
+- Verify Tracking Updates
+- Verify Notifications
+
+Use production-ready code, clean architecture, proper error handling, and scalable implementation for Replit deployment.

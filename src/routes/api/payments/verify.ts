@@ -4,6 +4,8 @@ import { orders, userSessions, profiles } from "@shared/schema";
 import { eq, and, gt } from "drizzle-orm";
 import { z } from "zod";
 import { hmacSha256, timingSafeEqual } from "@server/password";
+import { createCKShipShipment } from "@server/ckship";
+import { sendSMS, smsOrderConfirmed, smsShipmentCreated } from "@server/notify";
 
 async function requireUser(request: Request) {
   const auth = request.headers.get("authorization");
@@ -55,9 +57,67 @@ export const Route = createFileRoute("/api/payments/verify")({
           paymentStatus: "paid",
           status: "confirmed",
           razorpayPaymentId: razorpay_payment_id,
-        }).where(and(eq(orders.razorpayOrderId, razorpay_order_id), eq(orders.userId, user.id))).returning({ id: orders.id });
+        }).where(and(eq(orders.razorpayOrderId, razorpay_order_id), eq(orders.userId, user.id))).returning({
+          id: orders.id,
+          shippingName: orders.shippingName,
+          shippingPhone: orders.shippingPhone,
+          shippingAddress: orders.shippingAddress,
+          total: orders.total,
+          items: orders.items,
+          trackingId: orders.trackingId,
+        });
 
         if (!order) return Response.json({ error: "Could not finalize order" }, { status: 500 });
+
+        // Fire background tasks — order success response is not blocked by these
+        (async () => {
+          const name = order.shippingName ?? "Customer";
+          const phone = order.shippingPhone;
+
+          // Send order confirmed SMS
+          if (phone) {
+            sendSMS(phone, smsOrderConfirmed(name, order.id, order.total)).catch(console.error);
+          }
+
+          // Auto-create CKShip shipment
+          try {
+            const result = await createCKShipShipment({
+              id: order.id,
+              shippingName: order.shippingName,
+              shippingPhone: order.shippingPhone,
+              shippingAddress: order.shippingAddress,
+              total: order.total,
+              items: (order.items ?? []) as Array<{ name: string; qty: number; price: number }>,
+            });
+
+            await db.update(orders)
+              .set({
+                ckshipShipmentId: result.shipmentId,
+                ckshipOrderNumber: result.orderNumber,
+                awbNumber: result.awbNumber,
+                courierName: result.courierName,
+                shippingCost: result.shippingCost !== null ? String(result.shippingCost) : null,
+                labelUrl: result.labelUrl,
+                shipmentStatus: "Created",
+                trackingStatus: "Packed",
+                trackingUpdatedAt: new Date(),
+              })
+              .where(eq(orders.id, order.id));
+
+            console.log(`[verify] CKShip shipment created for order ${order.id}, AWB: ${result.awbNumber}`);
+
+            // Send shipment created SMS if AWB assigned
+            if (phone && result.awbNumber && result.courierName) {
+              sendSMS(
+                phone,
+                smsShipmentCreated(name, result.awbNumber, result.courierName, order.trackingId)
+              ).catch(console.error);
+            }
+          } catch (err) {
+            console.error(`[verify] Auto-CKShip failed for order ${order.id}:`, err);
+          }
+        })();
+
         return Response.json({ success: true, orderId: order.id });
       },
     },
