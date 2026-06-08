@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, ShoppingBag, ArrowRight, X } from "lucide-react";
+import { Search, ShoppingBag, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { products, CATEGORY_LABELS } from "@/lib/products";
@@ -31,10 +31,9 @@ function SearchPage() {
   const { add } = useCart();
   const [inputValue, setInputValue] = useState(q ?? "");
 
-  // Use the live input value so results update as you type (not just on submit)
   const query = inputValue.trim().toLowerCase();
 
-  const results = query
+  const filtered = query
     ? products.filter((p) => {
         const categoryLabelMatch = p.categories.some((slug) => {
           const label = CATEGORY_LABELS[slug] ?? "";
@@ -48,13 +47,14 @@ function SearchPage() {
           categoryLabelMatch
         );
       })
-    : [];
+    : products;
+
+  const noResults = query.length > 0 && filtered.length === 0;
+  const displayList = noResults ? products : filtered;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = inputValue.trim();
-    if (!trimmed) return;
-    navigate({ to: "/search", search: { q: trimmed } });
+    navigate({ to: "/search", search: inputValue.trim() ? { q: inputValue.trim() } : {} });
   };
 
   return (
@@ -63,7 +63,7 @@ function SearchPage() {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="font-display text-3xl sm:text-4xl mb-6">Search Products</h1>
 
-        <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mb-10">
+        <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
@@ -91,76 +91,62 @@ function SearchPage() {
           </button>
         </form>
 
-        {!query && (
-          <div className="text-center py-20 text-muted-foreground">
-            <Search className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p className="text-lg">Type something to search our products</p>
-          </div>
-        )}
+        {/* Result count / status line */}
+        <p className="text-sm text-muted-foreground mb-6">
+          {noResults ? (
+            <>
+              <span className="text-destructive font-medium">No results for "{query}"</span>
+              {" "}— showing all {products.length} products
+            </>
+          ) : query ? (
+            <>{filtered.length} result{filtered.length === 1 ? "" : "s"} for <span className="font-semibold text-foreground">"{query}"</span></>
+          ) : (
+            <>All {products.length} products</>
+          )}
+        </p>
 
-        {query && results.length === 0 && (
-          <div className="text-center py-20">
-            <Search className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-30" />
-            <h2 className="font-display text-2xl mb-2">No results for "{q}"</h2>
-            <p className="text-muted-foreground mb-6">Try a different keyword or browse the shop.</p>
-            <Link
-              to="/shop"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:opacity-90"
-            >
-              Browse Shop <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        )}
-
-        {query && results.length > 0 && (
-          <>
-            <p className="text-sm text-muted-foreground mb-6">
-              {results.length} result{results.length === 1 ? "" : "s"} for <span className="font-semibold text-foreground">"{q}"</span>
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-              {results.map((p) => (
-                <article key={p.slug} className="bg-white rounded-2xl overflow-hidden shadow-card group">
-                  <Link to="/product/$slug" params={{ slug: p.slug }} className="block bg-accent/30 relative">
-                    {p.badge && (
-                      <span className={`absolute top-2 left-2 text-[10px] font-bold text-white px-2 py-0.5 rounded-full ${p.badgeColor}`}>
-                        {p.badge}
-                      </span>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {displayList.map((p) => (
+            <article key={p.slug} className="bg-white rounded-2xl overflow-hidden shadow-card group">
+              <Link to="/product/$slug" params={{ slug: p.slug }} className="block bg-accent/30 relative">
+                {p.badge && (
+                  <span className={`absolute top-2 left-2 text-[10px] font-bold text-white px-2 py-0.5 rounded-full ${p.badgeColor}`}>
+                    {p.badge}
+                  </span>
+                )}
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  loading="lazy"
+                  className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </Link>
+              <div className="p-4">
+                <Link to="/product/$slug" params={{ slug: p.slug }}>
+                  <h3 className="font-display text-base font-semibold mb-1 hover:text-primary transition leading-snug">{p.name}</h3>
+                </Link>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{p.desc}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <span className="font-semibold text-foreground">₹{p.price}</span>
+                    {p.oldPrice > p.price && (
+                      <span className="text-xs text-muted-foreground line-through ml-1">₹{p.oldPrice}</span>
                     )}
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      loading="lazy"
-                      className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </Link>
-                  <div className="p-4">
-                    <Link to="/product/$slug" params={{ slug: p.slug }}>
-                      <h3 className="font-display text-base font-semibold mb-1 hover:text-primary transition leading-snug">{p.name}</h3>
-                    </Link>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{p.desc}</p>
-                    <div className="flex items-center justify-between gap-2">
-                      <div>
-                        <span className="font-semibold text-foreground">₹{p.price}</span>
-                        {p.oldPrice > p.price && (
-                          <span className="text-xs text-muted-foreground line-through ml-1">₹{p.oldPrice}</span>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => {
-                          add({ name: p.name, price: p.price, image: p.image, slug: p.slug });
-                          toast.success(`${p.name} added to cart`);
-                        }}
-                        className="flex items-center gap-1 bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-semibold hover:opacity-90 transition"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5" /> Add
-                      </button>
-                    </div>
                   </div>
-                </article>
-              ))}
-            </div>
-          </>
-        )}
+                  <button
+                    onClick={() => {
+                      add({ name: p.name, price: p.price, image: p.image, slug: p.slug });
+                      toast.success(`${p.name} added to cart`);
+                    }}
+                    className="flex items-center gap-1 bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-semibold hover:opacity-90 transition"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" /> Add
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       </main>
       <Footer />
     </div>
