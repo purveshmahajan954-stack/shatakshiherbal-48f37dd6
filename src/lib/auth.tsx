@@ -6,6 +6,8 @@ export type AppUser = {
   phone: string | null;
   fullName: string | null;
   avatarUrl: string | null;
+  address: string | null;
+  hasPassword: boolean;
 };
 
 type AuthCtx = {

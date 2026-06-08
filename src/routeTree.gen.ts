@@ -69,6 +69,7 @@ import { Route as ApiAdminShipmentsRouteImport } from './routes/api/admin/shipme
 import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
 import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
 import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
+import { Route as ApiAdminMigrateRouteImport } from './routes/api/admin/migrate'
 import { Route as ApiAdminMeRouteImport } from './routes/api/admin/me'
 import { Route as ApiAdminLeadsRouteImport } from './routes/api/admin/leads'
 import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
@@ -375,6 +376,11 @@ const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
   path: '/api/admin/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminMigrateRoute = ApiAdminMigrateRouteImport.update({
+  id: '/api/admin/migrate',
+  path: '/api/admin/migrate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminMeRoute = ApiAdminMeRouteImport.update({
   id: '/api/admin/me',
   path: '/api/admin/me',
@@ -445,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
+  '/api/admin/migrate': typeof ApiAdminMigrateRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
@@ -511,6 +518,7 @@ export interface FileRoutesByTo {
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
+  '/api/admin/migrate': typeof ApiAdminMigrateRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
@@ -579,6 +587,7 @@ export interface FileRoutesById {
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
+  '/api/admin/migrate': typeof ApiAdminMigrateRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
@@ -648,6 +657,7 @@ export interface FileRouteTypes {
     | '/api/admin/dashboard'
     | '/api/admin/leads'
     | '/api/admin/me'
+    | '/api/admin/migrate'
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
@@ -714,6 +724,7 @@ export interface FileRouteTypes {
     | '/api/admin/dashboard'
     | '/api/admin/leads'
     | '/api/admin/me'
+    | '/api/admin/migrate'
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
@@ -781,6 +792,7 @@ export interface FileRouteTypes {
     | '/api/admin/dashboard'
     | '/api/admin/leads'
     | '/api/admin/me'
+    | '/api/admin/migrate'
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
@@ -839,6 +851,7 @@ export interface RootRouteChildren {
   ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
   ApiAdminLeadsRoute: typeof ApiAdminLeadsRoute
   ApiAdminMeRoute: typeof ApiAdminMeRoute
+  ApiAdminMigrateRoute: typeof ApiAdminMigrateRoute
   ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
   ApiAdminProductsRoute: typeof ApiAdminProductsRoute
   ApiAdminReportsRoute: typeof ApiAdminReportsRoute
@@ -1286,6 +1299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/migrate': {
+      id: '/api/admin/migrate'
+      path: '/api/admin/migrate'
+      fullPath: '/api/admin/migrate'
+      preLoaderRoute: typeof ApiAdminMigrateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/me': {
       id: '/api/admin/me'
       path: '/api/admin/me'
@@ -1385,6 +1405,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminDashboardRoute: ApiAdminDashboardRoute,
   ApiAdminLeadsRoute: ApiAdminLeadsRoute,
   ApiAdminMeRoute: ApiAdminMeRoute,
+  ApiAdminMigrateRoute: ApiAdminMigrateRoute,
   ApiAdminOrdersRoute: ApiAdminOrdersRoute,
   ApiAdminProductsRoute: ApiAdminProductsRoute,
   ApiAdminReportsRoute: ApiAdminReportsRoute,
