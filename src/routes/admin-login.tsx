@@ -44,6 +44,9 @@ function AdminLoginPage() {
       }
       const data = await res.json();
       localStorage.setItem("admin_token", data.token);
+      if (data.admin) {
+        localStorage.setItem("admin_data", JSON.stringify(data.admin));
+      }
       navigate({ to: "/admin", replace: true });
     } catch (err: any) {
       setError(err?.message || "Invalid credentials");
