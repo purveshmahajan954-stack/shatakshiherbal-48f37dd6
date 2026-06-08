@@ -28,6 +28,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -46,6 +47,7 @@ import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
+import { Route as ApiUserProfileRouteImport } from './routes/api/user/profile'
 import { Route as ApiUserOrdersRouteImport } from './routes/api/user/orders'
 import { Route as ApiPublicWebhookUpdateRouteImport } from './routes/api/public/webhook-update'
 import { Route as ApiPaymentsVerifyRouteImport } from './routes/api/payments/verify'
@@ -168,6 +170,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -257,6 +264,11 @@ const AdminCustomersRoute = AdminCustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
   getParentRoute: () => AdminRoute,
+} as any)
+const ApiUserProfileRoute = ApiUserProfileRouteImport.update({
+  id: '/api/user/profile',
+  path: '/api/user/profile',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiUserOrdersRoute = ApiUserOrdersRouteImport.update({
   id: '/api/user/orders',
@@ -393,6 +405,7 @@ const ApiPublicRazorpayWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
   '/auth-callback': typeof AuthCallbackRoute
@@ -453,11 +466,13 @@ export interface FileRoutesByFullPath {
   '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
   '/api/user/orders': typeof ApiUserOrdersRoute
+  '/api/user/profile': typeof ApiUserProfileRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/admin-login': typeof AdminLoginRoute
   '/auth-callback': typeof AuthCallbackRoute
   '/cart': typeof CartRoute
@@ -517,12 +532,14 @@ export interface FileRoutesByTo {
   '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
   '/api/user/orders': typeof ApiUserOrdersRoute
+  '/api/user/profile': typeof ApiUserProfileRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
   '/auth-callback': typeof AuthCallbackRoute
@@ -583,6 +600,7 @@ export interface FileRoutesById {
   '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
   '/api/user/orders': typeof ApiUserOrdersRoute
+  '/api/user/profile': typeof ApiUserProfileRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRouteTypes {
@@ -590,6 +608,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/account'
     | '/admin'
     | '/admin-login'
     | '/auth-callback'
@@ -650,11 +669,13 @@ export interface FileRouteTypes {
     | '/api/payments/verify'
     | '/api/public/webhook-update'
     | '/api/user/orders'
+    | '/api/user/profile'
     | '/api/public/razorpay/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/account'
     | '/admin-login'
     | '/auth-callback'
     | '/cart'
@@ -714,11 +735,13 @@ export interface FileRouteTypes {
     | '/api/payments/verify'
     | '/api/public/webhook-update'
     | '/api/user/orders'
+    | '/api/user/profile'
     | '/api/public/razorpay/webhook'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/account'
     | '/admin'
     | '/admin-login'
     | '/auth-callback'
@@ -779,12 +802,14 @@ export interface FileRouteTypes {
     | '/api/payments/verify'
     | '/api/public/webhook-update'
     | '/api/user/orders'
+    | '/api/user/profile'
     | '/api/public/razorpay/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -835,6 +860,7 @@ export interface RootRouteChildren {
   ApiPaymentsVerifyRoute: typeof ApiPaymentsVerifyRoute
   ApiPublicWebhookUpdateRoute: typeof ApiPublicWebhookUpdateRoute
   ApiUserOrdersRoute: typeof ApiUserOrdersRoute
+  ApiUserProfileRoute: typeof ApiUserProfileRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
@@ -973,6 +999,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -1098,6 +1131,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/customers'
       preLoaderRoute: typeof AdminCustomersRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/api/user/profile': {
+      id: '/api/user/profile'
+      path: '/api/user/profile'
+      fullPath: '/api/user/profile'
+      preLoaderRoute: typeof ApiUserProfileRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/user/orders': {
       id: '/api/user/orders'
@@ -1315,6 +1355,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
@@ -1365,6 +1406,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPaymentsVerifyRoute: ApiPaymentsVerifyRoute,
   ApiPublicWebhookUpdateRoute: ApiPublicWebhookUpdateRoute,
   ApiUserOrdersRoute: ApiUserOrdersRoute,
+  ApiUserProfileRoute: ApiUserProfileRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport

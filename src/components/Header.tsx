@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, Menu, X, Trash2, LogOut, Shield, Package, ArrowRight, Heart, Search, LogIn } from "lucide-react";
+import { ShoppingBag, Menu, X, Trash2, LogOut, Shield, Package, ArrowRight, Heart, Search, LogIn, UserCircle } from "lucide-react";
 import { useState, useRef } from "react";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
@@ -169,10 +169,10 @@ export function Header() {
               </SheetContent>
             </Sheet>
 
-            {/* Orders (logged in) */}
+            {/* My Account (logged in) */}
             {user && (
-              <Link to="/orders" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold text-foreground hover:bg-accent transition">
-                <Package className="w-3.5 h-3.5" />Orders
+              <Link to="/account" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold text-foreground hover:bg-accent transition">
+                <UserCircle className="w-3.5 h-3.5" />My Account
               </Link>
             )}
 
@@ -238,7 +238,7 @@ export function Header() {
             )}
             {user ? (
               <>
-                <Link to="/orders" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-foreground hover:text-primary">My Orders</Link>
+                <Link to="/account" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-foreground hover:text-primary">My Account</Link>
                 <button onClick={() => { signOut(); setOpen(false); }} className="py-2 text-sm font-medium text-primary text-left">Sign Out</button>
               </>
             ) : (
