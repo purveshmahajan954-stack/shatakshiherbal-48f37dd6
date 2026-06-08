@@ -31,7 +31,8 @@ function SearchPage() {
   const { add } = useCart();
   const [inputValue, setInputValue] = useState(q ?? "");
 
-  const query = (q ?? "").trim().toLowerCase();
+  // Use the live input value so results update as you type (not just on submit)
+  const query = inputValue.trim().toLowerCase();
 
   const results = query
     ? products.filter((p) => {
@@ -41,8 +42,8 @@ function SearchPage() {
         });
         return (
           p.name.toLowerCase().includes(query) ||
-          p.desc.toLowerCase().includes(query) ||
-          p.longDesc.toLowerCase().includes(query) ||
+          (p.desc ?? "").toLowerCase().includes(query) ||
+          (p.longDesc ?? "").toLowerCase().includes(query) ||
           p.categories.some((c) => c.toLowerCase().includes(query)) ||
           categoryLabelMatch
         );
