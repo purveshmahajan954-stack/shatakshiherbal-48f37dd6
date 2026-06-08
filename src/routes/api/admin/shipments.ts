@@ -105,6 +105,27 @@ export const Route = createFileRoute("/api/admin/shipments")({
 
         if (!orderId) return Response.json({ error: "Missing order_id" }, { status: 400 });
 
+        // refresh-all doesn't need a specific order — handle before single-order lookup
+        if (action === "refresh-all") {
+          const allOrders = await db
+            .select({ id: orders.id, awbNumber: orders.awbNumber })
+            .from(orders)
+            .where(eq(orders.shipmentStatus, "Created"));
+
+          let refreshed = 0;
+          for (const o of allOrders) {
+            if (!o.awbNumber) continue;
+            try {
+              const track = await trackCKShipShipment(o.awbNumber);
+              await db.update(orders)
+                .set({ trackingStatus: track.status, trackingLocation: track.location, trackingEta: track.eta, trackingUpdatedAt: new Date() })
+                .where(eq(orders.id, o.id));
+              refreshed++;
+            } catch {}
+          }
+          return Response.json({ ok: true, refreshed });
+        }
+
         const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
         if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
 
@@ -183,26 +204,6 @@ export const Route = createFileRoute("/api/admin/shipments")({
           } catch (err: any) {
             return Response.json({ error: err.message }, { status: 502 });
           }
-        }
-
-        if (action === "refresh-all") {
-          const allOrders = await db
-            .select({ id: orders.id, awbNumber: orders.awbNumber })
-            .from(orders)
-            .where(eq(orders.shipmentStatus, "Created"));
-
-          let refreshed = 0;
-          for (const o of allOrders) {
-            if (!o.awbNumber) continue;
-            try {
-              const track = await trackCKShipShipment(o.awbNumber);
-              await db.update(orders)
-                .set({ trackingStatus: track.status, trackingLocation: track.location, trackingEta: track.eta, trackingUpdatedAt: new Date() })
-                .where(eq(orders.id, o.id));
-              refreshed++;
-            } catch {}
-          }
-          return Response.json({ ok: true, refreshed });
         }
 
         return Response.json({ error: "Unknown action" }, { status: 400 });
