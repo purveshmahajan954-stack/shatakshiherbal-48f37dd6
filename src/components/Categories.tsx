@@ -1,7 +1,7 @@
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-const categories = [
+export const categories = [
   { slug: "diabetes-care", name: "Diabetes, thyroid BP and cholesterol Care", desc: "Natural management formulas", count: 8, icon: "🩺", bg: "oklch(0.92 0.05 145)", chip: "oklch(0.78 0.13 50)" },
   { slug: "arthritis-care", name: "Arthritis Joints pain care", desc: "Pure herbal churnas", count: 11, icon: "🦴", bg: "oklch(0.93 0.07 90)", chip: "oklch(0.7 0.15 75)" },
   { slug: "liver-kidney-care", name: "Liver kidney care", desc: "Authentic formulations", count: 4, icon: "🛡️", bg: "oklch(0.92 0.04 200)", chip: "oklch(0.55 0.12 200)" },
