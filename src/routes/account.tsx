@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
+import { useCart } from "@/lib/cart";
 import { LoginScreen } from "@/components/LoginScreen";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -8,7 +9,7 @@ import { toast } from "sonner";
 import {
   Loader2, User, Phone, Mail, Package, ShoppingBag,
   LogOut, Pencil, Check, X, Truck, FileDown, Copy,
-  ChevronRight, Lock, MapPin, Eye, EyeOff,
+  ChevronRight, Lock, MapPin, Eye, EyeOff, Trash2, Plus, Minus,
 } from "lucide-react";
 import { downloadInvoice } from "@/lib/invoice";
 
@@ -170,6 +171,7 @@ function AddressRow({ value, onSave }: { value: string; onSave: (v: string) => P
 /* ── main page ──────────────────────────────────────────────────────────── */
 function AccountPage() {
   const { user, loading, signOut, refreshUser } = useAuth();
+  const { items: cartItems, total: cartTotal, setQty, remove: removeFromCart } = useCart();
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
@@ -382,6 +384,78 @@ function AccountPage() {
             </ul>
           )}
         </section>
+
+        {/* ── My Cart ──────────────────────────────────────────────────── */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-2xl">My Cart</h2>
+            <span className="text-sm text-muted-foreground">{cartItems.length} item{cartItems.length !== 1 ? "s" : ""}</span>
+          </div>
+
+          {cartItems.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow-card border border-border/50 p-12 text-center">
+              <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-30" />
+              <p className="text-muted-foreground mb-6">Your cart is empty.</p>
+              <Link to="/shop" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:opacity-90 transition">
+                <ShoppingBag className="w-4 h-4" /> Browse Products
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-card border border-border/50 p-5 sm:p-6">
+              <ul className="divide-y divide-border/50">
+                {cartItems.map((item) => (
+                  <li key={item.name} className="flex items-center gap-4 py-4 first:pt-0 last:pb-0">
+                    {item.image && (
+                      <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-cover bg-accent/30 shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">{item.name}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">₹{item.price.toLocaleString("en-IN")} each</div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => setQty(item.name, item.qty - 1)}
+                        className="w-7 h-7 rounded-full border border-border flex items-center justify-center hover:bg-accent transition"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="w-6 text-center text-sm font-semibold">{item.qty}</span>
+                      <button
+                        onClick={() => setQty(item.name, item.qty + 1)}
+                        className="w-7 h-7 rounded-full border border-border flex items-center justify-center hover:bg-accent transition"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <div className="w-20 text-right font-semibold text-sm shrink-0">
+                      ₹{(item.price * item.qty).toLocaleString("en-IN")}
+                    </div>
+                    <button
+                      onClick={() => removeFromCart(item.name)}
+                      className="text-muted-foreground hover:text-destructive transition shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-5 pt-5 border-t border-border/50 flex items-center justify-between gap-4">
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Total: </span>
+                  <span className="font-bold text-lg">₹{cartTotal.toLocaleString("en-IN")}</span>
+                </div>
+                <Link
+                  to="/checkout"
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
+                >
+                  Checkout <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          )}
+        </section>
+
       </main>
       <Footer />
     </div>
