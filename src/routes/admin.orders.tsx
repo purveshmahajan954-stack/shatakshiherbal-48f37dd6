@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { adminGet, adminPatch } from "@/lib/api-client";
-import { Loader2, Search, RotateCcw, ChevronDown } from "lucide-react";
+import { Loader2, Search, RotateCcw, ChevronDown, FileDown, Truck } from "lucide-react";
 import { toast } from "sonner";
+import { downloadInvoice } from "@/lib/invoice";
 
 export const Route = createFileRoute("/admin/orders")({
   component: OrdersPage,
@@ -26,6 +27,11 @@ type Order = {
   razorpayPaymentId: string | null;
   paymentStatus: string;
   status: string;
+  trackingId: string | null;
+  trackingStatus: string;
+  awbNumber: string | null;
+  courierName: string | null;
+  shipmentStatus: string;
   createdAt: string;
 };
 
@@ -183,6 +189,32 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
                 </li>
               ))}
             </ul>
+            {/* Shipment info */}
+            {order.awbNumber && (
+              <>
+                <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Shipment</h4>
+                <div className="text-sm space-y-1 border border-border rounded-lg bg-card p-2.5">
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-3.5 h-3.5 text-blue-500" />
+                    <span className="text-muted-foreground">AWB:</span>
+                    <span className="font-mono font-medium">{order.awbNumber}</span>
+                  </div>
+                  {order.courierName && <div><span className="text-muted-foreground">Courier:</span> {order.courierName}</div>}
+                  <div><span className="text-muted-foreground">Status:</span> {order.trackingStatus}</div>
+                  {order.trackingId && (
+                    <Link
+                      to="/track/$trackingId"
+                      params={{ trackingId: order.trackingId }}
+                      target="_blank"
+                      className="text-xs text-primary hover:underline"
+                    >
+                      View tracking page ↗
+                    </Link>
+                  )}
+                </div>
+              </>
+            )}
+
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Manage</h4>
             <div className="flex flex-wrap gap-2 items-center">
               <label className="text-xs text-muted-foreground">Order:</label>
@@ -195,6 +227,28 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
               </select>
               {updating && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
             </div>
+            {/* Invoice download */}
+            {(order.paymentStatus === "paid" || order.paymentStatus === "confirmed") && (
+              <button
+                onClick={() => downloadInvoice({
+                  id: order.id,
+                  shipping_name: order.shippingName,
+                  shipping_phone: order.shippingPhone,
+                  email: order.email,
+                  shipping_address: order.shippingAddress,
+                  items: order.items,
+                  subtotal: order.subtotal,
+                  delivery_charge: order.deliveryCharge,
+                  total: order.total,
+                  payment_status: order.paymentStatus,
+                  razorpay_payment_id: order.razorpayPaymentId,
+                  created_at: order.createdAt,
+                })}
+                className="mt-3 inline-flex items-center gap-2 border border-primary/40 text-primary bg-primary/5 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-primary/10 transition"
+              >
+                <FileDown className="w-3.5 h-3.5" /> Download Invoice
+              </button>
+            )}
           </div>
         </div>
       )}

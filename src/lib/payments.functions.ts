@@ -183,7 +183,33 @@ export const getMyOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
     const user = await requireAuth();
-    const orderList = await db.select().from(orders)
+    const orderList = await db
+      .select({
+        id: orders.id,
+        items: orders.items,
+        total: orders.total,
+        subtotal: orders.subtotal,
+        deliveryCharge: orders.deliveryCharge,
+        gst: orders.gst,
+        discount: orders.discount,
+        status: orders.status,
+        paymentStatus: orders.paymentStatus,
+        shippingName: orders.shippingName,
+        shippingPhone: orders.shippingPhone,
+        shippingAddress: orders.shippingAddress,
+        email: orders.email,
+        razorpayOrderId: orders.razorpayOrderId,
+        razorpayPaymentId: orders.razorpayPaymentId,
+        trackingId: orders.trackingId,
+        trackingStatus: orders.trackingStatus,
+        trackingLocation: orders.trackingLocation,
+        trackingEta: orders.trackingEta,
+        awbNumber: orders.awbNumber,
+        courierName: orders.courierName,
+        shipmentStatus: orders.shipmentStatus,
+        createdAt: orders.createdAt,
+      })
+      .from(orders)
       .where(eq(orders.userId, user.id))
       .orderBy(desc(orders.createdAt))
       .limit(50);

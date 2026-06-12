@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
 import { orders } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ne } from "drizzle-orm";
 import { requireAdmin } from "@server/admin-auth";
 import {
   createCKShipShipment,
@@ -9,6 +9,7 @@ import {
   getCKShipLabel,
   cancelCKShipShipment,
 } from "@server/ckship";
+import { sendSMS, smsShipmentCreated } from "@server/notify";
 
 export const Route = createFileRoute("/api/admin/shipments")({
   server: {
@@ -29,6 +30,8 @@ export const Route = createFileRoute("/api/admin/shipments")({
             status: orders.status,
             trackingId: orders.trackingId,
             trackingStatus: orders.trackingStatus,
+            trackingLocation: orders.trackingLocation,
+            trackingEta: orders.trackingEta,
             ckshipShipmentId: orders.ckshipShipmentId,
             ckshipOrderNumber: orders.ckshipOrderNumber,
             awbNumber: orders.awbNumber,
@@ -56,12 +59,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
         const orderId = body?.order_id;
         if (!orderId) return Response.json({ error: "Missing order_id" }, { status: 400 });
 
-        const [order] = await db
-          .select()
-          .from(orders)
-          .where(eq(orders.id, orderId))
-          .limit(1);
-
+        const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
         if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
 
         try {
@@ -88,6 +86,14 @@ export const Route = createFileRoute("/api/admin/shipments")({
             })
             .where(eq(orders.id, orderId));
 
+          /* Send shipment SMS notification */
+          if (order.shippingPhone && result.awbNumber && result.courierName) {
+            sendSMS(
+              order.shippingPhone,
+              smsShipmentCreated(order.shippingName ?? "Customer", result.awbNumber, result.courierName, order.trackingId)
+            ).catch(console.error);
+          }
+
           return Response.json({ ok: true, result });
         } catch (err: any) {
           console.error("[admin/shipments POST] CKShip error:", err);
@@ -105,25 +111,38 @@ export const Route = createFileRoute("/api/admin/shipments")({
 
         if (!orderId) return Response.json({ error: "Missing order_id" }, { status: 400 });
 
-        // refresh-all doesn't need a specific order — handle before single-order lookup
+        /* refresh-all: bulk update tracking for all active shipments */
         if (action === "refresh-all") {
           const allOrders = await db
             .select({ id: orders.id, awbNumber: orders.awbNumber })
             .from(orders)
-            .where(eq(orders.shipmentStatus, "Created"));
+            .where(ne(orders.shipmentStatus, "Cancelled"));
 
           let refreshed = 0;
+          const errors: string[] = [];
+
           for (const o of allOrders) {
             if (!o.awbNumber) continue;
             try {
               const track = await trackCKShipShipment(o.awbNumber);
               await db.update(orders)
-                .set({ trackingStatus: track.status, trackingLocation: track.location, trackingEta: track.eta, trackingUpdatedAt: new Date() })
+                .set({
+                  trackingStatus: track.status,
+                  trackingLocation: track.location,
+                  trackingEta: track.eta,
+                  courierName: track.courierName ?? undefined,
+                  trackingEvents: track.events,
+                  shipmentStatus: "Tracking Updated",
+                  trackingUpdatedAt: new Date(),
+                })
                 .where(eq(orders.id, o.id));
               refreshed++;
-            } catch {}
+            } catch (err: any) {
+              errors.push(`${o.id}: ${err?.message ?? "unknown"}`);
+            }
           }
-          return Response.json({ ok: true, refreshed });
+
+          return Response.json({ ok: true, refreshed, errors });
         }
 
         const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
@@ -139,6 +158,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
                 trackingLocation: track.location,
                 trackingEta: track.eta,
                 courierName: track.courierName ?? order.courierName,
+                trackingEvents: track.events,
                 shipmentStatus: "Tracking Updated",
                 trackingUpdatedAt: new Date(),
               })
@@ -200,6 +220,15 @@ export const Route = createFileRoute("/api/admin/shipments")({
                 trackingUpdatedAt: new Date(),
               })
               .where(eq(orders.id, orderId));
+
+            /* Re-send shipment SMS */
+            if (order.shippingPhone && result.awbNumber && result.courierName) {
+              sendSMS(
+                order.shippingPhone,
+                smsShipmentCreated(order.shippingName ?? "Customer", result.awbNumber, result.courierName, order.trackingId)
+              ).catch(console.error);
+            }
+
             return Response.json({ ok: true, result });
           } catch (err: any) {
             return Response.json({ error: err.message }, { status: 502 });

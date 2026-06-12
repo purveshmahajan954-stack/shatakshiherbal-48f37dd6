@@ -124,6 +124,7 @@ export const orders = pgTable(
     trackingLocation: text("tracking_location"),
     trackingEta: text("tracking_eta"),
     trackingUpdatedAt: timestamp("tracking_updated_at").defaultNow().notNull(),
+    trackingEvents: jsonb("tracking_events").$type<Array<{ status: string; location: string; timestamp: string; description?: string }>>().default([]),
     ckshipShipmentId: text("ckship_shipment_id"),
     ckshipOrderNumber: text("ckship_order_number"),
     awbNumber: text("awb_number"),

@@ -1,0 +1,98 @@
+Integrate CKShip Shipping API into my e-commerce website and build a complete order tracking system.
+
+Requirements:
+
+1. Secure CKShip Integration
+
+- Store CKShip API credentials in Replit Secrets/Environment Variables.
+- Never expose API keys on the frontend.
+- All CKShip API calls must be handled by the backend.
+
+2. Automatic Shipment Creation
+
+- When an order is placed and payment is successful (or COD order is confirmed), automatically create a shipment in CKShip.
+- Save Shipment ID, AWB Number, Courier Name, and Tracking URL in the database.
+
+3. Order Tracking System
+
+- Create a public "Track Order" page.
+- Customers can enter Order ID, Email, Phone Number, or Tracking Number.
+- Fetch the latest shipment status from CKShip.
+- Display:
+  - Order Confirmed
+  - Shipment Created
+  - Picked Up
+  - In Transit
+  - Out For Delivery
+  - Delivered
+  - RTO (if applicable)
+
+4. Customer Dashboard
+
+- Add a "My Orders" section.
+- Customers can view all orders.
+- Show order details, invoice, AWB number, courier name, and live tracking status.
+- Add a "Track Package" button.
+
+5. Admin Panel
+
+- View all orders and shipment details.
+- View courier assigned by CKShip.
+- Re-sync tracking status manually.
+- Generate shipping labels.
+- Download invoices.
+- Mark COD orders as confirmed.
+
+6. Notifications
+
+- Send WhatsApp, SMS, and Email notifications for:
+  - Order Confirmed
+  - Shipment Created
+  - Picked Up
+  - In Transit
+  - Out For Delivery
+  - Delivered
+  - RTO
+
+7. Invoice System
+
+- Generate professional PDF invoices automatically.
+- Include:
+  - Company Name
+  - GST Details
+  - Customer Details
+  - Product Details
+  - Shipping Charges
+  - Order Total
+  - Invoice Number
+
+8. Database
+   Store:
+
+- Order ID
+- Customer Details
+- Payment Status
+- Shipment ID
+- AWB Number
+- Courier Name
+- Tracking URL
+- Order Status
+- Tracking History
+
+9. Error Handling
+
+- Retry failed CKShip API requests.
+- Log all API errors.
+- Show user-friendly error messages.
+
+10. Tech Requirements
+
+- Production-ready code.
+- Mobile responsive UI.
+- Clean architecture.
+- Secure backend APIs.
+- Detailed comments in code.
+- Environment variable configuration.
+- Ready for deployment on Replit.
+
+Build the complete implementation with frontend, backend, database schema, API routes, admin panel, customer dashboard, tracking page, invoice generation, and notification system.
