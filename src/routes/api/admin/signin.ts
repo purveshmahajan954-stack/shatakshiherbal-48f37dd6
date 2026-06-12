@@ -7,7 +7,7 @@ import { getHardcodedAdminToken } from "@server/admin-auth";
 
 const ADMIN_EMAIL = "admin@shatakshiherbal.com";
 const HARDCODED_USERNAME = "admin";
-const HARDCODED_PASSWORD = "shatakshi@2024";
+const HARDCODED_PASSWORD = "shatakshiherbal";
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const Route = createFileRoute("/api/admin/signin")({
