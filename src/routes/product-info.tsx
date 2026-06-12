@@ -7,7 +7,7 @@ export const Route = createFileRoute("/product-info")({
   component: ProductInfoPage,
   head: () => ({
     meta: [
-      { title: "Product Info — Shatakshi Herbal" },
+      { title: "Our Certifications — Shatakshi Herbal" },
       { name: "description", content: "Learn about Ayurvedic herbs and our formulations." },
     ],
   }),
@@ -19,7 +19,7 @@ function ProductInfoPage() {
       <Header />
       <main className="flex flex-col items-center justify-center py-32 px-4 text-center">
         <BookOpen className="w-14 h-14 text-primary mb-6 opacity-60" />
-        <h1 className="font-display text-3xl sm:text-4xl mb-3">Product Info</h1>
+        <h1 className="font-display text-3xl sm:text-4xl mb-3">Our Certifications</h1>
         <p className="text-muted-foreground max-w-md mb-8">
           Our blog articles and Ayurvedic guides have moved to the About Us page.
         </p>
