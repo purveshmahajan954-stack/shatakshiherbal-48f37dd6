@@ -1,9 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Leaf, Loader2, Eye, EyeOff, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Leaf, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { OtpInput } from "@/components/OtpInput";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
@@ -17,105 +16,44 @@ export const Route = createFileRoute("/signup")({
   component: SignupPage,
 });
 
-type SignupStep = "form" | "verify" | "success";
-const RESEND_SECONDS = 30;
-
 function SignupPage() {
   const { refreshUser, user } = useAuth();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState<SignupStep>("form");
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [otp, setOtp] = useState("");
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
-  const [countdown, setCountdown] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
   }, [user, navigate]);
 
-  useEffect(() => {
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, []);
-
-  const startCountdown = () => {
-    setCountdown(RESEND_SECONDS);
-    timerRef.current = setInterval(() => {
-      setCountdown((c) => {
-        if (c <= 1) { clearInterval(timerRef.current!); return 0; }
-        return c - 1;
-      });
-    }, 1000);
-  };
-
-  const handleSendOtp = async () => {
-    const digits = phone.replace(/\D/g, "");
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!fullName.trim()) { toast.error("Please enter your full name"); return; }
-    if (digits.length !== 10) { toast.error("Enter a valid 10-digit mobile number"); return; }
+    if (!email.trim()) { toast.error("Please enter your email"); return; }
     if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
 
     setBusy(true);
     try {
-      const res = await fetch("/api/auth/otp-send", {
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ email: email.trim(), password, fullName: fullName.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to send OTP");
-      setStep("verify");
-      setOtp("");
-      startCountdown();
-      toast.success("OTP sent to your mobile!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send OTP");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp.length !== 6) { toast.error("Enter the 6-digit OTP"); return; }
-    setBusy(true);
-    try {
-      const res = await fetch("/api/auth/otp-verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, code: otp, context: "signup", fullName, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Verification failed");
+      if (!res.ok) throw new Error(data.error || "Signup failed");
       localStorage.setItem("auth_token", data.token);
+      document.cookie = `auth_token=${data.token}; path=/; max-age=${7 * 24 * 3600}; SameSite=Lax`;
       await refreshUser();
-      setStep("success");
+      setDone(true);
       setTimeout(() => navigate({ to: "/" }), 1500);
     } catch (err: any) {
-      toast.error(err.message || "Verification failed");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const handleResend = async () => {
-    setBusy(true);
-    try {
-      const res = await fetch("/api/auth/otp-send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to resend OTP");
-      setOtp("");
-      startCountdown();
-      toast.success("New OTP sent!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to resend OTP");
+      toast.error(err.message || "Signup failed");
     } finally {
       setBusy(false);
     }
@@ -140,56 +78,18 @@ function SignupPage() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-card border border-border/50">
-            {step === "success" ? (
+            {done ? (
               <div className="p-8 text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
                   <CheckCircle2 className="w-8 h-8 text-green-500" />
                 </div>
                 <h2 className="text-xl font-semibold text-foreground mb-1">Account Created!</h2>
                 <p className="text-sm text-muted-foreground">
-                  Welcome to Shatakshi Herbal, {fullName.split(" ")[0]}! Redirecting you now…
+                  Welcome to Shatakshi Herbal, {fullName.split(" ")[0]}! Redirecting…
                 </p>
-              </div>
-            ) : step === "verify" ? (
-              <div className="p-7">
-                <button
-                  onClick={() => { setStep("form"); setOtp(""); }}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition"
-                >
-                  <ArrowLeft className="w-4 h-4" /> Change number
-                </button>
-                <h2 className="text-lg font-semibold text-foreground mb-1">Verify your number</h2>
-                <p className="text-sm text-muted-foreground mb-6">
-                  Enter the 6-digit code sent to{" "}
-                  <span className="font-medium text-foreground">+91 {phone.replace(/\D/g, "")}</span>
-                </p>
-                <OtpInput value={otp} onChange={setOtp} disabled={busy} />
-                <button
-                  onClick={handleVerifyOtp}
-                  disabled={busy || otp.length !== 6}
-                  className="w-full mt-6 bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
-                >
-                  {busy && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Verify & Create Account
-                </button>
-                <div className="text-center mt-4">
-                  {countdown > 0 ? (
-                    <span className="text-sm text-muted-foreground">
-                      Resend OTP in <span className="font-medium text-foreground tabular-nums">{countdown}s</span>
-                    </span>
-                  ) : (
-                    <button
-                      onClick={handleResend}
-                      disabled={busy}
-                      className="text-sm text-primary font-medium hover:underline disabled:opacity-50"
-                    >
-                      Resend OTP
-                    </button>
-                  )}
-                </div>
               </div>
             ) : (
-              <form className="p-7 space-y-4" onSubmit={(e) => { e.preventDefault(); handleSendOtp(); }}>
+              <form className="p-7 space-y-4" onSubmit={handleSignup}>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
                   <input
@@ -200,20 +100,15 @@ function SignupPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Mobile Number</label>
-                  <div className="flex">
-                    <span className="inline-flex items-center px-3.5 border border-r-0 border-border rounded-l-xl bg-gray-50 text-sm text-muted-foreground font-medium">
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      maxLength={10}
-                      value={phone.replace(/\D/g, "")}
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                      placeholder="9876543210"
-                      className="flex-1 border border-border rounded-r-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  </div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
@@ -238,6 +133,7 @@ function SignupPage() {
                     <p className="text-xs text-red-500 mt-1">At least 6 characters required</p>
                   )}
                 </div>
+
                 <button
                   type="submit"
                   disabled={busy}
