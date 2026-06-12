@@ -24,7 +24,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-cream via-cream to-accent/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <motion.div suppressHydrationWarning initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <div className="inline-flex items-center gap-2 bg-accent/60 px-3 sm:px-4 py-2 rounded-full text-[11px] sm:text-xs font-semibold text-primary mb-6 sm:mb-8">
             <span className="w-2 h-2 rounded-full bg-primary-light" />
             AYUSH CERTIFIED · 100% NATURAL

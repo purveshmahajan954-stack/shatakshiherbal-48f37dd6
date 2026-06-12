@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Premium Ayurvedic formulations crafted from nature's finest ingredients. AYUSH certified, 100% natural herbal medicines." },
     ],
     links: [
-      { rel: "preload", as: "image", href: "/src/assets/hero-slide-1.webp", fetchpriority: "high" },
+      { rel: "preload", as: "image", href: "/src/assets/hero-slide-1.webp", fetchPriority: "high" },
     ],
   }),
 });
