@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { computeTotals } from "@/lib/payments.functions";
 import { Loader2, ShieldCheck, MapPin, Wallet, Search } from "lucide-react";
+import { AbandonmentPopup } from "@/components/AbandonmentPopup";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -55,7 +56,20 @@ function CheckoutPage() {
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showAbandonment, setShowAbandonment] = useState(false);
   const pincodeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abandonmentShown = useRef(false);
+
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !abandonmentShown.current) {
+        abandonmentShown.current = true;
+        setShowAbandonment(true);
+      }
+    };
+    document.addEventListener("mouseleave", handleMouseLeave);
+    return () => document.removeEventListener("mouseleave", handleMouseLeave);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -231,6 +245,7 @@ function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-cream/40">
+      <AbandonmentPopup open={showAbandonment} onClose={() => setShowAbandonment(false)} />
       <Header />
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-10">
         <h1 className="font-display text-3xl sm:text-4xl mb-8">Checkout</h1>

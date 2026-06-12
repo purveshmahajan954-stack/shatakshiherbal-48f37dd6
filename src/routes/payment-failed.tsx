@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
+import { useState } from "react";
 import { XCircle, RotateCcw, ShoppingBag } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { AbandonmentPopup } from "@/components/AbandonmentPopup";
 
 export const Route = createFileRoute("/payment-failed")({
   validateSearch: z.object({
@@ -20,6 +22,7 @@ export const Route = createFileRoute("/payment-failed")({
 
 function FailedPage() {
   const { reason } = Route.useSearch();
+  const [showPopup, setShowPopup] = useState(true);
   const friendly =
     reason === "dismissed"
       ? "You closed the payment window before completing the transaction."
@@ -27,6 +30,7 @@ function FailedPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-cream/40">
+      <AbandonmentPopup open={showPopup} onClose={() => setShowPopup(false)} />
       <Header />
       <main className="flex-1 max-w-xl mx-auto w-full px-4 py-16">
         <div className="bg-white rounded-2xl shadow-card p-8 sm:p-12 text-center">
