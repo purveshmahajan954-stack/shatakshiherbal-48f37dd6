@@ -14,6 +14,19 @@ import {
 
 export const appRoleEnum = pgEnum("app_role", ["admin", "manager", "user"]);
 
+export type SavedAddress = {
+  id: string;
+  label: string;
+  flatHouse: string;
+  areaStreet: string;
+  landmark?: string;
+  district: string;
+  pincode: string;
+  city: string;
+  state: string;
+  isDefault?: boolean;
+};
+
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").unique(),
@@ -23,6 +36,7 @@ export const profiles = pgTable("profiles", {
   googleId: text("google_id").unique(),
   avatarUrl: text("avatar_url"),
   address: text("address"),
+  savedAddresses: jsonb("saved_addresses").$type<SavedAddress[]>().default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

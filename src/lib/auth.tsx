@@ -1,5 +1,18 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
+export type SavedAddress = {
+  id: string;
+  label: string;
+  flatHouse: string;
+  areaStreet: string;
+  landmark?: string;
+  district: string;
+  pincode: string;
+  city: string;
+  state: string;
+  isDefault?: boolean;
+};
+
 export type AppUser = {
   id: string;
   email: string | null;
@@ -7,6 +20,7 @@ export type AppUser = {
   fullName: string | null;
   avatarUrl: string | null;
   address: string | null;
+  savedAddresses: SavedAddress[];
   hasPassword: boolean;
 };
 

@@ -5,9 +5,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import type { SavedAddress } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { computeTotals } from "@/lib/payments.functions";
-import { Loader2, ShieldCheck, MapPin, Wallet, Search } from "lucide-react";
+import { Loader2, ShieldCheck, MapPin, Wallet, Search, Check } from "lucide-react";
 import { AbandonmentPopup } from "@/components/AbandonmentPopup";
 
 const INDIAN_STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry"];
@@ -54,9 +55,10 @@ function CheckoutPage() {
   const [areaStreet, setAreaStreet] = useState("");
   const [landmark, setLandmark] = useState("");
   const [pincode, setPincode] = useState("");
+  const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [district, setDistrict] = useState("");
+  const [selectedAddrId, setSelectedAddrId] = useState<string | null>(null);
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -79,29 +81,28 @@ function CheckoutPage() {
     if (user) {
       setEmail(user.email ?? "");
       setName(user.fullName ?? "");
-
       if (user.phone) {
         const digits = user.phone.replace(/\D/g, "");
         setPhone(digits.length === 12 && digits.startsWith("91") ? digits.slice(2) : digits.slice(-10));
       }
-
-      if (user.address) {
-        const pinMatch = user.address.match(/\b(\d{6})\b/);
-        if (pinMatch) {
-          const pin = pinMatch[1];
-          const pinStart = user.address.indexOf(pin);
-          const street = user.address.slice(0, pinStart).replace(/,\s*$/, "").trim();
-          const parts = street.split(",").map(s => s.trim());
-          setFlatHouse(parts[0] || "");
-          setAreaStreet(parts.slice(1).join(", ") || "");
-          setPincode(pin);
-          fetchPincodeData(pin);
-        } else {
-          setFlatHouse(user.address);
-        }
-      }
+      // Auto-select default saved address
+      const saved = user.savedAddresses ?? [];
+      const def = saved.find(a => a.isDefault) ?? saved[0];
+      if (def) applyAddress(def);
     }
   }, [user]);
+
+  const applyAddress = (addr: SavedAddress) => {
+    setSelectedAddrId(addr.id);
+    setFlatHouse(addr.flatHouse);
+    setAreaStreet(addr.areaStreet);
+    setLandmark(addr.landmark ?? "");
+    setDistrict(addr.district);
+    setPincode(addr.pincode);
+    setCity(addr.city);
+    setState(addr.state);
+    setPincodeError(null);
+  };
 
   const fetchPincodeData = async (pin: string) => {
     if (pin.length !== 6) return;
@@ -132,6 +133,7 @@ function CheckoutPage() {
     const digits = val.replace(/\D/g, "").slice(0, 6);
     setPincode(digits);
     setPincodeError(null);
+    setSelectedAddrId(null);
     if (pincodeTimeout.current) clearTimeout(pincodeTimeout.current);
     if (digits.length === 6) {
       pincodeTimeout.current = setTimeout(() => fetchPincodeData(digits), 400);
@@ -148,9 +150,10 @@ function CheckoutPage() {
   if (!user) return <LoginScreen title="Sign in to checkout" subtitle="Your cart is saved — sign in to complete your order securely" />;
 
   const totals = computeTotals(total);
+  const savedAddresses: SavedAddress[] = user.savedAddresses ?? [];
 
   const buildFullAddress = () => {
-    const parts = [flatHouse.trim(), areaStreet.trim(), landmark.trim(), district || "", city.trim(), state.trim(), pincode].filter(Boolean);
+    const parts = [flatHouse.trim(), areaStreet.trim(), landmark.trim(), district.trim(), city.trim(), state.trim(), pincode].filter(Boolean);
     return parts.join(", ");
   };
 
@@ -262,11 +265,40 @@ function CheckoutPage() {
               <h2 className="flex items-center gap-2 font-display text-xl mb-4">
                 <MapPin className="w-5 h-5 text-primary" /> Shipping Address
               </h2>
-              <div className="grid sm:grid-cols-2 gap-3 mb-4">
+
+              <div className="grid sm:grid-cols-2 gap-3 mb-5">
                 <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone (10 digits)" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" type="email" className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
+
+              {/* Saved address picker */}
+              {savedAddresses.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Saved Addresses</p>
+                  <div className="space-y-2">
+                    {savedAddresses.map(addr => (
+                      <button
+                        key={addr.id}
+                        onClick={() => applyAddress(addr)}
+                        className={`w-full text-left border rounded-xl px-4 py-3 transition flex items-start gap-3 ${selectedAddrId === addr.id ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border hover:border-primary/40 bg-white"}`}
+                      >
+                        <div className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${selectedAddrId === addr.id ? "border-primary bg-primary" : "border-border"}`}>
+                          {selectedAddrId === addr.id && <Check className="w-2.5 h-2.5 text-white" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full mr-2">{addr.label}</span>
+                          {addr.isDefault && <span className="text-[10px] text-amber-600 font-semibold">Default</span>}
+                          <p className="text-sm text-foreground mt-1 leading-snug">
+                            {[addr.flatHouse, addr.areaStreet, addr.district, addr.city, addr.state, addr.pincode].filter(Boolean).join(", ")}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Or fill a new address below ↓</p>
+                </div>
+              )}
 
               <div className="bg-green-50 border border-green-100 rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-primary uppercase mb-1">
@@ -275,17 +307,17 @@ function CheckoutPage() {
 
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground">Flat, House no., Building, Apartment</label>
-                  <input value={flatHouse} onChange={(e) => setFlatHouse(e.target.value)} placeholder="e.g. 12B, Shanti Niwas" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  <input value={flatHouse} onChange={(e) => { setFlatHouse(e.target.value); setSelectedAddrId(null); }} placeholder="e.g. 12B, Shanti Niwas" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground">Area, Street, Sector, Village</label>
-                  <input value={areaStreet} onChange={(e) => setAreaStreet(e.target.value)} placeholder="e.g. Shivaji Ward, MG Road" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  <input value={areaStreet} onChange={(e) => { setAreaStreet(e.target.value); setSelectedAddrId(null); }} placeholder="e.g. Shivaji Ward, MG Road" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground">Landmark <span className="text-muted-foreground/60">(optional)</span></label>
-                  <input value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="e.g. Near Apollo Hospital" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  <input value={landmark} onChange={(e) => { setLandmark(e.target.value); setSelectedAddrId(null); }} placeholder="e.g. Near Apollo Hospital" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -308,21 +340,29 @@ function CheckoutPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Town / City</label>
-                    <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Gadarwara" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <label className="text-xs text-muted-foreground">District</label>
+                    <input value={district} onChange={(e) => { setDistrict(e.target.value); setSelectedAddrId(null); }} placeholder="e.g. Narsinghpur" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">State</label>
-                  <select value={state} onChange={(e) => setState(e.target.value)} className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="">Choose a state</option>
-                    {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Town / City</label>
+                    <input value={city} onChange={(e) => { setCity(e.target.value); setSelectedAddrId(null); }} placeholder="e.g. Gadarwara" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">State</label>
+                    <select value={state} onChange={(e) => { setState(e.target.value); setSelectedAddrId(null); }} className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                      <option value="">Choose a state</option>
+                      {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
                 </div>
               </div>
+
               {pincode.length === 6 && city && state && !pincodeLoading && (
-                <p className="text-xs text-primary mt-2 font-medium">📍 Auto-detected: {city}, {state}</p>
+                <p className="text-xs text-primary mt-2 font-medium">📍 Auto-detected: {district ? `${district}, ` : ""}{city}, {state}</p>
               )}
             </section>
 

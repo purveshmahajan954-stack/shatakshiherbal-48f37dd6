@@ -9,8 +9,9 @@ import { toast } from "sonner";
 import {
   Loader2, User, Phone, Mail, Package, ShoppingBag,
   LogOut, Pencil, Check, X, Truck, FileDown, Copy,
-  ChevronRight, Lock, MapPin, Eye, EyeOff, Trash2, Plus, Minus, Search,
+  ChevronRight, Lock, MapPin, Eye, EyeOff, Trash2, Plus, Minus, Search, Star,
 } from "lucide-react";
+import type { SavedAddress } from "@/lib/auth";
 
 const INDIAN_STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry"];
 import { downloadInvoice } from "@/lib/invoice";
@@ -118,34 +119,32 @@ function EditRow({
   );
 }
 
-/* ── address row ────────────────────────────────────────────────────────── */
-function AddressRow({ value, onSave }: { value: string; onSave: (v: string) => Promise<void> }) {
-  const [editing, setEditing] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [flatHouse, setFlatHouse] = useState("");
-  const [areaStreet, setAreaStreet] = useState("");
-  const [landmark, setLandmark] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [city, setCity] = useState("");
-  const [addrState, setAddrState] = useState("");
+/* ── address form (shared for add / edit) ───────────────────────────────── */
+const BLANK_ADDR = { label: "Home", flatHouse: "", areaStreet: "", landmark: "", district: "", pincode: "", city: "", state: "", isDefault: false };
+
+function AddressForm({
+  initial,
+  onSave,
+  onCancel,
+  isFirst,
+}: {
+  initial?: Partial<SavedAddress>;
+  onSave: (a: Omit<SavedAddress, "id">) => Promise<void>;
+  onCancel: () => void;
+  isFirst?: boolean;
+}) {
+  const [label, setLabel] = useState(initial?.label ?? "Home");
+  const [flatHouse, setFlatHouse] = useState(initial?.flatHouse ?? "");
+  const [areaStreet, setAreaStreet] = useState(initial?.areaStreet ?? "");
+  const [landmark, setLandmark] = useState(initial?.landmark ?? "");
+  const [district, setDistrict] = useState(initial?.district ?? "");
+  const [pincode, setPincode] = useState(initial?.pincode ?? "");
+  const [city, setCity] = useState(initial?.city ?? "");
+  const [addrState, setAddrState] = useState(initial?.state ?? "");
+  const [isDefault, setIsDefault] = useState(initial?.isDefault ?? isFirst ?? false);
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState<string | null>(null);
-
-  const parseAddress = (addr: string) => {
-    const pinMatch = addr.match(/\b(\d{6})\b/);
-    if (pinMatch) {
-      const pin = pinMatch[1];
-      const before = addr.slice(0, addr.indexOf(pin)).replace(/,\s*$/, "").trim();
-      const parts = before.split(",").map(s => s.trim());
-      setFlatHouse(parts[0] || "");
-      setAreaStreet(parts.slice(1).join(", ") || "");
-      setPincode(pin);
-    } else {
-      setFlatHouse(addr);
-    }
-  };
-
-  useEffect(() => { if (!editing) parseAddress(value); }, [value, editing]);
+  const [busy, setBusy] = useState(false);
 
   const fetchPincode = async (pin: string) => {
     if (pin.length !== 6) return;
@@ -155,7 +154,11 @@ function AddressRow({ value, onSave }: { value: string; onSave: (v: string) => P
       const data = await res.json();
       if (data[0]?.Status === "Success") {
         const po = data[0].PostOffice?.[0];
-        if (po) { setCity(po.Division || po.Name || ""); setAddrState(po.State || ""); }
+        if (po) {
+          setCity(po.Division || po.Name || "");
+          setAddrState(po.State || "");
+          setDistrict(po.District || "");
+        }
       } else { setPincodeError("Invalid pincode"); }
     } catch { setPincodeError("Could not fetch pincode"); }
     finally { setPincodeLoading(false); }
@@ -165,87 +168,237 @@ function AddressRow({ value, onSave }: { value: string; onSave: (v: string) => P
     const digits = val.replace(/\D/g, "").slice(0, 6);
     setPincode(digits); setPincodeError(null);
     if (digits.length === 6) fetchPincode(digits);
-    else { setCity(""); setAddrState(""); }
+    else { setCity(""); setAddrState(""); setDistrict(""); }
   };
 
-  const buildAddress = () =>
-    [flatHouse, areaStreet, landmark, city, addrState, pincode].filter(Boolean).join(", ");
-
   const save = async () => {
-    if (!flatHouse.trim()) return;
+    if (!flatHouse.trim()) return toast.error("Enter flat/house address");
+    if (pincode.length !== 6) return toast.error("Enter valid 6-digit pincode");
+    if (!city.trim()) return toast.error("Enter city");
+    if (!addrState.trim()) return toast.error("Select state");
     setBusy(true);
-    try { await onSave(buildAddress()); setEditing(false); } finally { setBusy(false); }
+    try {
+      await onSave({ label, flatHouse, areaStreet, landmark, district, pincode, city, state: addrState, isDefault });
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <div className="bg-green-50 border border-green-100 rounded-xl p-4 space-y-3">
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground font-medium">Address Label</label>
+        <div className="flex gap-2">
+          {["Home", "Office", "Other"].map(l => (
+            <button key={l} onClick={() => setLabel(l)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${label === l ? "bg-primary text-white border-primary" : "border-border text-muted-foreground hover:border-primary"}`}>
+              {l}
+            </button>
+          ))}
+          {!["Home", "Office", "Other"].includes(label) && (
+            <input value={label} onChange={e => setLabel(e.target.value)} className="border border-border rounded-full px-3 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary" />
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground">Flat, House no., Building, Apartment</label>
+        <input autoFocus value={flatHouse} onChange={e => setFlatHouse(e.target.value)} placeholder="e.g. 12B, Shanti Niwas" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground">Area, Street, Sector, Village</label>
+        <input value={areaStreet} onChange={e => setAreaStreet(e.target.value)} placeholder="e.g. Shivaji Ward, MG Road" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground">Landmark <span className="text-muted-foreground/60">(optional)</span></label>
+        <input value={landmark} onChange={e => setLandmark(e.target.value)} placeholder="e.g. Near Apollo Hospital" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">Pincode</label>
+          <div className="relative">
+            <input value={pincode} onChange={e => handlePincodeChange(e.target.value)} placeholder="6 digit PIN" inputMode="numeric" maxLength={6}
+              className={`w-full border bg-white rounded-md px-3 py-2 text-sm pr-8 focus:outline-none focus:ring-2 focus:ring-primary ${pincodeError ? "border-red-400" : "border-border"}`} />
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+              {pincodeLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" /> : <Search className="w-3.5 h-3.5 text-muted-foreground" />}
+            </div>
+          </div>
+          {pincodeError && <p className="text-[11px] text-red-500">{pincodeError}</p>}
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">District</label>
+          <input value={district} onChange={e => setDistrict(e.target.value)} placeholder="e.g. Narsinghpur" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">Town / City</label>
+          <input value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Gadarwara" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">State</label>
+          <select value={addrState} onChange={e => setAddrState(e.target.value)} className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="">Choose state</option>
+            {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <label className="flex items-center gap-2 cursor-pointer text-sm">
+        <input type="checkbox" checked={isDefault} onChange={e => setIsDefault(e.target.checked)} className="accent-primary" />
+        Set as default address
+      </label>
+
+      <div className="flex gap-2 pt-1">
+        <button onClick={save} disabled={busy} className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50">
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />} Save Address
+        </button>
+        <button onClick={onCancel} className="flex items-center gap-1.5 border border-border text-sm text-muted-foreground px-4 py-2 rounded-lg hover:bg-accent/50">
+          <X className="w-3.5 h-3.5" /> Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── saved addresses section ────────────────────────────────────────────── */
+function SavedAddressesSection({ userId }: { userId: string }) {
+  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const token = () => localStorage.getItem("auth_token") ?? "";
+
+  const load = async () => {
+    try {
+      const res = await fetch("/api/user/addresses", { headers: { Authorization: `Bearer ${token()}` } });
+      const data = await res.json();
+      setAddresses(data.addresses ?? []);
+    } catch { toast.error("Could not load addresses"); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { load(); }, [userId]);
+
+  const handleAdd = async (a: Omit<SavedAddress, "id">) => {
+    const res = await fetch("/api/user/addresses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
+      body: JSON.stringify(a),
+    });
+    if (!res.ok) { toast.error("Failed to save address"); return; }
+    toast.success("Address saved!");
+    setAdding(false);
+    load();
+  };
+
+  const handleEdit = (id: string) => async (a: Omit<SavedAddress, "id">) => {
+    const res = await fetch(`/api/user/addresses?id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
+      body: JSON.stringify(a),
+    });
+    if (!res.ok) { toast.error("Failed to update address"); return; }
+    toast.success("Address updated!");
+    setEditingId(null);
+    load();
+  };
+
+  const handleDelete = async (id: string) => {
+    const res = await fetch(`/api/user/addresses?id=${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token()}` },
+    });
+    if (!res.ok) { toast.error("Failed to delete address"); return; }
+    toast.success("Address deleted");
+    load();
+  };
+
+  const handleSetDefault = async (id: string) => {
+    const addr = addresses.find(a => a.id === id);
+    if (!addr) return;
+    await fetch(`/api/user/addresses?id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token()}` },
+      body: JSON.stringify({ ...addr, isDefault: true }),
+    });
+    load();
   };
 
   return (
     <div className="flex items-start gap-3 bg-accent/30 rounded-lg px-4 py-3">
       <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">Delivery Address</div>
-        {editing ? (
-          <div className="mt-2 bg-green-50 border border-green-100 rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-2 text-[11px] font-semibold tracking-widest text-primary uppercase">
-              <MapPin className="w-3 h-3" /> Delivery Address
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Flat, House no., Building, Apartment</label>
-              <input autoFocus value={flatHouse} onChange={e => setFlatHouse(e.target.value)} placeholder="e.g. 12B, Shanti Niwas" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Area, Street, Sector, Village</label>
-              <input value={areaStreet} onChange={e => setAreaStreet(e.target.value)} placeholder="e.g. Shivaji Ward, MG Road" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Landmark <span className="text-muted-foreground/60">(optional)</span></label>
-              <input value={landmark} onChange={e => setLandmark(e.target.value)} placeholder="e.g. Near Apollo Hospital" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Pincode</label>
-                <div className="relative">
-                  <input value={pincode} onChange={e => handlePincodeChange(e.target.value)} placeholder="6 digit PIN" inputMode="numeric" maxLength={6}
-                    className={`w-full border bg-white rounded-md px-3 py-2 text-sm pr-8 focus:outline-none focus:ring-2 focus:ring-primary ${pincodeError ? "border-red-400" : "border-border"}`} />
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
-                    {pincodeLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" /> : <Search className="w-3.5 h-3.5 text-muted-foreground" />}
-                  </div>
-                </div>
-                {pincodeError && <p className="text-[11px] text-red-500">{pincodeError}</p>}
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Town / City</label>
-                <input value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Gadarwara" className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">State</label>
-              <select value={addrState} onChange={e => setAddrState(e.target.value)} className="w-full border border-border bg-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                <option value="">Choose a state</option>
-                {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-
-            <div className="flex gap-2 pt-1">
-              <button onClick={save} disabled={busy} className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50">
-                {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />} Save
-              </button>
-              <button onClick={() => setEditing(false)} className="flex items-center gap-1.5 border border-border text-sm text-muted-foreground px-4 py-2 rounded-lg hover:bg-accent/50">
-                <X className="w-3.5 h-3.5" /> Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-start justify-between gap-2">
-            <span className="text-sm font-medium whitespace-pre-line">
-              {value || <span className="text-muted-foreground italic">Add your delivery address</span>}
-            </span>
-            <button onClick={() => setEditing(true)} className="text-muted-foreground hover:text-primary shrink-0 mt-0.5">
-              <Pencil className="w-3.5 h-3.5" />
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Saved Addresses</div>
+          {!adding && (
+            <button onClick={() => setAdding(true)} className="flex items-center gap-1 text-xs text-primary font-semibold hover:underline">
+              <Plus className="w-3.5 h-3.5" /> Add New
             </button>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="py-4 flex justify-center"><Loader2 className="w-4 h-4 animate-spin text-primary" /></div>
+        ) : (
+          <div className="space-y-3">
+            {addresses.map(addr => (
+              <div key={addr.id}>
+                {editingId === addr.id ? (
+                  <AddressForm
+                    initial={addr}
+                    onSave={handleEdit(addr.id)}
+                    onCancel={() => setEditingId(null)}
+                  />
+                ) : (
+                  <div className={`relative border rounded-xl p-3 bg-white transition ${addr.isDefault ? "border-primary/40 ring-1 ring-primary/20" : "border-border"}`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{addr.label}</span>
+                          {addr.isDefault && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold">
+                              <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> Default
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-foreground leading-snug">
+                          {[addr.flatHouse, addr.areaStreet, addr.landmark, addr.district, addr.city, addr.state, addr.pincode].filter(Boolean).join(", ")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {!addr.isDefault && (
+                          <button onClick={() => handleSetDefault(addr.id)} title="Set as default" className="p-1.5 text-muted-foreground hover:text-amber-500 rounded-md hover:bg-accent/50">
+                            <Star className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        <button onClick={() => setEditingId(addr.id)} className="p-1.5 text-muted-foreground hover:text-primary rounded-md hover:bg-accent/50">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDelete(addr.id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-md hover:bg-accent/50">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {adding && (
+              <AddressForm
+                isFirst={addresses.length === 0}
+                onSave={handleAdd}
+                onCancel={() => setAdding(false)}
+              />
+            )}
+
+            {addresses.length === 0 && !adding && (
+              <p className="text-sm text-muted-foreground italic">No saved addresses yet. Add one to speed up checkout!</p>
+            )}
           </div>
         )}
       </div>
@@ -350,11 +503,8 @@ function AccountPage() {
               hint={!user.hasPassword ? "Set a password to enable email + password login" : undefined}
             />
 
-            {/* Address */}
-            <AddressRow
-              value={user.address ?? ""}
-              onSave={save("address")}
-            />
+            {/* Saved Addresses */}
+            <SavedAddressesSection userId={user.id} />
           </div>
 
           <div className="mt-5 pt-5 border-t border-border/50">

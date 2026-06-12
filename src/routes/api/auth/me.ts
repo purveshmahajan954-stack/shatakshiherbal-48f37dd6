@@ -42,6 +42,7 @@ export const Route = createFileRoute("/api/auth/me")({
               fullName: profile.fullName,
               avatarUrl: profile.avatarUrl,
               address: profile.address ?? null,
+              savedAddresses: (profile as any).savedAddresses ?? [],
               hasPassword: !!profile.passwordHash,
             },
             isAdmin,

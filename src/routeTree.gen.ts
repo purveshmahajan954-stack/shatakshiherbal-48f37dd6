@@ -49,6 +49,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as ApiUserProfileRouteImport } from './routes/api/user/profile'
 import { Route as ApiUserOrdersRouteImport } from './routes/api/user/orders'
+import { Route as ApiUserAddressesRouteImport } from './routes/api/user/addresses'
 import { Route as ApiPublicWebhookUpdateRouteImport } from './routes/api/public/webhook-update'
 import { Route as ApiPaymentsVerifyRouteImport } from './routes/api/payments/verify'
 import { Route as ApiPaymentsRazorpayKeyRouteImport } from './routes/api/payments/razorpay-key'
@@ -277,6 +278,11 @@ const ApiUserOrdersRoute = ApiUserOrdersRouteImport.update({
   path: '/api/user/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiUserAddressesRoute = ApiUserAddressesRouteImport.update({
+  id: '/api/user/addresses',
+  path: '/api/user/addresses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhookUpdateRoute = ApiPublicWebhookUpdateRouteImport.update({
   id: '/api/public/webhook-update',
   path: '/api/public/webhook-update',
@@ -479,6 +485,7 @@ export interface FileRoutesByFullPath {
   '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
   '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
+  '/api/user/addresses': typeof ApiUserAddressesRoute
   '/api/user/orders': typeof ApiUserOrdersRoute
   '/api/user/profile': typeof ApiUserProfileRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -547,6 +554,7 @@ export interface FileRoutesByTo {
   '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
   '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
+  '/api/user/addresses': typeof ApiUserAddressesRoute
   '/api/user/orders': typeof ApiUserOrdersRoute
   '/api/user/profile': typeof ApiUserProfileRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -617,6 +625,7 @@ export interface FileRoutesById {
   '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
   '/api/payments/verify': typeof ApiPaymentsVerifyRoute
   '/api/public/webhook-update': typeof ApiPublicWebhookUpdateRoute
+  '/api/user/addresses': typeof ApiUserAddressesRoute
   '/api/user/orders': typeof ApiUserOrdersRoute
   '/api/user/profile': typeof ApiUserProfileRoute
   '/api/public/razorpay/webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -688,6 +697,7 @@ export interface FileRouteTypes {
     | '/api/payments/razorpay-key'
     | '/api/payments/verify'
     | '/api/public/webhook-update'
+    | '/api/user/addresses'
     | '/api/user/orders'
     | '/api/user/profile'
     | '/api/public/razorpay/webhook'
@@ -756,6 +766,7 @@ export interface FileRouteTypes {
     | '/api/payments/razorpay-key'
     | '/api/payments/verify'
     | '/api/public/webhook-update'
+    | '/api/user/addresses'
     | '/api/user/orders'
     | '/api/user/profile'
     | '/api/public/razorpay/webhook'
@@ -825,6 +836,7 @@ export interface FileRouteTypes {
     | '/api/payments/razorpay-key'
     | '/api/payments/verify'
     | '/api/public/webhook-update'
+    | '/api/user/addresses'
     | '/api/user/orders'
     | '/api/user/profile'
     | '/api/public/razorpay/webhook'
@@ -885,6 +897,7 @@ export interface RootRouteChildren {
   ApiPaymentsRazorpayKeyRoute: typeof ApiPaymentsRazorpayKeyRoute
   ApiPaymentsVerifyRoute: typeof ApiPaymentsVerifyRoute
   ApiPublicWebhookUpdateRoute: typeof ApiPublicWebhookUpdateRoute
+  ApiUserAddressesRoute: typeof ApiUserAddressesRoute
   ApiUserOrdersRoute: typeof ApiUserOrdersRoute
   ApiUserProfileRoute: typeof ApiUserProfileRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
@@ -1172,6 +1185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUserOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/user/addresses': {
+      id: '/api/user/addresses'
+      path: '/api/user/addresses'
+      fullPath: '/api/user/addresses'
+      preLoaderRoute: typeof ApiUserAddressesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhook-update': {
       id: '/api/public/webhook-update'
       path: '/api/public/webhook-update'
@@ -1447,6 +1467,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPaymentsRazorpayKeyRoute: ApiPaymentsRazorpayKeyRoute,
   ApiPaymentsVerifyRoute: ApiPaymentsVerifyRoute,
   ApiPublicWebhookUpdateRoute: ApiPublicWebhookUpdateRoute,
+  ApiUserAddressesRoute: ApiUserAddressesRoute,
   ApiUserOrdersRoute: ApiUserOrdersRoute,
   ApiUserProfileRoute: ApiUserProfileRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
