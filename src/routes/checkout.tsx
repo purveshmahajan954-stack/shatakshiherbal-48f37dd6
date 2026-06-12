@@ -59,6 +59,7 @@ function CheckoutPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [selectedAddrId, setSelectedAddrId] = useState<string | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -85,10 +86,20 @@ function CheckoutPage() {
         const digits = user.phone.replace(/\D/g, "");
         setPhone(digits.length === 12 && digits.startsWith("91") ? digits.slice(2) : digits.slice(-10));
       }
-      // Auto-select default saved address
-      const saved = user.savedAddresses ?? [];
-      const def = saved.find(a => a.isDefault) ?? saved[0];
-      if (def) applyAddress(def);
+      // Fetch fresh saved addresses directly from API
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        fetch("/api/user/addresses", { headers: { Authorization: `Bearer ${token}` } })
+          .then(r => r.json())
+          .then(data => {
+            const addrs: SavedAddress[] = data.addresses ?? [];
+            setSavedAddresses(addrs);
+            // Auto-fill default address
+            const def = addrs.find(a => a.isDefault) ?? addrs[0];
+            if (def) applyAddress(def);
+          })
+          .catch(() => {});
+      }
     }
   }, [user]);
 
@@ -150,7 +161,6 @@ function CheckoutPage() {
   if (!user) return <LoginScreen title="Sign in to checkout" subtitle="Your cart is saved — sign in to complete your order securely" />;
 
   const totals = computeTotals(total);
-  const savedAddresses: SavedAddress[] = user.savedAddresses ?? [];
 
   const buildFullAddress = () => {
     const parts = [flatHouse.trim(), areaStreet.trim(), landmark.trim(), district.trim(), city.trim(), state.trim(), pincode].filter(Boolean);
