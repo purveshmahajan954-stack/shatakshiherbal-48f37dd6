@@ -39,7 +39,7 @@ function saveCachedAdmin(admin: AdminUser | null) {
 }
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const [admin, setAdmin] = useState<AdminUser | null>(readCachedAdmin);
+  const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchMe = async (background = false) => {
