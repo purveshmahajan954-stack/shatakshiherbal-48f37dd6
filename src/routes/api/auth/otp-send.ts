@@ -33,6 +33,32 @@ function normalizePhone(raw: string): string | null {
   return null;
 }
 
+class TwilioError extends Error {
+  code: number;
+  constructor(message: string, code: number) {
+    super(message);
+    this.code = code;
+  }
+}
+
+function friendlyTwilioError(code: number): string {
+  switch (code) {
+    case 21608:
+      return "This phone number hasn't been verified with our SMS provider yet. Please sign up using Google, or contact support to get your number added.";
+    case 21211:
+      return "Invalid phone number. Please check the number and try again.";
+    case 21614:
+      return "This number cannot receive SMS. Please use a different number or sign up with Google.";
+    case 21610:
+      return "This number has opted out of SMS. Please sign up with Google instead.";
+    case 30003:
+    case 30005:
+      return "Your number is unreachable right now. Please try again later or sign up with Google.";
+    default:
+      return "Failed to send OTP. Please try again or sign up using Google.";
+  }
+}
+
 async function sendViaTwilio(phone: string, otp: string) {
   const sid = process.env.TWILIO_ACCOUNT_SID;
   const token = process.env.TWILIO_AUTH_TOKEN;
@@ -61,8 +87,11 @@ async function sendViaTwilio(phone: string, otp: string) {
   );
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Twilio API error ${res.status}: ${text}`);
+    let data: any;
+    try { data = await res.json(); } catch { data = {}; }
+    const code = data?.code ?? 0;
+    console.error("[otp-send] Twilio error code:", code, data?.message);
+    throw new TwilioError(friendlyTwilioError(code), code);
   }
 }
 
