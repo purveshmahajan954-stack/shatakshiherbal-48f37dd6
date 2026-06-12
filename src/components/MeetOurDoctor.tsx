@@ -16,25 +16,25 @@ export function MeetOurDoctor() {
           </p>
         </div>
 
-        <div className="bg-dark-hero rounded-3xl overflow-hidden shadow-soft lg:grid lg:grid-cols-5 max-w-5xl mx-auto">
-          <div className="lg:col-span-2 flex flex-col items-center justify-center py-12 px-8 border-b border-white/10 lg:border-b-0 lg:border-r">
+        <div className="bg-white rounded-3xl overflow-hidden shadow-soft lg:grid lg:grid-cols-5 max-w-5xl mx-auto">
+          <div className="lg:col-span-2 flex flex-col items-center justify-center py-12 px-8 border-b border-border lg:border-b-0 lg:border-r bg-accent/30">
             <div className="relative">
-              <div className="w-40 h-40 rounded-full overflow-hidden ring-4 ring-primary/40 shadow-lg bg-primary/10 flex items-center justify-center">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-cream/20" fill="currentColor">
+              <div className="w-40 h-40 rounded-full overflow-hidden ring-4 ring-primary/20 shadow-lg bg-primary/10 flex items-center justify-center">
+                <svg viewBox="0 0 100 100" className="w-full h-full text-primary/20" fill="currentColor">
                   <circle cx="50" cy="38" r="22" />
                   <ellipse cx="50" cy="85" rx="34" ry="24" />
                 </svg>
               </div>
-              <div className="absolute -bottom-2 -right-2 bg-white rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-md">
+              <div className="absolute -bottom-2 -right-2 bg-white rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-md border border-border">
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                 <span className="font-bold text-sm text-foreground">4.7</span>
                 <span className="text-xs text-muted-foreground">(88)</span>
               </div>
             </div>
 
-            <h3 className="mt-6 font-display text-2xl text-cream text-center">Dr. Suneel Katiya</h3>
-            <p className="text-primary-light text-sm font-medium mt-1 text-center">B.A.M.S, M.D.</p>
-            <p className="text-cream/60 text-xs mt-1 text-center">Diabetes Center · Ayurvedic Medicine</p>
+            <h3 className="mt-6 font-display text-2xl text-foreground text-center">Dr. Suneel Katiya</h3>
+            <p className="text-primary text-sm font-medium mt-1 text-center">B.A.M.S, M.D.</p>
+            <p className="text-muted-foreground text-xs mt-1 text-center">Diabetes Center · Ayurvedic Medicine</p>
 
             <div className="mt-8 flex flex-col gap-3 w-full">
               <a
@@ -47,31 +47,31 @@ export function MeetOurDoctor() {
                 href="https://maps.google.com/?q=By-pass+Road+near+Chitragupt+School+Gadarwara+Madhya+Pradesh"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 border border-cream/25 hover:bg-white/5 text-cream rounded-xl px-5 py-3 text-sm font-medium transition w-full"
+                className="flex items-center justify-center gap-2 border border-border hover:bg-accent/50 text-foreground rounded-xl px-5 py-3 text-sm font-medium transition w-full"
               >
-                <MapPin className="w-4 h-4 text-primary-light" /> Get Directions
+                <MapPin className="w-4 h-4 text-primary" /> Get Directions
               </a>
             </div>
           </div>
 
           <div className="lg:col-span-3 py-12 px-8 lg:px-10 flex flex-col justify-between gap-8">
             <div>
-              <h4 className="font-display text-xl text-cream mb-3">About the Doctor</h4>
-              <p className="text-cream/70 text-sm leading-relaxed">
+              <h4 className="font-display text-xl text-foreground mb-3">About the Doctor</h4>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Dr. Suneel Katiya is a certified Ayurvedic physician with over 15 years of clinical experience specialising in diabetes management and metabolic disorders through natural remedies. He has been instrumental in formulating Shatakshi Herbal's product range, ensuring each preparation adheres to classical Ayurvedic principles while meeting modern therapeutic standards.
               </p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 relative">
-              <Quote className="w-8 h-8 text-primary/40 absolute -top-3 -left-1" />
-              <p className="font-display text-lg italic text-cream/90 leading-relaxed">
+            <div className="bg-accent/40 border border-border rounded-2xl p-6 relative">
+              <Quote className="w-8 h-8 text-primary/30 absolute -top-3 -left-1" />
+              <p className="font-display text-lg italic text-foreground leading-relaxed">
                 "Ayurveda is not just medicine — it is a way of living in harmony with nature. True healing begins when we treat the root cause, not merely the symptom."
               </p>
-              <p className="mt-3 text-primary-light text-xs font-semibold">— Dr. Suneel Katiya</p>
+              <p className="mt-3 text-primary text-xs font-semibold">— Dr. Suneel Katiya</p>
             </div>
 
-            <div className="flex items-start gap-3 text-cream/60 text-xs leading-relaxed">
-              <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary-light" />
+            <div className="flex items-start gap-3 text-muted-foreground text-xs leading-relaxed">
+              <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
               <span>By-pass Road, near Chitragupt School, Shivaji Ward, Gadarwara, Madhya Pradesh 487551</span>
             </div>
           </div>
