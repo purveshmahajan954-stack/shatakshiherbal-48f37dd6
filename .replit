@@ -43,21 +43,17 @@ waitForPort = 5000
 name = "Shipping Panel"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node shipping/server.js"
-waitForPort = 3001
-
 [workflows.workflow.metadata]
 outputType = "console"
 
-[[ports]]
-localPort = 3001
-externalPort = 4200
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd shipping && node server.js"
+waitForPort = 3001
 
 [[ports]]
-localPort = 5000
-externalPort = 80
+localPort = 3001
+externalPort = 3001
 
 [[ports]]
 localPort = 5002
