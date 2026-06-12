@@ -61,6 +61,25 @@ function CheckoutPage() {
     if (user) {
       setEmail(user.email ?? "");
       setName(user.fullName ?? "");
+
+      if (user.phone) {
+        const digits = user.phone.replace(/\D/g, "");
+        setPhone(digits.length === 12 && digits.startsWith("91") ? digits.slice(2) : digits.slice(-10));
+      }
+
+      if (user.address) {
+        const pinMatch = user.address.match(/\b(\d{6})\b/);
+        if (pinMatch) {
+          const pin = pinMatch[1];
+          const pinStart = user.address.indexOf(pin);
+          const street = user.address.slice(0, pinStart).replace(/,\s*$/, "").trim();
+          setStreetAddress(street);
+          setPincode(pin);
+          fetchPincodeData(pin);
+        } else {
+          setStreetAddress(user.address);
+        }
+      }
     }
   }, [user]);
 
