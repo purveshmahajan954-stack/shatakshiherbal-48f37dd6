@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { products as staticProducts, getProductBySlug, type Product } from "./products";
 import productPlaceholder from "@/assets/product-1.webp";
 
@@ -57,15 +57,37 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
   };
 }
 
+const CACHE_TTL = 5 * 60 * 1000;
+let _cache: { data: Product[]; at: number } | null = null;
+let _inflight: Promise<Product[]> | null = null;
+
 export async function fetchProductsFromDb(): Promise<Product[]> {
-  const res = await fetch("/api/products");
-  if (!res.ok) throw new Error("Failed to fetch products");
-  const data = await res.json();
-  return (data.products as DbProduct[]).map((d) => mergeProduct(d, getProductBySlug(d.slug)));
+  if (_cache && Date.now() - _cache.at < CACHE_TTL) return _cache.data;
+  if (_inflight) return _inflight;
+
+  _inflight = fetch("/api/products", {
+    headers: { Accept: "application/json" },
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error("Failed to fetch products");
+      const data = await res.json();
+      const list = (data.products as DbProduct[]).map((d) =>
+        mergeProduct(d, getProductBySlug(d.slug))
+      );
+      _cache = { data: list, at: Date.now() };
+      return list;
+    })
+    .finally(() => { _inflight = null; });
+
+  return _inflight;
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
   try {
+    if (_cache) {
+      const hit = _cache.data.find((p) => p.slug === slug);
+      if (hit) return hit;
+    }
     const res = await fetch(`/api/products?slug=${encodeURIComponent(slug)}`);
     if (!res.ok) return getProductBySlug(slug) ?? null;
     const data = await res.json();
@@ -78,25 +100,34 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
 
 export function useProducts() {
   const [items, setItems] = useState<Product[]>(staticProducts);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const mounted = useRef(true);
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (showSpinner = false) => {
+    if (showSpinner) setLoading(true);
     setError(null);
     try {
       const list = await fetchProductsFromDb();
+      if (!mounted.current) return;
       setItems(list.length > 0 ? list : staticProducts);
     } catch {
+      if (!mounted.current) return;
       setItems(staticProducts);
     } finally {
-      setLoading(false);
+      if (mounted.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    load();
+    mounted.current = true;
+    if (_cache && Date.now() - _cache.at < CACHE_TTL) {
+      setItems(_cache.data.length > 0 ? _cache.data : staticProducts);
+    } else {
+      load(false);
+    }
+    return () => { mounted.current = false; };
   }, [load]);
 
-  return { items, loading, error, retry: load };
+  return { items, loading, error, retry: () => load(true) };
 }

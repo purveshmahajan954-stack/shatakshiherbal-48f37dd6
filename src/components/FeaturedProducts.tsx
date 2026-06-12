@@ -1,4 +1,4 @@
-import { ArrowRight, Plus, Star, Zap, X, Heart, Loader2, Search, RefreshCw } from "lucide-react";
+import { ArrowRight, Plus, Star, Zap, X, Heart, Search, RefreshCw } from "lucide-react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -113,9 +113,23 @@ export function FeaturedProducts() {
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-muted-foreground flex flex-col items-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <p className="text-sm">Loading products…</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-card animate-pulse">
+                <div className="aspect-square bg-accent/40" />
+                <div className="p-5 space-y-3">
+                  <div className="h-3 w-1/3 bg-accent/60 rounded" />
+                  <div className="h-5 w-2/3 bg-accent/60 rounded" />
+                  <div className="h-3 w-full bg-accent/40 rounded" />
+                  <div className="h-3 w-4/5 bg-accent/40 rounded" />
+                  <div className="pt-3 flex items-center justify-between">
+                    <div className="h-7 w-16 bg-accent/60 rounded" />
+                    <div className="h-10 w-10 rounded-full bg-accent/60" />
+                  </div>
+                  <div className="h-10 w-full bg-accent/40 rounded-md" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : error ? (
           <div className="text-center py-20 flex flex-col items-center gap-4">
