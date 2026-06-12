@@ -10,6 +10,8 @@ import { computeTotals } from "@/lib/payments.functions";
 import { Loader2, ShieldCheck, MapPin, Wallet, Search } from "lucide-react";
 import { AbandonmentPopup } from "@/components/AbandonmentPopup";
 
+const INDIAN_STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry"];
+
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
@@ -48,7 +50,9 @@ function CheckoutPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [streetAddress, setStreetAddress] = useState("");
+  const [flatHouse, setFlatHouse] = useState("");
+  const [areaStreet, setAreaStreet] = useState("");
+  const [landmark, setLandmark] = useState("");
   const [pincode, setPincode] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
@@ -87,11 +91,13 @@ function CheckoutPage() {
           const pin = pinMatch[1];
           const pinStart = user.address.indexOf(pin);
           const street = user.address.slice(0, pinStart).replace(/,\s*$/, "").trim();
-          setStreetAddress(street);
+          const parts = street.split(",").map(s => s.trim());
+          setFlatHouse(parts[0] || "");
+          setAreaStreet(parts.slice(1).join(", ") || "");
           setPincode(pin);
           fetchPincodeData(pin);
         } else {
-          setStreetAddress(user.address);
+          setFlatHouse(user.address);
         }
       }
     }
@@ -144,7 +150,7 @@ function CheckoutPage() {
   const totals = computeTotals(total);
 
   const buildFullAddress = () => {
-    const parts = [streetAddress.trim(), district || "", city.trim(), state.trim(), pincode].filter(Boolean);
+    const parts = [flatHouse.trim(), areaStreet.trim(), landmark.trim(), district || "", city.trim(), state.trim(), pincode].filter(Boolean);
     return parts.join(", ");
   };
 
@@ -153,7 +159,7 @@ function CheckoutPage() {
     if (name.trim().length < 2) return toast.error("Please enter your name");
     if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Please enter a valid email");
     if (phone.replace(/\D/g, "").length < 10) return toast.error("Please enter a valid phone number");
-    if (streetAddress.trim().length < 5) return toast.error("Please enter your street address");
+    if (flatHouse.trim().length < 3) return toast.error("Please enter your flat/house address");
     if (pincode.length !== 6) return toast.error("Please enter a valid 6-digit pincode");
     if (!city.trim()) return toast.error("Please enter your city");
     if (!state.trim()) return toast.error("Please enter your state");
@@ -256,33 +262,67 @@ function CheckoutPage() {
               <h2 className="flex items-center gap-2 font-display text-xl mb-4">
                 <MapPin className="w-5 h-5 text-primary" /> Shipping Address
               </h2>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-2 gap-3 mb-4">
                 <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone (10 digits)" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                 <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" type="email" className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                <textarea value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="House no., street, landmark" rows={2} className="sm:col-span-2 border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+              </div>
 
-                <div className="relative">
-                  <input
-                    value={pincode}
-                    onChange={(e) => handlePincodeChange(e.target.value)}
-                    placeholder="6-digit Pincode"
-                    inputMode="numeric"
-                    maxLength={6}
-                    className={`w-full border rounded-md px-4 py-2.5 text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-primary ${pincodeError ? "border-red-400" : "border-border"}`}
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {pincodeLoading ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Search className="w-4 h-4 text-muted-foreground" />}
-                  </div>
-                  {pincodeError && <p className="text-xs text-red-500 mt-1">{pincodeError}</p>}
+              <div className="bg-green-50 border border-green-100 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-primary uppercase mb-1">
+                  <MapPin className="w-3.5 h-3.5" /> Delivery Address
                 </div>
 
-                <input value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="District" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City / Division" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                <input value={state} onChange={(e) => setState(e.target.value)} placeholder="State" className="border border-border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Flat, House no., Building, Apartment</label>
+                  <input value={flatHouse} onChange={(e) => setFlatHouse(e.target.value)} placeholder="e.g. 12B, Shanti Niwas" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Area, Street, Sector, Village</label>
+                  <input value={areaStreet} onChange={(e) => setAreaStreet(e.target.value)} placeholder="e.g. Shivaji Ward, MG Road" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Landmark <span className="text-muted-foreground/60">(optional)</span></label>
+                  <input value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="e.g. Near Apollo Hospital" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Pincode</label>
+                    <div className="relative">
+                      <input
+                        value={pincode}
+                        onChange={(e) => handlePincodeChange(e.target.value)}
+                        placeholder="6 digit PIN"
+                        inputMode="numeric"
+                        maxLength={6}
+                        className={`w-full border bg-white rounded-md px-4 py-2.5 text-sm pr-9 focus:outline-none focus:ring-2 focus:ring-primary ${pincodeError ? "border-red-400" : "border-border"}`}
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {pincodeLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" /> : <Search className="w-3.5 h-3.5 text-muted-foreground" />}
+                      </div>
+                    </div>
+                    {pincodeError && <p className="text-xs text-red-500">{pincodeError}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Town / City</label>
+                    <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Gadarwara" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">State</label>
+                  <select value={state} onChange={(e) => setState(e.target.value)} className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">Choose a state</option>
+                    {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
               </div>
               {pincode.length === 6 && city && state && !pincodeLoading && (
-                <p className="text-xs text-primary mt-3 font-medium">📍 Auto-detected: {city}, {state}</p>
+                <p className="text-xs text-primary mt-2 font-medium">📍 Auto-detected: {city}, {state}</p>
               )}
             </section>
 
