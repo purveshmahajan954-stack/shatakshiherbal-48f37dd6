@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AyurvedicWisdom } from "@/components/AyurvedicWisdom";
 import { Testimonials } from "@/components/Testimonials";
+import { Blogs } from "@/components/Blogs";
 
 export const Route = createFileRoute("/about")({
   component: AboutPage,
@@ -20,6 +21,7 @@ function AboutPage() {
       <Header />
       <main>
         <AyurvedicWisdom />
+        <Blogs />
         <Testimonials />
       </main>
       <Footer />
