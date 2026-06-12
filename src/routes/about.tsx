@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { AyurvedicWisdom } from "@/components/AyurvedicWisdom";
 import { MeetOurDoctor } from "@/components/MeetOurDoctor";
 import { Testimonials } from "@/components/Testimonials";
 import { Blogs } from "@/components/Blogs";
@@ -21,7 +20,6 @@ function AboutPage() {
     <div className="min-h-screen bg-cream">
       <Header />
       <main>
-        <AyurvedicWisdom />
         <MeetOurDoctor />
         <Blogs />
         <Testimonials />
