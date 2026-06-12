@@ -145,20 +145,30 @@ function ProductForm({ initial, onCancel, onSave }: { initial: Product | null; o
   const submit = async (e: React.FormEvent) => { e.preventDefault(); setSaving(true); await onSave(form); setSaving(false); };
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((p) => ({ ...p, [k]: v }));
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { toast.error("Image must be under 2 MB"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5 MB"); return; }
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setImagePreview(dataUrl);
-      set("image_url", dataUrl);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const token = localStorage.getItem("admin_token");
+      const res = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error || "Upload failed"); return; }
+      setImagePreview(data.url);
+      set("image_url", data.url);
+      toast.success("Image uploaded");
+    } catch {
+      toast.error("Upload failed");
+    } finally {
       setUploading(false);
-    };
-    reader.onerror = () => { toast.error("Failed to read image"); setUploading(false); };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleUrlChange = (url: string) => {

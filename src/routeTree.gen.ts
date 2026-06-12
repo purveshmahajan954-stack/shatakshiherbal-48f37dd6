@@ -63,6 +63,7 @@ import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google-callback'
 import { Route as ApiAuthGoogleRouteImport } from './routes/api/auth/google'
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
+import { Route as ApiAdminUploadImageRouteImport } from './routes/api/admin/upload-image'
 import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
 import { Route as ApiAdminSigninRouteImport } from './routes/api/admin/signin'
 import { Route as ApiAdminShipmentsRouteImport } from './routes/api/admin/shipments'
@@ -346,6 +347,11 @@ const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
   path: '/api/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminUploadImageRoute = ApiAdminUploadImageRouteImport.update({
+  id: '/api/admin/upload-image',
+  path: '/api/admin/upload-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminSignoutRoute = ApiAdminSignoutRouteImport.update({
   id: '/api/admin/signout',
   path: '/api/admin/signout',
@@ -458,6 +464,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
+  '/api/admin/upload-image': typeof ApiAdminUploadImageRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
@@ -525,6 +532,7 @@ export interface FileRoutesByTo {
   '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
+  '/api/admin/upload-image': typeof ApiAdminUploadImageRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
@@ -594,6 +602,7 @@ export interface FileRoutesById {
   '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
+  '/api/admin/upload-image': typeof ApiAdminUploadImageRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
@@ -664,6 +673,7 @@ export interface FileRouteTypes {
     | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
+    | '/api/admin/upload-image'
     | '/api/admin/users'
     | '/api/auth/google'
     | '/api/auth/google-callback'
@@ -731,6 +741,7 @@ export interface FileRouteTypes {
     | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
+    | '/api/admin/upload-image'
     | '/api/admin/users'
     | '/api/auth/google'
     | '/api/auth/google-callback'
@@ -799,6 +810,7 @@ export interface FileRouteTypes {
     | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
+    | '/api/admin/upload-image'
     | '/api/admin/users'
     | '/api/auth/google'
     | '/api/auth/google-callback'
@@ -858,6 +870,7 @@ export interface RootRouteChildren {
   ApiAdminShipmentsRoute: typeof ApiAdminShipmentsRoute
   ApiAdminSigninRoute: typeof ApiAdminSigninRoute
   ApiAdminSignoutRoute: typeof ApiAdminSignoutRoute
+  ApiAdminUploadImageRoute: typeof ApiAdminUploadImageRoute
   ApiAdminUsersRoute: typeof ApiAdminUsersRoute
   ApiAuthGoogleRoute: typeof ApiAuthGoogleRoute
   ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
@@ -1257,6 +1270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/upload-image': {
+      id: '/api/admin/upload-image'
+      path: '/api/admin/upload-image'
+      fullPath: '/api/admin/upload-image'
+      preLoaderRoute: typeof ApiAdminUploadImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/signout': {
       id: '/api/admin/signout'
       path: '/api/admin/signout'
@@ -1412,6 +1432,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminShipmentsRoute: ApiAdminShipmentsRoute,
   ApiAdminSigninRoute: ApiAdminSigninRoute,
   ApiAdminSignoutRoute: ApiAdminSignoutRoute,
+  ApiAdminUploadImageRoute: ApiAdminUploadImageRoute,
   ApiAdminUsersRoute: ApiAdminUsersRoute,
   ApiAuthGoogleRoute: ApiAuthGoogleRoute,
   ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
