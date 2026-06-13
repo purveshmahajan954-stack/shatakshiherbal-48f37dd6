@@ -154,6 +154,7 @@ export const orders = pgTable(
     shippingCost: numeric("shipping_cost"),
     labelUrl: text("label_url"),
     shipmentStatus: text("shipment_status").notNull().default("Not Created"),
+    shipmentFailedReason: text("shipment_failed_reason"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => [

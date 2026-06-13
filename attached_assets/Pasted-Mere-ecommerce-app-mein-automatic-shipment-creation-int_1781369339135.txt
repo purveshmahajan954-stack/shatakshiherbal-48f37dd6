@@ -1,0 +1,49 @@
+Mere ecommerce app mein automatic shipment creation integrate karo CKship API ke saath.
+
+STEP 1 — Secret add karo:
+Replit Secrets mein ek nayi secret add karo:
+Key: CKSHIP_TOKEN
+Value: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3d3dy5ja3NoaXAuaW4vYXBpL2xvZ2luIiwiaWF0IjoxNzgwNjM4MjMyLCJleHAiOjE3ODMyMzAyMzIsIm5iZiI6MTc4MDYzODIzMiwianRpIjoiY1k5azVaQThkdW9tTG5YeiIsInN1YiI6IjE1OSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.UCqnhLAooo2Sm_tNeqOuoSqMFUFQt9D4d61qnBiC0QI
+
+STEP 2 — Automation logic:
+Jab bhi customer ka order successfully PAID/CONFIRMED hota hai (payment success ke baad), automatically ek function call karo jo CKship API se shipment create karega.
+
+API Details:
+- Method: POST
+- Endpoint: https://www.ckship.in/api/shipment/add-update
+- Headers:
+    Authorization: Bearer ${process.env.CKSHIP_TOKEN}
+    Content-Type: application/json
+
+Request Body (order ke data se dynamically banao):
+{
+  "address_id": 195,
+  "receiver_name": "<order.customerName>",
+  "receiver_number": "<order.phone>",
+  "receiver_address": "<order.address>",
+  "receiver_pin": "<order.pincode>",
+  "receiver_city": "<order.city>",
+  "receiver_state_id": "<order.state>",
+  "shipment_weight": <order.weight>,
+  "shipment_length": <order.length>,
+  "shipment_width": <order.width>,
+  "shipment_height": <order.height>,
+  "parcel_content_description": "<order.productDescription>",
+  "parcel_type": 1,
+  "qty": <order.quantity>,
+  "invoice_amount": <order.totalAmount>,
+  "order_id": "<order.id>"
+}
+
+address_id hamesha 195 fixed rakhna hai (warehouse address).
+
+STEP 3 — Response Handling:
+- Agar response mein "status": true aaye:
+   - Response se "shipment" (shipment ID) aur "awb" (tracking number) nikal kar order ke database record mein save karo, columns: ckship_shipment_id aur awb_number
+   - Customer ko order page/email mein AWB/tracking number dikhao
+- Agar "status": false aaye:
+   - "message" field ko error log mein save karo
+   - Admin panel mein order ko "Shipment Failed - Retry Needed" flag ke saath mark karo
+
+STEP 4:
+Ye pura function payment-success webhook/handler ke andar call karo, taaki order paid hote hi shipment automatically create ho jaye, manual intervention ki zarurat na pade.

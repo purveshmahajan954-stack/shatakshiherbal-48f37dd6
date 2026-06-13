@@ -1,8 +1,8 @@
 const CKSHIP_BASE = "https://www.ckship.in";
 
 function token(): string {
-  const t = process.env.CKSHIP_AUTH_TOKEN;
-  if (!t) throw new Error("CKSHIP_AUTH_TOKEN not configured");
+  const t = process.env.CKSHIP_TOKEN ?? process.env.CKSHIP_AUTH_TOKEN;
+  if (!t) throw new Error("CKSHIP_TOKEN not configured");
   return t;
 }
 
@@ -52,15 +52,6 @@ export type CKShipTrackResult = {
   raw: unknown;
 };
 
-function todayDate() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function generateOrderNumber(orderId: string) {
-  const suffix = orderId.replace(/-/g, "").slice(0, 8).toUpperCase();
-  return `SH-${suffix}`;
-}
-
 export async function createCKShipShipment(order: {
   id: string;
   shippingName: string | null;
@@ -71,10 +62,10 @@ export async function createCKShipShipment(order: {
   paymentMethod?: string | null;
 }): Promise<CKShipShipmentResult> {
   return withRetry(async () => {
-    const orderNumber = generateOrderNumber(order.id);
     const productDesc = (order.items ?? []).map((i) => `${i.name} x${i.qty}`).join(", ").slice(0, 200) || "Herbal Products";
     const totalQty = (order.items ?? []).reduce((s, i) => s + i.qty, 0) || 1;
 
+    // Parse address parts
     const address = order.shippingAddress ?? "";
     const parts = address.split(",").map((p) => p.trim());
     const pinMatch = address.match(/\b(\d{6})\b/);
@@ -83,25 +74,31 @@ export async function createCKShipShipment(order: {
     const state = parts.length >= 1 ? parts[parts.length - 1].replace(/\s*\d{6}\s*/, "").trim() : "Maharashtra";
     const streetAddress = parts.slice(0, Math.max(1, parts.length - 2)).join(", ") || address;
 
+    // Weight: ~0.3 kg per item, min 0.1 kg
+    const weight = Math.max(0.1, totalQty * 0.3);
+
     const payload = {
-      order_number: orderNumber,
-      order_date: todayDate(),
-      payment_mode: order.paymentMethod === "cod" ? "cod" : "prepaid",
-      order_amount: Number(order.total),
-      consignee_name: order.shippingName ?? "Customer",
-      consignee_phone: order.shippingPhone ?? "",
-      consignee_address: streetAddress,
-      consignee_city: city,
-      consignee_state: state,
-      consignee_pincode: pincode,
-      product_desc: productDesc,
-      product_quantity: totalQty,
-      product_weight: Math.max(0.1, totalQty * 0.2),
+      address_id: 195,
+      receiver_name: order.shippingName ?? "Customer",
+      receiver_number: order.shippingPhone ?? "",
+      receiver_address: streetAddress,
+      receiver_pin: pincode,
+      receiver_city: city,
+      receiver_state_id: state,
+      shipment_weight: weight,
+      shipment_length: 15,
+      shipment_width: 10,
+      shipment_height: 10,
+      parcel_content_description: productDesc,
+      parcel_type: 1,
+      qty: totalQty,
+      invoice_amount: Number(order.total),
+      order_id: order.id,
     };
 
     console.log("[CKShip] createShipment payload:", JSON.stringify(payload));
 
-    const res = await fetch(`${CKSHIP_BASE}/api/shipment/create`, {
+    const res = await fetch(`${CKSHIP_BASE}/api/shipment/add-update`, {
       method: "POST",
       headers: ckHeaders(),
       body: JSON.stringify(payload),
@@ -113,18 +110,30 @@ export async function createCKShipShipment(order: {
     let data: any;
     try { data = JSON.parse(bodyText); } catch { throw new Error(`CKShip: Invalid response (${res.status}): ${bodyText.slice(0, 200)}`); }
 
-    if (!res.ok) {
+    // API returns { "status": true/false, "message": "...", "shipment": "...", "awb": "..." }
+    if (data?.status === false) {
+      throw new Error(data?.message || `CKShip error ${res.status}`);
+    }
+
+    if (!res.ok && data?.status !== true) {
       throw new Error(data?.message || data?.error || data?.msg || `CKShip error ${res.status}`);
     }
 
-    const d = data?.data ?? data ?? {};
-    const awbNumber = d.awb_number ?? d.awb ?? d.tracking_number ?? d.trackingNumber ?? null;
-    const shipmentId = d.shipment_id ?? d.id ?? d.ckship_id ?? null;
-    const courierName = d.courier_name ?? d.courier ?? d.service_name ?? null;
-    const shippingCost = d.shipping_cost ?? d.rate ?? d.charges ?? null;
-    const labelUrl = d.label_url ?? d.label ?? d.pdf_url ?? null;
+    const awbNumber = data?.awb ?? data?.awb_number ?? data?.data?.awb ?? null;
+    const shipmentId = String(data?.shipment ?? data?.shipment_id ?? data?.data?.shipment_id ?? "");
+    const courierName = data?.courier_name ?? data?.courier ?? data?.data?.courier_name ?? null;
+    const shippingCost = data?.shipping_cost ?? data?.rate ?? data?.data?.shipping_cost ?? null;
+    const labelUrl = data?.label_url ?? data?.label ?? data?.data?.label_url ?? null;
 
-    return { shipmentId, orderNumber, awbNumber, courierName, shippingCost: shippingCost ? Number(shippingCost) : null, labelUrl, raw: data };
+    return {
+      shipmentId: shipmentId || null,
+      orderNumber: order.id,
+      awbNumber,
+      courierName,
+      shippingCost: shippingCost ? Number(shippingCost) : null,
+      labelUrl,
+      raw: data,
+    };
   }, "createShipment");
 }
 

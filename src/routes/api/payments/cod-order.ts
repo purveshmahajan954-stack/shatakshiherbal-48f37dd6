@@ -95,16 +95,43 @@ export const Route = createFileRoute("/api/payments/cod-order")({
           trackingEta: "3-5 days",
         }).returning({ id: orders.id });
 
-        // Auto-create CKShip shipment in background
-        createCKShipShipment({
-          orderId: orderRow.id,
-          shippingName: shipping.name,
-          shippingPhone: shipping.phone,
-          shippingAddress: shipping.address,
-          items: trustedItems,
-          total: totals.total,
-          paymentMethod: "cod",
-        }).catch((err) => console.error("[cod-order] CKShip error:", err));
+        // Auto-create CKShip shipment in background — saves result/error to DB
+        (async () => {
+          try {
+            const result = await createCKShipShipment({
+              id: orderRow.id,
+              shippingName: shipping.name,
+              shippingPhone: shipping.phone,
+              shippingAddress: shipping.address,
+              items: trustedItems,
+              total: totals.total,
+              paymentMethod: "cod",
+            });
+
+            await db.update(orders).set({
+              ckshipShipmentId: result.shipmentId,
+              ckshipOrderNumber: result.orderNumber,
+              awbNumber: result.awbNumber,
+              courierName: result.courierName,
+              shippingCost: result.shippingCost !== null ? String(result.shippingCost) : null,
+              labelUrl: result.labelUrl,
+              shipmentStatus: "Created",
+              shipmentFailedReason: null,
+              trackingStatus: "Packed",
+              trackingUpdatedAt: new Date(),
+            }).where(eq(orders.id, orderRow.id));
+
+            console.log(`[cod-order] CKShip shipment created for order ${orderRow.id}, AWB: ${result.awbNumber}`);
+          } catch (err) {
+            const reason = err instanceof Error ? err.message : String(err);
+            console.error(`[cod-order] Auto-CKShip failed for order ${orderRow.id}:`, reason);
+
+            await db.update(orders).set({
+              shipmentStatus: "Shipment Failed - Retry Needed",
+              shipmentFailedReason: reason.slice(0, 500),
+            }).where(eq(orders.id, orderRow.id));
+          }
+        })();
 
         // Notify admin of new COD order in background
         import("@server/notify").then(({ notifyPaymentSuccess }) => {

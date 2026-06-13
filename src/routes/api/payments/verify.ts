@@ -114,6 +114,7 @@ export const Route = createFileRoute("/api/payments/verify")({
                 shippingCost: result.shippingCost !== null ? String(result.shippingCost) : null,
                 labelUrl: result.labelUrl,
                 shipmentStatus: "Created",
+                shipmentFailedReason: null,
                 trackingStatus: "Packed",
                 trackingUpdatedAt: new Date(),
               })
@@ -129,7 +130,14 @@ export const Route = createFileRoute("/api/payments/verify")({
               ).catch(console.error);
             }
           } catch (err) {
-            console.error(`[verify] Auto-CKShip failed for order ${order.id}:`, err);
+            const reason = err instanceof Error ? err.message : String(err);
+            console.error(`[verify] Auto-CKShip failed for order ${order.id}:`, reason);
+            await db.update(orders)
+              .set({
+                shipmentStatus: "Shipment Failed - Retry Needed",
+                shipmentFailedReason: reason.slice(0, 500),
+              })
+              .where(eq(orders.id, order.id));
           }
         })();
 

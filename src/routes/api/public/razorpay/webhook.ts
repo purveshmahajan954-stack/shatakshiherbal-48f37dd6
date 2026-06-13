@@ -4,6 +4,7 @@ import { orders } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { hmacSha256, timingSafeEqual } from "@server/password";
 import { notifyPaymentSuccess, logPaymentEvent } from "@server/notify";
+import { createCKShipShipment } from "@server/ckship";
 
 export const Route = createFileRoute("/api/public/razorpay/webhook")({
   server: {
@@ -68,7 +69,7 @@ export const Route = createFileRoute("/api/public/razorpay/webhook")({
 
             console.log(`[Webhook] ✅ Order confirmed via ${event} for rzpOrderId=${rzpOrderId}`);
 
-            // Only notify if not already processed by verify.ts (avoid duplicate notifications)
+            // Only notify & create shipment if not already processed by verify.ts
             if (orderRow && orderRow.paymentStatus !== "paid") {
               console.log(`[Webhook] Firing notifications for order ${orderRow.id}`);
               notifyPaymentSuccess({
@@ -82,6 +83,39 @@ export const Route = createFileRoute("/api/public/razorpay/webhook")({
                 total: orderRow.total,
                 items: (orderRow.items ?? []) as Array<{ name: string; qty: number; price: number }>,
               }).catch((err) => console.error("[Webhook] notifyPaymentSuccess error:", err));
+
+              // Auto-create CKShip shipment (only if verify.ts hasn't already done it)
+              if (orderRow.shipmentStatus === "Not Created") {
+                createCKShipShipment({
+                  id: orderRow.id,
+                  shippingName: orderRow.shippingName,
+                  shippingPhone: orderRow.shippingPhone,
+                  shippingAddress: orderRow.shippingAddress,
+                  total: orderRow.total,
+                  items: (orderRow.items ?? []) as Array<{ name: string; qty: number; price: number }>,
+                }).then(async (result) => {
+                  await db.update(orders).set({
+                    ckshipShipmentId: result.shipmentId,
+                    ckshipOrderNumber: result.orderNumber,
+                    awbNumber: result.awbNumber,
+                    courierName: result.courierName,
+                    shippingCost: result.shippingCost !== null ? String(result.shippingCost) : null,
+                    labelUrl: result.labelUrl,
+                    shipmentStatus: "Created",
+                    shipmentFailedReason: null,
+                    trackingStatus: "Packed",
+                    trackingUpdatedAt: new Date(),
+                  }).where(eq(orders.id, orderRow.id));
+                  console.log(`[Webhook] CKShip shipment created for order ${orderRow.id}, AWB: ${result.awbNumber}`);
+                }).catch(async (err) => {
+                  const reason = err instanceof Error ? err.message : String(err);
+                  console.error(`[Webhook] Auto-CKShip failed for order ${orderRow.id}:`, reason);
+                  await db.update(orders).set({
+                    shipmentStatus: "Shipment Failed - Retry Needed",
+                    shipmentFailedReason: reason.slice(0, 500),
+                  }).where(eq(orders.id, orderRow.id));
+                });
+              }
             } else {
               console.log(`[Webhook] Order already paid — skipping duplicate notification`);
               await logPaymentEvent({
