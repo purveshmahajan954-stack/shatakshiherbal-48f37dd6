@@ -8,7 +8,7 @@ The app supports **both** Replit dev (TCP PostgreSQL) and Cloudflare Workers (Ne
 - **Development (Replit):** Uses `DATABASE_URL` (Replit internal PostgreSQL, `pg` + `drizzle-orm/node-postgres`)
 - **Production (Cloudflare Workers):** Uses `NEON_DATABASE_URL` (Neon external PostgreSQL, `@neondatabase/serverless` + `drizzle-orm/neon-http`)
 
-**Current state:** `server/db.ts` now uses the **Neon HTTP driver** (`@neondatabase/serverless`) with `NEON_DATABASE_URL`. This is required for Cloudflare Workers (V8 isolates have no TCP support).
+**Current state:** `server/db.ts` now prefers `NEON_DATABASE_URL` (Neon HTTP driver) when set, falling back to `DATABASE_URL` (local Replit pg). This means both the Replit dev server and Cloudflare Workers use the same Neon database — admin panel changes on dev reflect immediately on the live site.
 
 **Why:** The Neon HTTP driver works on both edge runtimes and Node.js. The Replit built-in PostgreSQL (`DATABASE_URL`) is only reachable from within Replit's network — not from Cloudflare.
 
