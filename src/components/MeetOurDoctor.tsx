@@ -19,11 +19,8 @@ export function MeetOurDoctor() {
         <div className="bg-white rounded-3xl overflow-hidden shadow-soft lg:grid lg:grid-cols-5 max-w-5xl mx-auto">
           <div className="lg:col-span-2 flex flex-col items-center justify-center py-12 px-8 border-b border-border lg:border-b-0 lg:border-r bg-accent/30">
             <div className="relative">
-              <div className="w-40 h-40 rounded-full overflow-hidden ring-4 ring-primary/20 shadow-lg bg-primary/10 flex items-center justify-center">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-primary/20" fill="currentColor">
-                  <circle cx="50" cy="38" r="22" />
-                  <ellipse cx="50" cy="85" rx="34" ry="24" />
-                </svg>
+              <div className="w-40 h-40 rounded-full overflow-hidden ring-4 ring-primary/20 shadow-lg">
+                <img src="/testimonial-person.jpeg" alt="Dr. Suneel Katiya" className="w-full h-full object-cover object-top" />
               </div>
               <div className="absolute -bottom-2 -right-2 bg-white rounded-xl px-3 py-1.5 flex items-center gap-1 shadow-md border border-border">
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
