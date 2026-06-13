@@ -66,10 +66,16 @@ function EditRow({
   const [val, setVal] = useState(value);
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
-  useEffect(() => { if (!editing) setVal(value); }, [value, editing]);
+  useEffect(() => { if (!editing) { setVal(value); setFieldError(null); } }, [value, editing]);
 
   const save = async () => {
+    if (type === "password" && val.length < 6) {
+      setFieldError("Password must be at least 6 characters");
+      return;
+    }
+    setFieldError(null);
     setBusy(true);
     try { await onSave(val); setEditing(false); } finally { setBusy(false); }
   };
@@ -80,15 +86,16 @@ function EditRow({
       <div className="flex-1 min-w-0">
         <div className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">{label}</div>
         {editing ? (
+          <>
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative flex-1 min-w-0">
               <input
                 autoFocus
                 type={type === "password" && !show ? "password" : "text"}
                 value={val}
-                onChange={e => setVal(e.target.value)}
+                onChange={e => { setVal(e.target.value); if (fieldError) setFieldError(null); }}
                 placeholder={placeholder}
-                className="w-full border border-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary pr-8"
+                className={`w-full border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary pr-8 ${fieldError ? "border-red-400" : "border-border"}`}
               />
               {type === "password" && (
                 <button type="button" onClick={() => setShow(s => !s)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -101,6 +108,8 @@ function EditRow({
             </button>
             <button onClick={() => setEditing(false)} className="text-muted-foreground"><X className="w-4 h-4" /></button>
           </div>
+          {fieldError && <p className="text-[11px] text-red-500 mt-1">{fieldError}</p>}
+          </>
         ) : (
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-medium truncate">
