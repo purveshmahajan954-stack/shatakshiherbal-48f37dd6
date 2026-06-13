@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "@shared/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _warmedUp = false;
 
 function getDb() {
   if (_db) return _db;
@@ -12,6 +13,12 @@ function getDb() {
   }
   const sql = neon(connectionString);
   _db = drizzle(sql, { schema });
+
+  if (!_warmedUp) {
+    _warmedUp = true;
+    sql`SELECT 1`.catch(() => {});
+  }
+
   return _db;
 }
 

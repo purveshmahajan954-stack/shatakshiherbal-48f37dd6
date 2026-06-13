@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
 import { profiles, userRoles, userSessions } from "@shared/schema";
-import { eq, and, gt } from "drizzle-orm";
-import { verifyPassword, generateToken } from "@server/password";
+import { eq } from "drizzle-orm";
+import { verifyPassword, hashPassword, isLegacyHash, generateToken } from "@server/password";
 
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -42,17 +42,29 @@ export const Route = createFileRoute("/api/auth/signin")({
           if (!valid)
             return Response.json({ error: "Invalid email or password" }, { status: 401 });
 
-          const token = generateToken();
-          const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
-          await db.insert(userSessions).values({ token, profileId: profile.id, expiresAt });
+          if (isLegacyHash(storedHash)) {
+            const newHash = await hashPassword(password);
+            db.update(profiles)
+              .set({ passwordHash: newHash })
+              .where(eq(profiles.id, profile.id))
+              .catch(() => {});
+          }
 
-          const roleRows = await db
-            .select({ role: userRoles.role })
-            .from(userRoles)
-            .where(eq(userRoles.userId, profile.id));
+          const [sessionResult, roleRows] = await Promise.all([
+            db.insert(userSessions).values({
+              token: generateToken(),
+              profileId: profile.id,
+              expiresAt: new Date(Date.now() + SESSION_DURATION_MS),
+            }).returning({ token: userSessions.token }),
+            db.select({ role: userRoles.role })
+              .from(userRoles)
+              .where(eq(userRoles.userId, profile.id)),
+          ]);
+
+          const token = sessionResult[0]?.token ?? generateToken();
           const isAdmin = roleRows.some((r) => r.role === "admin");
-
           const cookieMaxAge = Math.floor(SESSION_DURATION_MS / 1000);
+
           return new Response(
             JSON.stringify({
               token,
