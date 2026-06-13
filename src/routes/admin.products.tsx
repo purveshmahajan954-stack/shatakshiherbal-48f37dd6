@@ -156,7 +156,7 @@ function ProductForm({ initial, onCancel, onSave }: { initial: Product | null; o
       const token = localStorage.getItem("admin_token");
       const res = await fetch("/api/admin/upload-image", {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: token ? { "X-Admin-Token": token } : {},
         body: fd,
       });
       const data = await res.json();
