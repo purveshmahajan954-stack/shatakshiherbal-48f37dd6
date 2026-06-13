@@ -5,7 +5,7 @@ import { eq, and, gt } from "drizzle-orm";
 import { z } from "zod";
 import { hmacSha256, timingSafeEqual } from "@server/password";
 import { createCKShipShipment } from "@server/ckship";
-import { sendSMS, smsOrderConfirmed, smsShipmentCreated } from "@server/notify";
+import { sendSMS, smsOrderConfirmed, smsShipmentCreated, notifyPaymentSuccess } from "@server/notify";
 
 async function requireUser(request: Request) {
   const auth = request.headers.get("authorization");
@@ -62,6 +62,7 @@ export const Route = createFileRoute("/api/payments/verify")({
           shippingName: orders.shippingName,
           shippingPhone: orders.shippingPhone,
           shippingAddress: orders.shippingAddress,
+          email: orders.email,
           total: orders.total,
           items: orders.items,
           trackingId: orders.trackingId,
@@ -73,6 +74,20 @@ export const Route = createFileRoute("/api/payments/verify")({
         (async () => {
           const name = order.shippingName ?? "Customer";
           const phone = order.shippingPhone;
+
+          // ── Notifications: email + Telegram + DB log ──
+          console.log(`[verify] Firing notifications for order ${order.id}`);
+          notifyPaymentSuccess({
+            id: order.id,
+            razorpayOrderId: razorpay_order_id,
+            razorpayPaymentId: razorpay_payment_id,
+            shippingName: order.shippingName,
+            shippingPhone: order.shippingPhone,
+            shippingAddress: order.shippingAddress,
+            email: null,
+            total: order.total,
+            items: (order.items ?? []) as Array<{ name: string; qty: number; price: number }>,
+          }).catch((err) => console.error("[verify] notifyPaymentSuccess error:", err));
 
           // Send order confirmed SMS
           if (phone) {

@@ -162,6 +162,35 @@ export const orders = pgTable(
   ],
 );
 
+export const paymentEvents = pgTable(
+  "payment_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id"),
+    razorpayOrderId: text("razorpay_order_id"),
+    razorpayPaymentId: text("razorpay_payment_id"),
+    event: text("event").notNull(),
+    amount: numeric("amount"),
+    customerName: text("customer_name"),
+    customerEmail: text("customer_email"),
+    customerPhone: text("customer_phone"),
+    items: jsonb("items").$type<Array<{ name: string; qty: number; price: number }>>(),
+    notificationsSent: jsonb("notifications_sent").$type<{
+      email?: boolean;
+      telegram?: boolean;
+      sms?: boolean;
+      emailError?: string;
+      telegramError?: string;
+    }>().default({}),
+    rawPayload: jsonb("raw_payload"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("payment_events_order_id_idx").on(t.orderId),
+    index("payment_events_created_at_idx").on(t.createdAt),
+  ]
+);
+
 export const contactMessages = pgTable("contact_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
