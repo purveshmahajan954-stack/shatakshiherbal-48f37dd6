@@ -84,7 +84,7 @@ export const Route = createFileRoute("/api/payments/verify")({
             shippingName: order.shippingName,
             shippingPhone: order.shippingPhone,
             shippingAddress: order.shippingAddress,
-            email: null,
+            email: order.email,
             total: order.total,
             items: (order.items ?? []) as Array<{ name: string; qty: number; price: number }>,
           }).catch((err) => console.error("[verify] notifyPaymentSuccess error:", err));
