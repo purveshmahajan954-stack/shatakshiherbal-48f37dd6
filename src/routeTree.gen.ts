@@ -36,6 +36,7 @@ import { Route as TrackTrackingIdRouteImport } from './routes/track.$trackingId'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
 import { Route as ApiProductsRouteImport } from './routes/api/products'
+import { Route as ApiFirebaseConfigRouteImport } from './routes/api/firebase-config'
 import { Route as ApiDeliveryWebhookRouteImport } from './routes/api/delivery-webhook'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -64,6 +65,7 @@ import { Route as ApiAuthOtpSendRouteImport } from './routes/api/auth/otp-send'
 import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
 import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google-callback'
 import { Route as ApiAuthGoogleRouteImport } from './routes/api/auth/google'
+import { Route as ApiAuthFirebasePhoneVerifyRouteImport } from './routes/api/auth/firebase-phone-verify'
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
 import { Route as ApiAdminUploadImageRouteImport } from './routes/api/admin/upload-image'
 import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
@@ -76,6 +78,7 @@ import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
 import { Route as ApiAdminMigrateRouteImport } from './routes/api/admin/migrate'
 import { Route as ApiAdminMeRouteImport } from './routes/api/admin/me'
 import { Route as ApiAdminLeadsRouteImport } from './routes/api/admin/leads'
+import { Route as ApiAdminFirebasePhoneVerifyRouteImport } from './routes/api/admin/firebase-phone-verify'
 import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
 import { Route as ApiAdminCustomersRouteImport } from './routes/api/admin/customers'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay/webhook'
@@ -213,6 +216,11 @@ const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
 const ApiProductsRoute = ApiProductsRouteImport.update({
   id: '/api/products',
   path: '/api/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFirebaseConfigRoute = ApiFirebaseConfigRouteImport.update({
+  id: '/api/firebase-config',
+  path: '/api/firebase-config',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDeliveryWebhookRoute = ApiDeliveryWebhookRouteImport.update({
@@ -355,6 +363,12 @@ const ApiAuthGoogleRoute = ApiAuthGoogleRouteImport.update({
   path: '/api/auth/google',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthFirebasePhoneVerifyRoute =
+  ApiAuthFirebasePhoneVerifyRouteImport.update({
+    id: '/api/auth/firebase-phone-verify',
+    path: '/api/auth/firebase-phone-verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
   id: '/api/admin/users',
   path: '/api/admin/users',
@@ -416,6 +430,12 @@ const ApiAdminLeadsRoute = ApiAdminLeadsRouteImport.update({
   path: '/api/admin/leads',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminFirebasePhoneVerifyRoute =
+  ApiAdminFirebasePhoneVerifyRouteImport.update({
+    id: '/api/admin/firebase-phone-verify',
+    path: '/api/admin/firebase-phone-verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAdminDashboardRoute = ApiAdminDashboardRouteImport.update({
   id: '/api/admin/dashboard',
   path: '/api/admin/dashboard',
@@ -467,6 +487,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/api/delivery-webhook': typeof ApiDeliveryWebhookRoute
+  '/api/firebase-config': typeof ApiFirebaseConfigRoute
   '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -474,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/api/admin/customers': typeof ApiAdminCustomersRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/firebase-phone-verify': typeof ApiAdminFirebasePhoneVerifyRoute
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
@@ -486,6 +508,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/upload-image': typeof ApiAdminUploadImageRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/firebase-phone-verify': typeof ApiAuthFirebasePhoneVerifyRoute
   '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
   '/api/auth/me': typeof ApiAuthMeRoute
@@ -538,6 +561,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/api/delivery-webhook': typeof ApiDeliveryWebhookRoute
+  '/api/firebase-config': typeof ApiFirebaseConfigRoute
   '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -545,6 +569,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/api/admin/customers': typeof ApiAdminCustomersRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/firebase-phone-verify': typeof ApiAdminFirebasePhoneVerifyRoute
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
@@ -557,6 +582,7 @@ export interface FileRoutesByTo {
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/upload-image': typeof ApiAdminUploadImageRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/firebase-phone-verify': typeof ApiAuthFirebasePhoneVerifyRoute
   '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
   '/api/auth/me': typeof ApiAuthMeRoute
@@ -611,6 +637,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/api/delivery-webhook': typeof ApiDeliveryWebhookRoute
+  '/api/firebase-config': typeof ApiFirebaseConfigRoute
   '/api/products': typeof ApiProductsRoute
   '/api/track-order': typeof ApiTrackOrderRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -618,6 +645,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/api/admin/customers': typeof ApiAdminCustomersRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/firebase-phone-verify': typeof ApiAdminFirebasePhoneVerifyRoute
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
@@ -630,6 +658,7 @@ export interface FileRoutesById {
   '/api/admin/signout': typeof ApiAdminSignoutRoute
   '/api/admin/upload-image': typeof ApiAdminUploadImageRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
+  '/api/auth/firebase-phone-verify': typeof ApiAuthFirebasePhoneVerifyRoute
   '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/google-callback': typeof ApiAuthGoogleCallbackRoute
   '/api/auth/me': typeof ApiAuthMeRoute
@@ -685,6 +714,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/contact'
     | '/api/delivery-webhook'
+    | '/api/firebase-config'
     | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
@@ -692,6 +722,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/admin/customers'
     | '/api/admin/dashboard'
+    | '/api/admin/firebase-phone-verify'
     | '/api/admin/leads'
     | '/api/admin/me'
     | '/api/admin/migrate'
@@ -704,6 +735,7 @@ export interface FileRouteTypes {
     | '/api/admin/signout'
     | '/api/admin/upload-image'
     | '/api/admin/users'
+    | '/api/auth/firebase-phone-verify'
     | '/api/auth/google'
     | '/api/auth/google-callback'
     | '/api/auth/me'
@@ -756,6 +788,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/contact'
     | '/api/delivery-webhook'
+    | '/api/firebase-config'
     | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
@@ -763,6 +796,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/admin/customers'
     | '/api/admin/dashboard'
+    | '/api/admin/firebase-phone-verify'
     | '/api/admin/leads'
     | '/api/admin/me'
     | '/api/admin/migrate'
@@ -775,6 +809,7 @@ export interface FileRouteTypes {
     | '/api/admin/signout'
     | '/api/admin/upload-image'
     | '/api/admin/users'
+    | '/api/auth/firebase-phone-verify'
     | '/api/auth/google'
     | '/api/auth/google-callback'
     | '/api/auth/me'
@@ -828,6 +863,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/contact'
     | '/api/delivery-webhook'
+    | '/api/firebase-config'
     | '/api/products'
     | '/api/track-order'
     | '/product/$slug'
@@ -835,6 +871,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/admin/customers'
     | '/api/admin/dashboard'
+    | '/api/admin/firebase-phone-verify'
     | '/api/admin/leads'
     | '/api/admin/me'
     | '/api/admin/migrate'
@@ -847,6 +884,7 @@ export interface FileRouteTypes {
     | '/api/admin/signout'
     | '/api/admin/upload-image'
     | '/api/admin/users'
+    | '/api/auth/firebase-phone-verify'
     | '/api/auth/google'
     | '/api/auth/google-callback'
     | '/api/auth/me'
@@ -892,12 +930,14 @@ export interface RootRouteChildren {
   WishlistRoute: typeof WishlistRoute
   ApiContactRoute: typeof ApiContactRoute
   ApiDeliveryWebhookRoute: typeof ApiDeliveryWebhookRoute
+  ApiFirebaseConfigRoute: typeof ApiFirebaseConfigRoute
   ApiProductsRoute: typeof ApiProductsRoute
   ApiTrackOrderRoute: typeof ApiTrackOrderRoute
   ProductSlugRoute: typeof ProductSlugRoute
   TrackTrackingIdRoute: typeof TrackTrackingIdRoute
   ApiAdminCustomersRoute: typeof ApiAdminCustomersRoute
   ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
+  ApiAdminFirebasePhoneVerifyRoute: typeof ApiAdminFirebasePhoneVerifyRoute
   ApiAdminLeadsRoute: typeof ApiAdminLeadsRoute
   ApiAdminMeRoute: typeof ApiAdminMeRoute
   ApiAdminMigrateRoute: typeof ApiAdminMigrateRoute
@@ -910,6 +950,7 @@ export interface RootRouteChildren {
   ApiAdminSignoutRoute: typeof ApiAdminSignoutRoute
   ApiAdminUploadImageRoute: typeof ApiAdminUploadImageRoute
   ApiAdminUsersRoute: typeof ApiAdminUsersRoute
+  ApiAuthFirebasePhoneVerifyRoute: typeof ApiAuthFirebasePhoneVerifyRoute
   ApiAuthGoogleRoute: typeof ApiAuthGoogleRoute
   ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
   ApiAuthMeRoute: typeof ApiAuthMeRoute
@@ -1121,6 +1162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/firebase-config': {
+      id: '/api/firebase-config'
+      path: '/api/firebase-config'
+      fullPath: '/api/firebase-config'
+      preLoaderRoute: typeof ApiFirebaseConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/delivery-webhook': {
       id: '/api/delivery-webhook'
       path: '/api/delivery-webhook'
@@ -1317,6 +1365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthGoogleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/firebase-phone-verify': {
+      id: '/api/auth/firebase-phone-verify'
+      path: '/api/auth/firebase-phone-verify'
+      fullPath: '/api/auth/firebase-phone-verify'
+      preLoaderRoute: typeof ApiAuthFirebasePhoneVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/users': {
       id: '/api/admin/users'
       path: '/api/admin/users'
@@ -1401,6 +1456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminLeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/firebase-phone-verify': {
+      id: '/api/admin/firebase-phone-verify'
+      path: '/api/admin/firebase-phone-verify'
+      fullPath: '/api/admin/firebase-phone-verify'
+      preLoaderRoute: typeof ApiAdminFirebasePhoneVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/dashboard': {
       id: '/api/admin/dashboard'
       path: '/api/admin/dashboard'
@@ -1478,12 +1540,14 @@ const rootRouteChildren: RootRouteChildren = {
   WishlistRoute: WishlistRoute,
   ApiContactRoute: ApiContactRoute,
   ApiDeliveryWebhookRoute: ApiDeliveryWebhookRoute,
+  ApiFirebaseConfigRoute: ApiFirebaseConfigRoute,
   ApiProductsRoute: ApiProductsRoute,
   ApiTrackOrderRoute: ApiTrackOrderRoute,
   ProductSlugRoute: ProductSlugRoute,
   TrackTrackingIdRoute: TrackTrackingIdRoute,
   ApiAdminCustomersRoute: ApiAdminCustomersRoute,
   ApiAdminDashboardRoute: ApiAdminDashboardRoute,
+  ApiAdminFirebasePhoneVerifyRoute: ApiAdminFirebasePhoneVerifyRoute,
   ApiAdminLeadsRoute: ApiAdminLeadsRoute,
   ApiAdminMeRoute: ApiAdminMeRoute,
   ApiAdminMigrateRoute: ApiAdminMigrateRoute,
@@ -1496,6 +1560,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminSignoutRoute: ApiAdminSignoutRoute,
   ApiAdminUploadImageRoute: ApiAdminUploadImageRoute,
   ApiAdminUsersRoute: ApiAdminUsersRoute,
+  ApiAuthFirebasePhoneVerifyRoute: ApiAuthFirebasePhoneVerifyRoute,
   ApiAuthGoogleRoute: ApiAuthGoogleRoute,
   ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
   ApiAuthMeRoute: ApiAuthMeRoute,
