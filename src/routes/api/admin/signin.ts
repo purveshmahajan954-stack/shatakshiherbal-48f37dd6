@@ -38,11 +38,12 @@ export const Route = createFileRoute("/api/admin/signin")({
         if (rows.length === 0) return Response.json({ error: "Invalid email or password" }, { status: 401 });
 
         const profile = rows[0] as any;
-        if (!profile.passwordHash) return Response.json({ error: "Invalid email or password" }, { status: 401 });
+        const storedHash = profile.passwordHash ?? profile.password_hash ?? null;
+        if (!storedHash) return Response.json({ error: "Invalid email or password" }, { status: 401 });
 
         let valid = false;
         try {
-          valid = await verifyPassword(password, profile.passwordHash);
+          valid = await verifyPassword(password, storedHash);
         } catch {
           return Response.json({ error: "Invalid email or password" }, { status: 401 });
         }
