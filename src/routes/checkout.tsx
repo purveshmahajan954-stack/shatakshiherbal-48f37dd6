@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import type { SavedAddress } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { computeTotals } from "@/lib/payments.functions";
-import { Loader2, ShieldCheck, MapPin, Wallet, Search, Check } from "lucide-react";
+import { Loader2, ShieldCheck, MapPin, Wallet, Search, Check, Banknote, CreditCard } from "lucide-react";
 
 const INDIAN_STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry"];
 
@@ -62,6 +62,7 @@ function CheckoutPage() {
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [payMethod, setPayMethod] = useState<"online" | "cod">("online");
   const pincodeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -153,16 +154,39 @@ function CheckoutPage() {
     return parts.join(", ");
   };
 
-  const handlePay = async () => {
-    if (items.length === 0) return toast.error("Your cart is empty");
-    if (name.trim().length < 2) return toast.error("Please enter your name");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Please enter a valid email");
-    if (phone.replace(/\D/g, "").length < 10) return toast.error("Please enter a valid phone number");
-    if (flatHouse.trim().length < 3) return toast.error("Please enter your flat/house address");
-    if (pincode.length !== 6) return toast.error("Please enter a valid 6-digit pincode");
-    if (!city.trim()) return toast.error("Please enter your city");
-    if (!state.trim()) return toast.error("Please enter your state");
+  const validateAddress = () => {
+    if (items.length === 0) { toast.error("Your cart is empty"); return false; }
+    if (name.trim().length < 2) { toast.error("Please enter your name"); return false; }
+    if (!/^\S+@\S+\.\S+$/.test(email)) { toast.error("Please enter a valid email"); return false; }
+    if (phone.replace(/\D/g, "").length < 10) { toast.error("Please enter a valid phone number"); return false; }
+    if (flatHouse.trim().length < 3) { toast.error("Please enter your flat/house address"); return false; }
+    if (pincode.length !== 6) { toast.error("Please enter a valid 6-digit pincode"); return false; }
+    if (!city.trim()) { toast.error("Please enter your city"); return false; }
+    if (!state.trim()) { toast.error("Please enter your state"); return false; }
+    return true;
+  };
 
+  const handleCOD = async () => {
+    if (!validateAddress()) return;
+    const token = localStorage.getItem("auth_token");
+    if (!token) return toast.error("Please sign in first");
+    const fullAddress = buildFullAddress();
+    setBusy(true);
+    try {
+      const res = await apiPost("/api/payments/cod-order", {
+        items: items.map((i) => ({ slug: i.slug, qty: i.qty, name: i.name, price: i.price, image: i.image })),
+        shipping: { name, email, phone, address: fullAddress },
+      }, token) as { orderId: string; totals: any };
+      clear();
+      navigate({ to: "/payment-success", search: { o: res.orderId } });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not place order. Please try again.");
+      setBusy(false);
+    }
+  };
+
+  const handlePay = async () => {
+    if (!validateAddress()) return;
     const token = localStorage.getItem("auth_token");
     if (!token) return toast.error("Please sign in first");
 
@@ -388,20 +412,62 @@ function CheckoutPage() {
               </div>
             </dl>
 
-            <button
-              onClick={handlePay}
-              disabled={busy}
-              className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60"
-            >
-              {busy
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
-                : <><Wallet className="w-4 h-4" /> Pay ₹{totals.total}</>
-              }
-            </button>
+            {/* Payment Method Selection */}
+            <div className="mt-5">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Payment Method</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setPayMethod("online")}
+                  className={`flex flex-col items-center gap-1.5 border rounded-xl px-3 py-3 text-xs font-semibold transition ${payMethod === "online" ? "border-primary bg-primary/5 ring-1 ring-primary/30 text-primary" : "border-border text-muted-foreground hover:border-primary/40"}`}
+                >
+                  <CreditCard className="w-5 h-5" />
+                  Online / UPI
+                </button>
+                <button
+                  onClick={() => setPayMethod("cod")}
+                  className={`flex flex-col items-center gap-1.5 border rounded-xl px-3 py-3 text-xs font-semibold transition ${payMethod === "cod" ? "border-amber-500 bg-amber-50 ring-1 ring-amber-400 text-amber-700" : "border-border text-muted-foreground hover:border-amber-400"}`}
+                >
+                  <Banknote className="w-5 h-5" />
+                  Cash on Delivery
+                </button>
+              </div>
+              {payMethod === "cod" && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                  💵 Pay ₹{totals.total} in cash when your order arrives at your doorstep.
+                </p>
+              )}
+            </div>
+
+            {payMethod === "online" ? (
+              <button
+                onClick={handlePay}
+                disabled={busy}
+                className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60"
+              >
+                {busy
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
+                  : <><Wallet className="w-4 h-4" /> Pay ₹{totals.total}</>
+                }
+              </button>
+            ) : (
+              <button
+                onClick={handleCOD}
+                disabled={busy}
+                className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-amber-500 text-white py-3 rounded-full font-semibold hover:bg-amber-600 disabled:opacity-60"
+              >
+                {busy
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
+                  : <><Banknote className="w-4 h-4" /> Place Order (COD)</>
+                }
+              </button>
+            )}
 
             <div className="mt-4 flex items-start gap-2 text-xs text-muted-foreground">
               <ShieldCheck className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-              <span>256-bit secure payment by Razorpay. Supports UPI, Cards, Netbanking &amp; Wallets.</span>
+              {payMethod === "online"
+                ? <span>256-bit secure payment by Razorpay. Supports UPI, Cards, Netbanking &amp; Wallets.</span>
+                : <span>Cash on Delivery available. Pay when your package arrives.</span>
+              }
             </div>
           </aside>
         </div>

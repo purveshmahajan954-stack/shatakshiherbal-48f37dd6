@@ -55,6 +55,7 @@ import { Route as ApiPaymentsVerifyRouteImport } from './routes/api/payments/ver
 import { Route as ApiPaymentsRazorpayKeyRouteImport } from './routes/api/payments/razorpay-key'
 import { Route as ApiPaymentsMarkFailedRouteImport } from './routes/api/payments/mark-failed'
 import { Route as ApiPaymentsCreateOrderRouteImport } from './routes/api/payments/create-order'
+import { Route as ApiPaymentsCodOrderRouteImport } from './routes/api/payments/cod-order'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAuthSignoutRouteImport } from './routes/api/auth/signout'
 import { Route as ApiAuthSigninRouteImport } from './routes/api/auth/signin'
@@ -308,6 +309,11 @@ const ApiPaymentsCreateOrderRoute = ApiPaymentsCreateOrderRouteImport.update({
   path: '/api/payments/create-order',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPaymentsCodOrderRoute = ApiPaymentsCodOrderRouteImport.update({
+  id: '/api/payments/cod-order',
+  path: '/api/payments/cod-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
   id: '/api/auth/signup',
   path: '/api/auth/signup',
@@ -480,6 +486,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payments/cod-order': typeof ApiPaymentsCodOrderRoute
   '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
   '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
   '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
@@ -549,6 +556,7 @@ export interface FileRoutesByTo {
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payments/cod-order': typeof ApiPaymentsCodOrderRoute
   '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
   '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
   '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
@@ -620,6 +628,7 @@ export interface FileRoutesById {
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payments/cod-order': typeof ApiPaymentsCodOrderRoute
   '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
   '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
   '/api/payments/razorpay-key': typeof ApiPaymentsRazorpayKeyRoute
@@ -692,6 +701,7 @@ export interface FileRouteTypes {
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
+    | '/api/payments/cod-order'
     | '/api/payments/create-order'
     | '/api/payments/mark-failed'
     | '/api/payments/razorpay-key'
@@ -761,6 +771,7 @@ export interface FileRouteTypes {
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
+    | '/api/payments/cod-order'
     | '/api/payments/create-order'
     | '/api/payments/mark-failed'
     | '/api/payments/razorpay-key'
@@ -831,6 +842,7 @@ export interface FileRouteTypes {
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
+    | '/api/payments/cod-order'
     | '/api/payments/create-order'
     | '/api/payments/mark-failed'
     | '/api/payments/razorpay-key'
@@ -892,6 +904,7 @@ export interface RootRouteChildren {
   ApiAuthSigninRoute: typeof ApiAuthSigninRoute
   ApiAuthSignoutRoute: typeof ApiAuthSignoutRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+  ApiPaymentsCodOrderRoute: typeof ApiPaymentsCodOrderRoute
   ApiPaymentsCreateOrderRoute: typeof ApiPaymentsCreateOrderRoute
   ApiPaymentsMarkFailedRoute: typeof ApiPaymentsMarkFailedRoute
   ApiPaymentsRazorpayKeyRoute: typeof ApiPaymentsRazorpayKeyRoute
@@ -1227,6 +1240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPaymentsCreateOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/payments/cod-order': {
+      id: '/api/payments/cod-order'
+      path: '/api/payments/cod-order'
+      fullPath: '/api/payments/cod-order'
+      preLoaderRoute: typeof ApiPaymentsCodOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/signup': {
       id: '/api/auth/signup'
       path: '/api/auth/signup'
@@ -1462,6 +1482,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSigninRoute: ApiAuthSigninRoute,
   ApiAuthSignoutRoute: ApiAuthSignoutRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
+  ApiPaymentsCodOrderRoute: ApiPaymentsCodOrderRoute,
   ApiPaymentsCreateOrderRoute: ApiPaymentsCreateOrderRoute,
   ApiPaymentsMarkFailedRoute: ApiPaymentsMarkFailedRoute,
   ApiPaymentsRazorpayKeyRoute: ApiPaymentsRazorpayKeyRoute,

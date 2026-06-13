@@ -11,6 +11,7 @@ type InvoiceData = {
   delivery_charge: number;
   total: number;
   payment_status: string;
+  payment_method?: string | null;
   razorpay_payment_id?: string | null;
   created_at: string;
 };
@@ -110,7 +111,7 @@ export function getInvoiceHtml(order: InvoiceData): string {
     <div class="info-box">
       <div class="label">Payment Details</div>
       <div class="value">
-        <strong>Method:</strong> ${(order.razorpay_payment_id || order.payment_status === "paid" || order.payment_status === "confirmed") ? "Online (Razorpay)" : "—"}<br>
+        <strong>Method:</strong> ${order.payment_method === "cod" ? "Cash on Delivery" : (order.razorpay_payment_id || order.payment_status === "paid" || order.payment_status === "confirmed") ? "Online (Razorpay)" : "—"}<br>
         <strong>Status:</strong> <span style="color:#2D5016;font-weight:600;text-transform:capitalize">${order.payment_status}</span><br>
         ${order.razorpay_payment_id ? `<strong>Payment ID:</strong><br><span style="font-size:11px;font-family:monospace">${order.razorpay_payment_id}</span>` : ""}
       </div>

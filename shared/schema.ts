@@ -139,6 +139,7 @@ export const orders = pgTable(
     email: text("email"),
     razorpayOrderId: text("razorpay_order_id").unique(),
     razorpayPaymentId: text("razorpay_payment_id"),
+    paymentMethod: text("payment_method").notNull().default("razorpay"),
     paymentStatus: text("payment_status").notNull().default("created"),
     trackingId: text("tracking_id").unique(),
     trackingStatus: text("tracking_status").notNull().default("Order Placed"),

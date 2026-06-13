@@ -240,14 +240,15 @@ export async function logPaymentEvent(params: {
 
 export async function notifyPaymentSuccess(order: {
   id: string;
-  razorpayOrderId?: string;
-  razorpayPaymentId?: string;
+  razorpayOrderId?: string | null;
+  razorpayPaymentId?: string | null;
   shippingName?: string | null;
   shippingPhone?: string | null;
   shippingAddress?: string | null;
   email?: string | null;
   total: string | number;
   items: Array<{ name: string; qty: number; price: number }>;
+  paymentMethod?: string | null;
 }): Promise<void> {
   const name    = order.shippingName    ?? "Customer";
   const phone   = order.shippingPhone   ?? "";
@@ -265,18 +266,20 @@ export async function notifyPaymentSuccess(order: {
   } = {};
 
   // ── WhatsApp (CallMeBot) — Primary notification ──
+  const isCod = order.paymentMethod === "cod";
   const waMsg =
-    `🌿 *NEW ORDER — Shatakshi Herbal*\n\n` +
+    `🌿 *${isCod ? "COD " : ""}NEW ORDER — Shatakshi Herbal*\n\n` +
     `📦 Order: #${shortId}\n` +
     `👤 Customer: ${name}\n` +
     `📞 Phone: ${phone || "N/A"}\n` +
     `📧 Email: ${email || "N/A"}\n` +
     `💰 Amount: *₹${amount}*\n` +
+    `💳 Payment: ${isCod ? "Cash on Delivery" : "Online (Razorpay)"}\n` +
     `🕒 Time: ${timestamp}\n\n` +
     `🛍 Items:\n` +
     order.items.map((i) => `  • ${i.name} x${i.qty} = ₹${i.price * i.qty}`).join("\n") +
     `\n\n📍 Address: ${address || "N/A"}` +
-    (order.razorpayPaymentId ? `\n💳 Payment ID: ${order.razorpayPaymentId}` : "");
+    (order.razorpayPaymentId ? `\n🔑 Payment ID: ${order.razorpayPaymentId}` : "");
 
   try {
     await sendWhatsApp(waMsg);

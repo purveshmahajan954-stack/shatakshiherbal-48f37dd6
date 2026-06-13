@@ -25,6 +25,7 @@ type Order = {
   shippingAddress: string | null;
   razorpayOrderId: string | null;
   razorpayPaymentId: string | null;
+  paymentMethod: string;
   paymentStatus: string;
   status: string;
   trackingId: string | null;
@@ -35,7 +36,7 @@ type Order = {
   createdAt: string;
 };
 
-const PAYMENT_STATUSES = ["created", "paid", "failed", "signature_failed", "refunded"];
+const PAYMENT_STATUSES = ["created", "paid", "failed", "signature_failed", "refunded", "cod_pending", "cod_collected"];
 const ORDER_STATUSES = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "failed"];
 
 function OrdersPage() {
@@ -174,7 +175,7 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
 
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Payment</h4>
             <div className="text-sm space-y-1">
-              <div><span className="text-muted-foreground">Method:</span> {order.razorpayPaymentId ? "Online (Razorpay)" : "—"}</div>
+              <div><span className="text-muted-foreground">Method:</span> {order.paymentMethod === "cod" ? "Cash on Delivery" : order.razorpayPaymentId ? "Online (Razorpay)" : "—"}</div>
               <div><span className="text-muted-foreground">Razorpay order:</span> <span className="font-mono text-xs">{order.razorpayOrderId || "—"}</span></div>
               <div><span className="text-muted-foreground">Payment ID:</span> <span className="font-mono text-xs">{order.razorpayPaymentId || "—"}</span></div>
             </div>
@@ -228,7 +229,7 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
               {updating && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
             </div>
             {/* Invoice download */}
-            {(order.paymentStatus === "paid" || order.paymentStatus === "confirmed") && (
+            {(order.paymentStatus === "paid" || order.paymentStatus === "confirmed" || order.paymentMethod === "cod") && (
               <button
                 onClick={() => downloadInvoice({
                   id: order.id,
@@ -241,6 +242,7 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
                   delivery_charge: order.deliveryCharge,
                   total: order.total,
                   payment_status: order.paymentStatus,
+                  payment_method: order.paymentMethod,
                   razorpay_payment_id: order.razorpayPaymentId,
                   created_at: order.createdAt,
                 })}

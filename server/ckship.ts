@@ -68,6 +68,7 @@ export async function createCKShipShipment(order: {
   shippingAddress: string | null;
   total: string | number;
   items: Array<{ name: string; qty: number; price: number }>;
+  paymentMethod?: string | null;
 }): Promise<CKShipShipmentResult> {
   return withRetry(async () => {
     const orderNumber = generateOrderNumber(order.id);
@@ -85,7 +86,7 @@ export async function createCKShipShipment(order: {
     const payload = {
       order_number: orderNumber,
       order_date: todayDate(),
-      payment_mode: "prepaid",
+      payment_mode: order.paymentMethod === "cod" ? "cod" : "prepaid",
       order_amount: Number(order.total),
       consignee_name: order.shippingName ?? "Customer",
       consignee_phone: order.shippingPhone ?? "",
