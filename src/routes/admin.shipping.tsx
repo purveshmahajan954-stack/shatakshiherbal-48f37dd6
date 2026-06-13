@@ -114,8 +114,12 @@ function ShippingPage() {
   const action = async (orderId: string, act: string, label: string) => {
     setBusyId(orderId + act);
     try {
-      await adminPatch(`/api/admin/shipments?action=${act}&order_id=${orderId}`, {});
-      toast.success(label);
+      const result = await adminPatch<{ ok: boolean; pending?: boolean; message?: string }>(`/api/admin/shipments?action=${act}&order_id=${orderId}`, {});
+      if (result?.pending) {
+        toast.info(result.message ?? "Tracking not yet active — check again in a few minutes");
+      } else {
+        toast.success(label);
+      }
       await load();
     } catch (err: any) {
       toast.error(err.message || label + " failed");

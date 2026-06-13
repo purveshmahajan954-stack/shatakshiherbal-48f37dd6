@@ -165,7 +165,12 @@ export const Route = createFileRoute("/api/admin/shipments")({
               .where(eq(orders.id, orderId));
             return Response.json({ ok: true, track });
           } catch (err: any) {
-            return Response.json({ error: err.message }, { status: 502 });
+            const msg: string = err?.message ?? "";
+            /* AWB not yet active in courier system — non-fatal, just inform */
+            if (msg.toLowerCase().includes("not yet available") || msg.includes("404")) {
+              return Response.json({ ok: true, pending: true, message: "Tracking not yet active — check again in a few minutes" });
+            }
+            return Response.json({ error: msg || "Tracking refresh failed" }, { status: 502 });
           }
         }
 

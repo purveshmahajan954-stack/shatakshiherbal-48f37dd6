@@ -157,7 +157,10 @@ export async function trackCKShipShipment(awbNumber: string): Promise<CKShipTrac
     let data: any;
     try { data = JSON.parse(bodyText); } catch { throw new Error(`CKShip tracking: Invalid response`); }
 
-    if (!res.ok) throw new Error(data?.message || data?.error || `CKShip track error ${res.status}`);
+    if (!res.ok) {
+      if (res.status === 404) throw new Error("Tracking not yet available — AWB may not be active in the courier system yet");
+      throw new Error(data?.message || data?.error || `CKShip track error ${res.status}`);
+    }
 
     const d = data?.data ?? data ?? {};
     const events: Array<{ status: string; location: string; timestamp: string; description?: string }> =

@@ -42,26 +42,37 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   return res.json();
 }
 
+async function throwApiError(res: Response): Promise<never> {
+  const text = await res.text();
+  try {
+    const json = JSON.parse(text);
+    throw new Error(json.error || json.message || text);
+  } catch (e) {
+    if (e instanceof SyntaxError) throw new Error(text);
+    throw e;
+  }
+}
+
 export async function adminGet<T>(path: string): Promise<T> {
   const res = await adminFetch(path);
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) await throwApiError(res);
   return res.json();
 }
 
 export async function adminPost<T>(path: string, body: unknown): Promise<T> {
   const res = await adminFetch(path, { method: "POST", body: JSON.stringify(body) });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) await throwApiError(res);
   return res.json();
 }
 
 export async function adminPatch<T>(path: string, body: unknown): Promise<T> {
   const res = await adminFetch(path, { method: "PATCH", body: JSON.stringify(body) });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) await throwApiError(res);
   return res.json();
 }
 
 export async function adminDelete<T>(path: string): Promise<T> {
   const res = await adminFetch(path, { method: "DELETE" });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) await throwApiError(res);
   return res.json();
 }
