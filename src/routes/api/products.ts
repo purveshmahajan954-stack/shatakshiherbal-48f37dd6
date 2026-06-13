@@ -3,7 +3,7 @@ import { db } from "@server/db";
 import { products } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
-const CACHE_SECONDS = 60;
+const NO_CACHE = "no-store, no-cache, must-revalidate";
 
 export const Route = createFileRoute("/api/products")({
   server: {
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/api/products")({
           return new Response(JSON.stringify({ product: rows[0] ?? null }), {
             headers: {
               "Content-Type": "application/json",
-              "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=300`,
+              "Cache-Control": NO_CACHE,
             },
           });
         }
@@ -56,7 +56,7 @@ export const Route = createFileRoute("/api/products")({
         return new Response(JSON.stringify({ products: rows }), {
           headers: {
             "Content-Type": "application/json",
-            "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=300`,
+            "Cache-Control": NO_CACHE,
           },
         });
       },

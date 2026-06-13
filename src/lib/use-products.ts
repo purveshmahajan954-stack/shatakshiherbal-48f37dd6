@@ -57,9 +57,14 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
   };
 }
 
-const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_TTL = 30 * 1000;
 let _cache: { data: Product[]; at: number } | null = null;
 let _inflight: Promise<Product[]> | null = null;
+
+export function clearProductCache() {
+  _cache = null;
+  _inflight = null;
+}
 
 export async function fetchProductsFromDb(): Promise<Product[]> {
   if (_cache && Date.now() - _cache.at < CACHE_TTL) return _cache.data;

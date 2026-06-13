@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { adminGet, adminPost, adminPatch, adminDelete } from "@/lib/api-client";
+import { clearProductCache } from "@/lib/use-products";
 import { Loader2, Search, Plus, Trash2, Pencil, X, Upload, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -51,6 +52,7 @@ function ProductsPage() {
   const remove = async (id: string) => {
     if (!confirm("Delete this product?")) return;
     await adminDelete(`/api/admin/products?id=${id}`).catch(() => { toast.error("Delete failed"); return; });
+    clearProductCache();
     setProducts((prev) => prev.filter((p) => p.id !== id));
     toast.success("Deleted");
   };
@@ -65,6 +67,7 @@ function ProductsPage() {
       await adminPost("/api/admin/products", payload).catch((e) => { toast.error(e?.message); return; });
       toast.success("Created");
     }
+    clearProductCache();
     setShowForm(false);
     setEditing(null);
     load();
