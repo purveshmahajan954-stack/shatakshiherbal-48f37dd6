@@ -10,7 +10,6 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-CALLMEBOT_PHONE = "918485838126"
 
 [workflows]
 runButton = "Project"
