@@ -35,8 +35,7 @@ function InvoiceModal({ order, onClose, onDownload }: { order: any; onClose: () 
   const items: { name: string; qty: number; price: number }[] = Array.isArray(order.items) ? order.items : [];
   const subtotal = Number(order.subtotal) || 0;
   const delivery = Number(order.delivery_charge) || 0;
-  const gst = Math.round(subtotal * 0.05);
-  const grandTotal = subtotal + delivery + gst;
+  const grandTotal = subtotal + delivery;
   const invoiceNumber = generateInvoiceNumber(order.id, order.created_at);
   const date = new Date(order.created_at).toLocaleDateString("en-IN", { dateStyle: "long" });
 
@@ -83,7 +82,7 @@ function InvoiceModal({ order, onClose, onDownload }: { order: any; onClose: () 
             <div className="bg-cream/50 rounded-xl p-4">
               <div className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2">Payment Details</div>
               <div className="text-xs space-y-1">
-                <div><span className="font-medium">Method:</span> {order.razorpay_payment_id ? "Online (Razorpay)" : "—"}</div>
+                <div><span className="font-medium">Method:</span> {order.payment_method === "cod" ? "Cash on Delivery" : order.razorpay_payment_id ? "Online (Razorpay)" : "—"}</div>
                 <div><span className="font-medium">Status:</span> <span className="text-primary font-semibold capitalize">{order.payment_status}</span></div>
                 {order.razorpay_payment_id && (
                   <div className="font-mono text-[10px] text-muted-foreground break-all">{order.razorpay_payment_id}</div>
@@ -126,9 +125,6 @@ function InvoiceModal({ order, onClose, onDownload }: { order: any; onClose: () 
             </div>
             <div className="flex justify-between px-4 py-2.5 text-sm border-b border-border">
               <span>Delivery Charges</span><span>₹{delivery.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="flex justify-between px-4 py-2.5 text-sm text-muted-foreground border-b border-border">
-              <span>GST (5%)</span><span>₹{gst.toLocaleString("en-IN")}</span>
             </div>
             <div className="flex justify-between px-4 py-3 text-base font-bold bg-primary text-primary-foreground">
               <span>Total Amount</span><span>₹{grandTotal.toLocaleString("en-IN")}</span>
