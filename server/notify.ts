@@ -1,5 +1,55 @@
 import { db } from "@server/db";
-import { paymentEvents } from "@shared/schema";
+import { paymentEvents, notificationQueue } from "@shared/schema";
+import { eq, and, lte } from "drizzle-orm";
+
+// ─── Retry Helper ─────────────────────────────────────────────────────────────
+
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  retries = 3,
+  baseDelayMs = 500,
+): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (attempt < retries) {
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        await new Promise((r) => setTimeout(r, delay));
+      }
+    }
+  }
+  throw lastErr;
+}
+
+// ─── Queue Helper ─────────────────────────────────────────────────────────────
+
+async function enqueueFailedNotification(params: {
+  orderId?: string | null;
+  razorpayOrderId?: string | null;
+  channel: string;
+  payload: Record<string, unknown>;
+  error: string;
+}): Promise<void> {
+  try {
+    await db.insert(notificationQueue).values({
+      orderId: params.orderId ?? null,
+      razorpayOrderId: params.razorpayOrderId ?? null,
+      channel: params.channel,
+      payload: params.payload,
+      attempts: 1,
+      maxAttempts: 5,
+      lastError: params.error.slice(0, 500),
+      status: "pending",
+      nextRetryAt: new Date(Date.now() + 2 * 60 * 1000),
+    });
+    console.log(`[Queue] Enqueued failed ${params.channel} notification for retry`);
+  } catch (err) {
+    console.error("[Queue] Failed to enqueue notification:", err);
+  }
+}
 
 // ─── SMS (Twilio) ────────────────────────────────────────────────────────────
 
@@ -16,7 +66,7 @@ export async function sendSMS(to: string, body: string): Promise<void> {
   const digits = to.replace(/\D/g, "");
   const phone = to.startsWith("+") ? to : `+91${digits.slice(-10)}`;
 
-  try {
+  await withRetry(async () => {
     const res = await fetch(
       `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
       {
@@ -30,13 +80,10 @@ export async function sendSMS(to: string, body: string): Promise<void> {
     );
     const data: any = await res.json();
     if (!res.ok) {
-      console.error("[SMS] Twilio error:", data?.message || data?.code);
-    } else {
-      console.log("[SMS] Sent to", phone, "SID:", data.sid);
+      throw new Error(data?.message || data?.code || `HTTP ${res.status}`);
     }
-  } catch (err) {
-    console.error("[SMS] Failed to send:", err);
-  }
+    console.log("[SMS] Sent to", phone, "SID:", data.sid);
+  }, 2);
 }
 
 export function smsOrderConfirmed(name: string, orderId: string, total: string | number) {
@@ -59,36 +106,45 @@ export function smsDelivered(name: string) {
 
 // ─── WhatsApp via CallMeBot ───────────────────────────────────────────────────
 
-export async function sendWhatsApp(message: string): Promise<void> {
+export async function sendWhatsApp(message: string, retryCtx?: { orderId?: string | null; razorpayOrderId?: string | null }): Promise<void> {
   const apiKey = process.env.CALLMEBOT_API_KEY;
-  const phone  = process.env.CALLMEBOT_PHONE; // e.g. 918485838126
+  const phone  = process.env.CALLMEBOT_PHONE;
 
   if (!apiKey || !phone) {
     console.log("[WhatsApp] CallMeBot not configured (CALLMEBOT_API_KEY / CALLMEBOT_PHONE missing), skipping");
     return;
   }
 
-  const encoded = encodeURIComponent(message);
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encoded}&apikey=${apiKey}`;
-
   try {
-    console.log("[WhatsApp] Sending via CallMeBot to", phone, "...");
-    const res = await fetch(url);
-    const text = await res.text();
-    if (!res.ok) {
-      console.error("[WhatsApp] ❌ CallMeBot error:", res.status, text.slice(0, 200));
-      throw new Error(`CallMeBot HTTP ${res.status}: ${text.slice(0, 200)}`);
-    }
-    console.log("[WhatsApp] ✅ CallMeBot response:", text.slice(0, 120));
+    await withRetry(async () => {
+      const encoded = encodeURIComponent(message);
+      const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encoded}&apikey=${apiKey}`;
+      console.log("[WhatsApp] Sending via CallMeBot to", phone, "...");
+      const res = await fetch(url);
+      const text = await res.text();
+      if (!res.ok) {
+        throw new Error(`CallMeBot HTTP ${res.status}: ${text.slice(0, 200)}`);
+      }
+      console.log("[WhatsApp] ✅ CallMeBot response:", text.slice(0, 120));
+    }, 3, 1000);
   } catch (err: any) {
-    console.error("[WhatsApp] ❌ Failed:", err?.message || err);
+    console.error("[WhatsApp] ❌ All retries failed:", err?.message || err);
+    if (retryCtx !== undefined) {
+      await enqueueFailedNotification({
+        orderId: retryCtx.orderId,
+        razorpayOrderId: retryCtx.razorpayOrderId,
+        channel: "whatsapp",
+        payload: { message },
+        error: err?.message ?? "unknown",
+      });
+    }
     throw err;
   }
 }
 
 // ─── Email (Nodemailer / Gmail) ───────────────────────────────────────────────
 
-export async function sendEmail(subject: string, html: string): Promise<void> {
+export async function sendEmail(subject: string, html: string, retryCtx?: { orderId?: string | null; razorpayOrderId?: string | null }): Promise<void> {
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;
   const to   = process.env.ADMIN_NOTIFY_EMAIL || user;
@@ -99,20 +155,31 @@ export async function sendEmail(subject: string, html: string): Promise<void> {
   }
 
   try {
-    const nodemailer = await import("nodemailer");
-    const transporter = nodemailer.default.createTransport({
-      service: "gmail",
-      auth: { user, pass },
-    });
-    const info = await transporter.sendMail({
-      from: `"Shatakshi Herbal" <${user}>`,
-      to,
-      subject,
-      html,
-    });
-    console.log("[Email] ✅ Sent:", info.messageId, "→", to);
+    await withRetry(async () => {
+      const nodemailer = await import("nodemailer");
+      const transporter = nodemailer.default.createTransport({
+        service: "gmail",
+        auth: { user, pass },
+      });
+      const info = await transporter.sendMail({
+        from: `"Shatakshi Herbal" <${user}>`,
+        to,
+        subject,
+        html,
+      });
+      console.log("[Email] ✅ Sent:", info.messageId, "→", to);
+    }, 3, 1000);
   } catch (err: any) {
-    console.error("[Email] ❌ Failed:", err?.message || err);
+    console.error("[Email] ❌ All retries failed:", err?.message || err);
+    if (retryCtx !== undefined) {
+      await enqueueFailedNotification({
+        orderId: retryCtx.orderId,
+        razorpayOrderId: retryCtx.razorpayOrderId,
+        channel: "email",
+        payload: { subject, html },
+        error: err?.message ?? "unknown",
+      });
+    }
     throw err;
   }
 }
@@ -171,7 +238,7 @@ function buildOrderEmailHtml(order: {
 
 // ─── Telegram ────────────────────────────────────────────────────────────────
 
-export async function sendTelegram(message: string): Promise<void> {
+export async function sendTelegram(message: string, retryCtx?: { orderId?: string | null; razorpayOrderId?: string | null }): Promise<void> {
   const token  = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -181,19 +248,29 @@ export async function sendTelegram(message: string): Promise<void> {
   }
 
   try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: "HTML" }),
-    });
-    const data: any = await res.json();
-    if (!data.ok) {
-      console.error("[Telegram] ❌ API error:", data.description);
-      throw new Error(data.description);
-    }
-    console.log("[Telegram] ✅ Sent, message_id:", data.result?.message_id);
+    await withRetry(async () => {
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: "HTML" }),
+      });
+      const data: any = await res.json();
+      if (!data.ok) {
+        throw new Error(data.description ?? "Telegram API error");
+      }
+      console.log("[Telegram] ✅ Sent, message_id:", data.result?.message_id);
+    }, 3, 1000);
   } catch (err: any) {
-    console.error("[Telegram] ❌ Failed:", err?.message || err);
+    console.error("[Telegram] ❌ All retries failed:", err?.message || err);
+    if (retryCtx !== undefined) {
+      await enqueueFailedNotification({
+        orderId: retryCtx.orderId,
+        razorpayOrderId: retryCtx.razorpayOrderId,
+        channel: "telegram",
+        payload: { message },
+        error: err?.message ?? "unknown",
+      });
+    }
     throw err;
   }
 }
@@ -211,8 +288,13 @@ export async function logPaymentEvent(params: {
   customerPhone?: string;
   items?: Array<{ name: string; qty: number; price: number }>;
   notificationsSent?: {
-    email?: boolean; telegram?: boolean; sms?: boolean; whatsapp?: boolean;
-    emailError?: string; telegramError?: string; whatsappError?: string;
+    email?: boolean;
+    telegram?: boolean;
+    sms?: boolean;
+    whatsapp?: boolean;
+    emailError?: string;
+    telegramError?: string;
+    whatsappError?: string;
   };
   rawPayload?: any;
 }): Promise<void> {
@@ -236,6 +318,72 @@ export async function logPaymentEvent(params: {
   }
 }
 
+// ─── Process Notification Queue ───────────────────────────────────────────────
+
+export async function processNotificationQueue(): Promise<{ processed: number; failed: number }> {
+  const now = new Date();
+  const pending = await db
+    .select()
+    .from(notificationQueue)
+    .where(
+      and(
+        eq(notificationQueue.status, "pending"),
+        lte(notificationQueue.nextRetryAt, now),
+      )
+    )
+    .limit(20);
+
+  let processed = 0;
+  let failed = 0;
+
+  for (const item of pending) {
+    const payload = item.payload as Record<string, any>;
+    const ctx = { orderId: item.orderId, razorpayOrderId: item.razorpayOrderId };
+    let success = false;
+    let errorMsg = "";
+
+    try {
+      if (item.channel === "whatsapp") {
+        await sendWhatsApp(payload.message as string);
+        success = true;
+      } else if (item.channel === "email") {
+        await sendEmail(payload.subject as string, payload.html as string);
+        success = true;
+      } else if (item.channel === "telegram") {
+        await sendTelegram(payload.message as string);
+        success = true;
+      }
+    } catch (err: any) {
+      errorMsg = err?.message?.slice(0, 500) ?? "unknown";
+    }
+
+    const newAttempts = item.attempts + 1;
+    const maxed = newAttempts >= item.maxAttempts;
+
+    if (success) {
+      await db.update(notificationQueue)
+        .set({ status: "done", processedAt: now, attempts: newAttempts })
+        .where(eq(notificationQueue.id, item.id));
+      processed++;
+      console.log(`[Queue] ✅ Retried ${item.channel} for order ${item.orderId ?? item.razorpayOrderId}`);
+    } else {
+      const nextDelay = Math.min(2 ** newAttempts * 60 * 1000, 4 * 60 * 60 * 1000);
+      await db.update(notificationQueue)
+        .set({
+          attempts: newAttempts,
+          lastError: errorMsg,
+          status: maxed ? "failed" : "pending",
+          nextRetryAt: new Date(Date.now() + nextDelay),
+        })
+        .where(eq(notificationQueue.id, item.id));
+      failed++;
+      console.warn(`[Queue] ❌ Retry ${newAttempts}/${item.maxAttempts} failed for ${item.channel}: ${errorMsg}`);
+    }
+  }
+
+  return { processed, failed };
+}
+
 // ─── Master Notifier ──────────────────────────────────────────────────────────
 
 export async function notifyPaymentSuccess(order: {
@@ -257,6 +405,7 @@ export async function notifyPaymentSuccess(order: {
   const amount  = Number(order.total);
   const shortId = order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
   const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  const retryCtx = { orderId: order.id, razorpayOrderId: order.razorpayOrderId ?? null };
 
   console.log(`[Notify] 🚀 Payment success — Order #${shortId}, ₹${amount}, Customer: ${name}`);
 
@@ -265,7 +414,7 @@ export async function notifyPaymentSuccess(order: {
     whatsappError?: string; emailError?: string; telegramError?: string;
   } = {};
 
-  // ── WhatsApp (CallMeBot) — Primary notification ──
+  // ── WhatsApp (CallMeBot) ──
   const isCod = order.paymentMethod === "cod";
   const waMsg =
     `🌿 *${isCod ? "COD " : ""}NEW ORDER — Shatakshi Herbal*\n\n` +
@@ -282,13 +431,13 @@ export async function notifyPaymentSuccess(order: {
     (order.razorpayPaymentId ? `\n🔑 Payment ID: ${order.razorpayPaymentId}` : "");
 
   try {
-    await sendWhatsApp(waMsg);
+    await sendWhatsApp(waMsg, retryCtx);
     notifications.whatsapp = true;
     console.log("[Notify] ✅ WhatsApp sent");
   } catch (err: any) {
     notifications.whatsapp = false;
     notifications.whatsappError = err?.message?.slice(0, 200) ?? "unknown";
-    console.error("[Notify] ❌ WhatsApp failed:", notifications.whatsappError);
+    console.error("[Notify] ❌ WhatsApp failed (queued for retry):", notifications.whatsappError);
   }
 
   // ── Email ──
@@ -303,9 +452,10 @@ export async function notifyPaymentSuccess(order: {
         amount,
         items: order.items,
         address,
-        razorpayPaymentId: order.razorpayPaymentId,
+        razorpayPaymentId: order.razorpayPaymentId ?? undefined,
         timestamp,
-      })
+      }),
+      retryCtx,
     );
     notifications.email = true;
   } catch (err: any) {
@@ -328,7 +478,7 @@ export async function notifyPaymentSuccess(order: {
     (order.razorpayPaymentId ? `\n💳 Payment ID: ${order.razorpayPaymentId}` : "");
 
   try {
-    await sendTelegram(tgMsg);
+    await sendTelegram(tgMsg, retryCtx);
     notifications.telegram = true;
   } catch (err: any) {
     notifications.telegram = false;
@@ -338,8 +488,8 @@ export async function notifyPaymentSuccess(order: {
   // ── Log to DB ──
   await logPaymentEvent({
     orderId: order.id,
-    razorpayOrderId: order.razorpayOrderId,
-    razorpayPaymentId: order.razorpayPaymentId,
+    razorpayOrderId: order.razorpayOrderId ?? undefined,
+    razorpayPaymentId: order.razorpayPaymentId ?? undefined,
     event: "payment.success",
     amount,
     customerName: name,

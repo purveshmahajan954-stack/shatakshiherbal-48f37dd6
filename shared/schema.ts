@@ -192,6 +192,28 @@ export const paymentEvents = pgTable(
   ]
 );
 
+export const notificationQueue = pgTable(
+  "notification_queue",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id"),
+    razorpayOrderId: text("razorpay_order_id"),
+    channel: text("channel").notNull(),
+    payload: jsonb("payload").notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    maxAttempts: integer("max_attempts").notNull().default(5),
+    lastError: text("last_error"),
+    status: text("status").notNull().default("pending"),
+    nextRetryAt: timestamp("next_retry_at").defaultNow().notNull(),
+    processedAt: timestamp("processed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("notification_queue_status_idx").on(t.status),
+    index("notification_queue_next_retry_idx").on(t.nextRetryAt),
+  ],
+);
+
 export const contactMessages = pgTable("contact_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),

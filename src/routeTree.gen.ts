@@ -69,6 +69,7 @@ import { Route as ApiAdminUploadImageRouteImport } from './routes/api/admin/uplo
 import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
 import { Route as ApiAdminSigninRouteImport } from './routes/api/admin/signin'
 import { Route as ApiAdminShipmentsRouteImport } from './routes/api/admin/shipments'
+import { Route as ApiAdminRetryNotificationsRouteImport } from './routes/api/admin/retry-notifications'
 import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
 import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
 import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
@@ -379,6 +380,12 @@ const ApiAdminShipmentsRoute = ApiAdminShipmentsRouteImport.update({
   path: '/api/admin/shipments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminRetryNotificationsRoute =
+  ApiAdminRetryNotificationsRouteImport.update({
+    id: '/api/admin/retry-notifications',
+    path: '/api/admin/retry-notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAdminReportsRoute = ApiAdminReportsRouteImport.update({
   id: '/api/admin/reports',
   path: '/api/admin/reports',
@@ -473,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
   '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
@@ -543,6 +551,7 @@ export interface FileRoutesByTo {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
   '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
@@ -615,6 +624,7 @@ export interface FileRoutesById {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
+  '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
   '/api/admin/shipments': typeof ApiAdminShipmentsRoute
   '/api/admin/signin': typeof ApiAdminSigninRoute
   '/api/admin/signout': typeof ApiAdminSignoutRoute
@@ -688,6 +698,7 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
+    | '/api/admin/retry-notifications'
     | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
@@ -758,6 +769,7 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
+    | '/api/admin/retry-notifications'
     | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
@@ -829,6 +841,7 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/products'
     | '/api/admin/reports'
+    | '/api/admin/retry-notifications'
     | '/api/admin/shipments'
     | '/api/admin/signin'
     | '/api/admin/signout'
@@ -891,6 +904,7 @@ export interface RootRouteChildren {
   ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
   ApiAdminProductsRoute: typeof ApiAdminProductsRoute
   ApiAdminReportsRoute: typeof ApiAdminReportsRoute
+  ApiAdminRetryNotificationsRoute: typeof ApiAdminRetryNotificationsRoute
   ApiAdminShipmentsRoute: typeof ApiAdminShipmentsRoute
   ApiAdminSigninRoute: typeof ApiAdminSigninRoute
   ApiAdminSignoutRoute: typeof ApiAdminSignoutRoute
@@ -1338,6 +1352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminShipmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/retry-notifications': {
+      id: '/api/admin/retry-notifications'
+      path: '/api/admin/retry-notifications'
+      fullPath: '/api/admin/retry-notifications'
+      preLoaderRoute: typeof ApiAdminRetryNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/reports': {
       id: '/api/admin/reports'
       path: '/api/admin/reports'
@@ -1469,6 +1490,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminOrdersRoute: ApiAdminOrdersRoute,
   ApiAdminProductsRoute: ApiAdminProductsRoute,
   ApiAdminReportsRoute: ApiAdminReportsRoute,
+  ApiAdminRetryNotificationsRoute: ApiAdminRetryNotificationsRoute,
   ApiAdminShipmentsRoute: ApiAdminShipmentsRoute,
   ApiAdminSigninRoute: ApiAdminSigninRoute,
   ApiAdminSignoutRoute: ApiAdminSignoutRoute,
