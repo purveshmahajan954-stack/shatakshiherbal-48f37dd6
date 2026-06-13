@@ -14,13 +14,20 @@ function ckHeaders() {
   };
 }
 
-/* Retry wrapper — 3 attempts with exponential backoff (500ms, 1s, 2s) */
+/* Wrap an error so withRetry bails out immediately without retrying */
+class NoRetryError extends Error {
+  constructor(message: string) { super(message); this.name = "NoRetryError"; }
+}
+
+/* Retry wrapper — 3 attempts with exponential backoff (500ms, 1s, 2s).
+   Throws NoRetryError directly without any retry. */
 async function withRetry<T>(fn: () => Promise<T>, label: string, attempts = 3): Promise<T> {
   let lastErr: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
       return await fn();
     } catch (err) {
+      if (err instanceof NoRetryError) throw err;
       lastErr = err;
       if (i < attempts - 1) {
         const delay = 500 * Math.pow(2, i);
@@ -158,7 +165,7 @@ export async function trackCKShipShipment(awbNumber: string): Promise<CKShipTrac
     try { data = JSON.parse(bodyText); } catch { throw new Error(`CKShip tracking: Invalid response`); }
 
     if (!res.ok) {
-      if (res.status === 404) throw new Error("Tracking not yet available — AWB may not be active in the courier system yet");
+      if (res.status === 404) throw new NoRetryError("Tracking not yet available — AWB may not be active in the courier system yet");
       throw new Error(data?.message || data?.error || `CKShip track error ${res.status}`);
     }
 
