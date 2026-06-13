@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { FastImage } from "@/components/ui/fast-image";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Minus, Plus, ShoppingBag, Star, Zap, Leaf, Shield, Truck, Sparkles, Droplet, Sun, Moon, Heart, FlaskConical, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -143,7 +144,7 @@ function ProductDetailPage() {
                   </span>
                 )}
                 {/* Discount badge removed */}
-                <img key={activeImg} src={gallery[activeImg]} alt={product.name} className="w-full aspect-square object-cover animate-in fade-in duration-300" />
+                <FastImage key={activeImg} src={gallery[activeImg]} alt={product.name} priority wrapperClassName="w-full" />
               </div>
               <div className="grid grid-cols-6 gap-2">
                 {gallery.map((src, i) => (

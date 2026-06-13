@@ -1,4 +1,5 @@
 import { ArrowRight, Plus, Star, Zap, X, Heart, Search, RefreshCw } from "lucide-react";
+import { FastImage } from "@/components/ui/fast-image";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -168,7 +169,7 @@ export function FeaturedProducts() {
                     >
                       <Heart className={`w-4 h-4 ${wishlist.has(p.slug) ? "fill-primary text-primary" : "text-foreground"}`} />
                     </button>
-                    <img src={p.image} alt={p.name} loading="lazy" width={400} height={400} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <FastImage src={p.image} alt={p.name} wrapperClassName="group-hover:scale-105 transition-transform duration-500" />
                     <button onClick={(e) => handleAdd(e, p)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
                   </div>
                   <div className="p-5">

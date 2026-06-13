@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { FastImage } from "@/components/ui/fast-image";
 import { useState } from "react";
 import { Search, ShoppingBag, X } from "lucide-react";
 import { Header } from "@/components/Header";
@@ -114,12 +115,7 @@ function SearchPage() {
                     {p.badge}
                   </span>
                 )}
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  loading="lazy"
-                  className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                <FastImage src={p.image} alt={p.name} wrapperClassName="group-hover:scale-105 transition-transform duration-500" />
               </Link>
               <div className="p-4">
                 <Link to="/product/$slug" params={{ slug: p.slug }}>

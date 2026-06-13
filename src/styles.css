@@ -98,3 +98,11 @@
   .shadow-soft { box-shadow: 0 10px 40px -10px oklch(0.38 0.09 155 / 0.15); }
   .shadow-card { box-shadow: 0 4px 24px -8px oklch(0.18 0.02 150 / 0.1); }
 }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  animation: shimmer 1.4s linear infinite;
+}

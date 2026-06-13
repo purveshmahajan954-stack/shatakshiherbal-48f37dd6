@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { FastImage } from "@/components/ui/fast-image";
 import { useEffect } from "react";
 import { Heart, Trash2, ShoppingBag, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -81,7 +82,7 @@ function WishlistPage() {
               {items.map((p) => (
                 <article key={p.slug} className="bg-white rounded-2xl overflow-hidden shadow-card group">
                   <Link to="/product/$slug" params={{ slug: p.slug }} className="block bg-accent/30">
-                    <img src={p.image} alt={p.name} loading="lazy" className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <FastImage src={p.image} alt={p.name} wrapperClassName="group-hover:scale-105 transition-transform duration-500" />
                   </Link>
                   <div className="p-5">
                     <Link to="/product/$slug" params={{ slug: p.slug }} className="block">

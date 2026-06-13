@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { FastImage } from "@/components/ui/fast-image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { adminGet, adminPost, adminPatch, adminDelete } from "@/lib/api-client";
 import { clearProductCache } from "@/lib/use-products";
@@ -108,7 +109,7 @@ function ProductsPage() {
                   <tr key={p.id} className="border-t border-border">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {p.imageUrl ? <img src={p.imageUrl} alt={p.name} className="w-10 h-10 object-cover rounded-md border border-border" /> : <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center"><ImageIcon className="w-4 h-4 text-muted-foreground" /></div>}
+                        {p.imageUrl ? <FastImage src={p.imageUrl} alt={p.name} wrapperClassName="w-10 h-10 rounded-md border border-border shrink-0" aspectRatio="square" /> : <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center shrink-0"><ImageIcon className="w-4 h-4 text-muted-foreground" /></div>}
                         <div><div className="font-medium">{p.name}</div><div className="text-xs text-muted-foreground">{p.slug}</div></div>
                       </div>
                     </td>
