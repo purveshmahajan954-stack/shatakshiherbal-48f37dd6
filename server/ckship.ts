@@ -65,13 +65,21 @@ export async function createCKShipShipment(order: {
     const productDesc = (order.items ?? []).map((i) => `${i.name} x${i.qty}`).join(", ").slice(0, 200) || "Herbal Products";
     const totalQty = (order.items ?? []).reduce((s, i) => s + i.qty, 0) || 1;
 
-    // Parse address parts
+    // Parse address parts — remove pincode first so last part = state, second-last = city
     const address = order.shippingAddress ?? "";
-    const parts = address.split(",").map((p) => p.trim());
     const pinMatch = address.match(/\b(\d{6})\b/);
     const pincode = pinMatch?.[1] ?? "400001";
+
+    // Strip the 6-digit pincode (and any surrounding commas/spaces) to get clean parts
+    const cleanAddress = address
+      .replace(/,?\s*\b\d{6}\b\s*,?/g, ",")
+      .replace(/,\s*,/g, ",")
+      .replace(/^,|,$/g, "")
+      .trim();
+    const parts = cleanAddress.split(",").map((p) => p.trim()).filter(Boolean);
+
+    const state = parts.length >= 1 ? parts[parts.length - 1] : "Maharashtra";
     const city = parts.length >= 2 ? parts[parts.length - 2] : "Mumbai";
-    const state = parts.length >= 1 ? parts[parts.length - 1].replace(/\s*\d{6}\s*/, "").trim() : "Maharashtra";
     const streetAddress = parts.slice(0, Math.max(1, parts.length - 2)).join(", ") || address;
 
     // Weight: ~0.3 kg per item, min 0.1 kg
@@ -87,7 +95,7 @@ export async function createCKShipShipment(order: {
       receiver_state_id: state,
       shipment_weight: weight,
       shipment_length: 15,
-      shipment_width: 10,
+      shipment_breadth: 10,
       shipment_height: 10,
       parcel_content_description: productDesc,
       parcel_type: 1,
