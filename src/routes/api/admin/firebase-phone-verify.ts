@@ -7,6 +7,8 @@ import { verifyFirebaseIdToken } from "@server/firebase";
 
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
+const last10 = (p: string) => p.replace(/\D/g, "").slice(-10);
+
 export const Route = createFileRoute("/api/admin/firebase-phone-verify")({
   server: {
     handlers: {
@@ -31,18 +33,20 @@ export const Route = createFileRoute("/api/admin/firebase-phone-verify")({
           return Response.json({ error: "No phone number in token" }, { status: 400 });
         }
 
-        // Check ADMIN_PHONE env var first (fast path)
-        const adminPhone = process.env.ADMIN_PHONE;
-        const normalizedAdminPhone = adminPhone
-          ? (adminPhone.startsWith("+") ? adminPhone : `+91${adminPhone.replace(/\D/g, "").slice(-10)}`)
-          : null;
+        const phoneLast10 = last10(phone);
+        const adminPhoneEnv = process.env.ADMIN_PHONE?.trim();
 
-        if (normalizedAdminPhone && phone !== normalizedAdminPhone) {
-          return Response.json({ error: "This phone number is not authorized as admin" }, { status: 403 });
-        }
+        console.log(`[AdminOTP] verified phone: ${phone} (last10: ${phoneLast10}), ADMIN_PHONE: ${adminPhoneEnv ? "set" : "not set"}`);
 
-        // If no ADMIN_PHONE set, check DB for admin role
-        if (!normalizedAdminPhone) {
+        if (adminPhoneEnv) {
+          // ADMIN_PHONE is set — compare last 10 digits (handles +91, 91, or 10-digit formats)
+          const adminLast10 = last10(adminPhoneEnv);
+          console.log(`[AdminOTP] comparing phoneLast10=${phoneLast10} vs adminLast10=${adminLast10}`);
+          if (adminLast10.length !== 10 || phoneLast10 !== adminLast10) {
+            return Response.json({ error: "This phone number is not authorized as admin" }, { status: 403 });
+          }
+        } else {
+          // No ADMIN_PHONE env — fall back to DB admin role check
           const profileRows = await db
             .select({ id: profiles.id })
             .from(profiles)
@@ -64,7 +68,7 @@ export const Route = createFileRoute("/api/admin/firebase-phone-verify")({
           }
         }
 
-        // Find or create admin profile
+        // Auth passed — find or create admin profile
         let existing = await db
           .select()
           .from(profiles)
