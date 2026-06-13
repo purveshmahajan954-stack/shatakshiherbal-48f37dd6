@@ -11,6 +11,40 @@ import { eq, and, desc } from "drizzle-orm";
 
 const RAZORPAY_BASE = "https://api.razorpay.com/v1";
 
+function mapOrder(o: any) {
+  if (!o) return null;
+  return {
+    id: o.id,
+    user_id: o.userId,
+    items: o.items,
+    total: o.total,
+    subtotal: o.subtotal,
+    gst: o.gst,
+    delivery_charge: o.deliveryCharge,
+    discount: o.discount,
+    coupon_code: o.couponCode,
+    status: o.status,
+    shipping_name: o.shippingName,
+    shipping_phone: o.shippingPhone,
+    shipping_address: o.shippingAddress,
+    email: o.email,
+    razorpay_order_id: o.razorpayOrderId,
+    razorpay_payment_id: o.razorpayPaymentId,
+    payment_method: o.paymentMethod,
+    payment_status: o.paymentStatus,
+    tracking_id: o.trackingId,
+    tracking_status: o.trackingStatus,
+    tracking_location: o.trackingLocation,
+    tracking_eta: o.trackingEta,
+    tracking_events: o.trackingEvents,
+    ckship_shipment_id: o.ckshipShipmentId,
+    awb_number: o.awbNumber,
+    courier_name: o.courierName,
+    shipment_status: o.shipmentStatus,
+    created_at: o.createdAt,
+  };
+}
+
 function rzpAuthHeader() {
   const id = process.env.RAZORPAY_KEY_ID;
   const secret = process.env.RAZORPAY_KEY_SECRET;
@@ -213,7 +247,7 @@ export const getMyOrders = createServerFn({ method: "GET" })
       .where(eq(orders.userId, user.id))
       .orderBy(desc(orders.createdAt))
       .limit(50);
-    return { orders: orderList };
+    return { orders: orderList.map(mapOrder) };
   });
 
 export const getMyOrder = createServerFn({ method: "GET" })
@@ -224,5 +258,5 @@ export const getMyOrder = createServerFn({ method: "GET" })
     const [order] = await db.select().from(orders)
       .where(and(eq(orders.id, data.id), eq(orders.userId, user.id)))
       .limit(1);
-    return { order: order ?? null };
+    return { order: mapOrder(order ?? null) };
   });
