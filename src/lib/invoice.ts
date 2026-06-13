@@ -35,9 +35,8 @@ export function getInvoiceHtml(order: InvoiceData): string {
   const invoiceNumber = generateInvoiceNumber(order.id, order.created_at);
 
   const subtotal = Number(order.subtotal) || 0;
-  const gstAmount = Math.round(subtotal * 0.05);
   const delivery = Number(order.delivery_charge) || 0;
-  const grandTotal = subtotal + gstAmount + delivery;
+  const grandTotal = subtotal + delivery;
 
   const rows = items
     .map(
@@ -77,7 +76,6 @@ export function getInvoiceHtml(order: InvoiceData): string {
   thead th:nth-child(3),thead th:nth-child(4){text-align:right}
   .totals{margin-left:auto;width:280px;border:1px solid #eee;border-radius:8px;overflow:hidden}
   .totals .row{display:flex;justify-content:space-between;padding:9px 14px;font-size:13px;border-bottom:1px solid #eee}
-  .totals .row.gst{color:#666;font-size:12px}
   .totals .row:last-child{background:#2D5016;color:#fff;font-weight:700;font-size:15px;border-bottom:none;padding:12px 14px}
   .footer{margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;line-height:1.6}
   @media print{body{padding:20px}@page{margin:1cm}}
@@ -112,7 +110,7 @@ export function getInvoiceHtml(order: InvoiceData): string {
     <div class="info-box">
       <div class="label">Payment Details</div>
       <div class="value">
-        <strong>Method:</strong> ${order.razorpay_payment_id ? "Online (Razorpay)" : "—"}<br>
+        <strong>Method:</strong> ${(order.razorpay_payment_id || order.payment_status === "paid" || order.payment_status === "confirmed") ? "Online (Razorpay)" : "—"}<br>
         <strong>Status:</strong> <span style="color:#2D5016;font-weight:600;text-transform:capitalize">${order.payment_status}</span><br>
         ${order.razorpay_payment_id ? `<strong>Payment ID:</strong><br><span style="font-size:11px;font-family:monospace">${order.razorpay_payment_id}</span>` : ""}
       </div>
@@ -137,7 +135,6 @@ export function getInvoiceHtml(order: InvoiceData): string {
   <div class="totals">
     <div class="row"><span>Subtotal</span><span>₹${subtotal.toLocaleString("en-IN")}</span></div>
     <div class="row"><span>Delivery Charges</span><span>₹${delivery.toLocaleString("en-IN")}</span></div>
-    <div class="row gst"><span>GST (5%)</span><span>₹${gstAmount.toLocaleString("en-IN")}</span></div>
     <div class="row"><span>Total Amount</span><span>₹${grandTotal.toLocaleString("en-IN")}</span></div>
   </div>
 
