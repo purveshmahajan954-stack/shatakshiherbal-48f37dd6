@@ -37,6 +37,10 @@ async function apiPost(path: string, body: unknown, token: string) {
     },
     body: JSON.stringify(body),
   });
+  const ct = res.headers.get("content-type") ?? "";
+  if (!ct.includes("json")) {
+    throw new Error(res.ok ? "Unexpected server response" : `Request failed (${res.status})`);
+  }
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error ?? `Request failed (${res.status})`);
   return data;
@@ -196,6 +200,8 @@ function CheckoutPage() {
     try {
       const [keyData, order] = await Promise.all([
         fetch("/api/payments/razorpay-key").then(async (r) => {
+          const ct = r.headers.get("content-type") ?? "";
+          if (!ct.includes("json")) throw new Error("Razorpay not configured");
           const d = await r.json();
           if (!r.ok) throw new Error(d?.error ?? "Razorpay not configured");
           return d as { keyId: string };

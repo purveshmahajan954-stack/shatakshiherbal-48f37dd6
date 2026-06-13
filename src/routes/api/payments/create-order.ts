@@ -68,11 +68,16 @@ export const Route = createFileRoute("/api/payments/create-order")({
         if (!parsed.success) return Response.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 });
 
         const { items, shipping } = parsed.data;
-        const trustedItems = items.map((i) => {
-          const product = getProductBySlug(i.slug);
-          if (!product) throw new Error(`Unknown product: ${i.slug}`);
-          return { slug: product.slug, name: product.name, price: Math.round(product.price), qty: i.qty, image: product.image };
-        });
+        let trustedItems: Array<{ slug: string; name: string; price: number; qty: number; image: string }>;
+        try {
+          trustedItems = items.map((i) => {
+            const product = getProductBySlug(i.slug);
+            if (!product) throw new Error(`Unknown product: ${i.slug}`);
+            return { slug: product.slug, name: product.name, price: Math.round(product.price), qty: i.qty, image: product.image };
+          });
+        } catch (err: any) {
+          return Response.json({ error: err?.message ?? "Invalid cart items" }, { status: 400 });
+        }
         const subtotal = trustedItems.reduce((s, i) => s + i.price * i.qty, 0);
         const totals = computeTotals(subtotal);
 

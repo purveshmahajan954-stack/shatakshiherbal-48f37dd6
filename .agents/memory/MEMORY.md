@@ -3,3 +3,4 @@
 - [CF Workers env secrets](cf-env-bridge.md) — CF Workers secrets are on the `env` binding, not `process.env`; must patch dist/server/server.js after build to copy them.
 - [Web Crypto password hashing](webcrypto-passwords.md) — bcryptjs replaced with Web Crypto PBKDF2 in server/password.ts; both DBs must be re-seeded after this change; seed order matters (Neon vs Replit DB).
 - [PBKDF2 CF Workers limit](pbkdf2-cf-workers.md) — 100k iterations exceeded CF Workers CPU limit; reduced to 10k; new hash format v2:iterations:salt:derived; old format auto-detected and re-hashed on login.
+- [API routes must not get HTML error conversion](api-html-error.md) — normalizeCatastrophicSsrResponse in server.ts must skip /api/ and /_serverFn/ routes; otherwise unhandled server errors on API routes return HTML which breaks res.json() callers.
