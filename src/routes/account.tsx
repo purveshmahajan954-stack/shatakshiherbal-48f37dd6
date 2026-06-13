@@ -591,7 +591,7 @@ function AccountPage() {
                     )}
 
                     <div className="mt-4 flex flex-wrap items-center gap-3">
-                      {(o.payment_status === "paid" || o.payment_status === "confirmed") && (
+                      {(o.payment_status === "paid" || o.payment_status === "confirmed" || o.payment_method === "cod") && (
                         <button
                           onClick={() => downloadInvoice(o)}
                           className="inline-flex items-center gap-1.5 border border-primary/40 text-primary bg-primary/5 px-3 py-1.5 rounded-full text-xs font-semibold hover:bg-primary/10 transition"
@@ -616,7 +616,7 @@ function AccountPage() {
                           <Copy className="w-3 h-3" /> Copy ID
                         </button>
                       )}
-                      {o.payment_status !== "paid" && o.payment_status !== "confirmed" && (
+                      {o.payment_status !== "paid" && o.payment_status !== "confirmed" && o.payment_method !== "cod" && !o.payment_status?.startsWith("cod") && (
                         <Link to="/checkout" className="text-xs text-primary font-semibold hover:underline ml-auto">
                           Retry payment <ChevronRight className="w-3 h-3 inline" />
                         </Link>
