@@ -10,4 +10,6 @@ After `npm run build:cloudflare`, run `node scripts/patch-cf-server.mjs` to inje
 
 **How to apply:** The patch is already wired into `npm run build:cloudflare` in `package.json`. If the build output structure changes (server.js fetch handler signature changes), update `scripts/patch-cf-server.mjs` to match the new target string.
 
-Secrets patched: `NEON_DATABASE_URL`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `NODE_ENV`.
+Secrets patched: `NEON_DATABASE_URL`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `FIREBASE_API_KEY`, `ADMIN_PHONE`, `CKSHIP_AUTH_TOKEN`, `NODE_ENV`.
+
+Any new secret added to Replit must also be pushed to CF via `wrangler secret put <KEY>` AND added to the `keys` array in `scripts/patch-cf-server.mjs`.
