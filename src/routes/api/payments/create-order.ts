@@ -73,7 +73,7 @@ export const Route = createFileRoute("/api/payments/create-order")({
           trustedItems = items.map((i) => {
             const product = getProductBySlug(i.slug);
             if (!product) throw new Error(`Unknown product: ${i.slug}`);
-            return { slug: product.slug, name: product.name, price: Math.round(product.price), qty: i.qty, image: product.image };
+            return { slug: product.slug, name: product.name, price: Math.round(product.price), qty: i.qty, image: product.publicImage };
           });
         } catch (err: any) {
           return Response.json({ error: err?.message ?? "Invalid cart items" }, { status: 400 });

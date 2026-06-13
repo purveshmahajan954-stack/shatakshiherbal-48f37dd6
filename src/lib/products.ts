@@ -56,6 +56,7 @@ export type Product = {
   slug: string;
   name: string;
   image: string;
+  publicImage: string;
   desc: string;
   longDesc: string;
   price: number;
@@ -147,6 +148,24 @@ export const slugify = (s: string) =>
 
 
 
+/* Stable public paths — not subject to Vite build hashes, safe to store in DB */
+const publicImageFiles = [
+  "product-1.webp","product-2.webp","product-3_new.webp","product-4_new.webp",
+  "product-5_new.webp","product-6_new.webp","product-7_new.webp","product-8_new.webp",
+  "product-9_new.webp","product-10_new.webp","product-11_new.webp","product-12_new.webp",
+  "product-13_new.webp","product-14_new.webp","product-15_new.webp","product-16_new.webp",
+  "product-17_new.webp","product-18_new.webp","product-19_new.webp","product-20_new.webp",
+  "product-21_new.webp","product-22_new.webp","product-23_new.webp","product-24_new.webp",
+  "product-25_new.webp","product-26_new.webp","product-27_new.webp","product-28_new.webp",
+  "product-29.webp","product-30.webp","product-31.webp","product-32.webp",
+  "product-33.webp","product-34.webp","product-35.webp","product-36.webp",
+  "product-37.webp","product-38.webp","product-39.webp","product-40.webp",
+  "product-41.webp","product-42.webp","product-43.webp","product-44.webp",
+  "product-45.webp","product-46.webp","product-47.webp","product-48.webp",
+  "product-49.webp","product-50.webp","product-51.webp","product-52.webp",
+  "product-53.webp",
+];
+
 const base = [
   { name: "Acidic Capsules", image: img1, desc: "Powerful Ayurvedic capsules formulated to relieve acidity, heartburn & indigestion…", price: 169, oldPrice: 1799, save: 1630, rating: 4.8, reviews: 234, badge: "BESTSELLER", badgeColor: "bg-primary", discount: 28 },
   { name: "Active G5", image: img2, desc: "Advanced Ayurvedic formulation to manage blood sugar levels and support healthy…", price: 249, oldPrice: 899, save: 650, rating: 4.7, reviews: 189, badge: "NEW", badgeColor: "bg-primary-light", discount: 72 },
@@ -203,9 +222,10 @@ const base = [
   { name: "Femina Careers tablets", image: img53, desc: "Femina Careers tablets helps regulate blood sugar levels naturally....", price: 1000, oldPrice: 1599, save: 599, rating: 4.6, reviews: 189, badge: null, badgeColor: "", discount: 37 },
 ];
 
-export const products: Product[] = base.map((p) => ({
+export const products: Product[] = base.map((p, i) => ({
   ...p,
   slug: slugify(p.name),
+  publicImage: `/product-images/${publicImageFiles[i]}`,
   longDesc: `${p.name} is a premium Ayurvedic formulation crafted from time-tested herbs and natural ingredients. ${p.desc.replace(/\.+$/, "")}. Made following authentic Ayurvedic principles, each batch is tested for purity and potency to deliver consistent wellness benefits.`,
   category: "Ayurvedic Tablets / Medicines",
   benefits: [

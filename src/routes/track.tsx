@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef } from "react";
+import { getProductBySlug, slugify } from "@/lib/products";
 import {
   Search, Phone, Hash, Loader2, Package, PackageCheck, Truck,
   MapPin, Clock, Check, CircleDashed, XCircle, RefreshCw,
@@ -416,16 +417,25 @@ function StatusCard({ data }: { data: TrackingData }) {
           <Boxes className="w-5 h-5 text-primary" /> Items in this shipment
         </h3>
         <ul className="divide-y divide-border">
-          {(data.items ?? []).map((item, idx) => (
+          {(data.items ?? []).map((item, idx) => {
+            /* Stale Vite-hashed URLs (e.g. /_build/assets/...) break after redeploy.
+               Fall back to the live publicImage from the products list. */
+            const stableImage = (() => {
+              if (item.image?.startsWith("/product-images/")) return item.image;
+              const p = getProductBySlug(slugify(item.name));
+              return p?.publicImage ?? item.image ?? null;
+            })();
+            return (
             <li key={idx} className="py-3 flex items-center gap-3 text-sm">
-              {item.image && (
-                <img src={item.image} alt={item.name} className="w-12 h-12 rounded-md object-cover bg-accent/30 shrink-0" />
+              {stableImage && (
+                <img src={stableImage} alt={item.name} className="w-12 h-12 rounded-md object-cover bg-accent/30 shrink-0" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
               )}
               <span className="flex-1 truncate">{item.name}</span>
               <span className="text-muted-foreground">× {item.qty}</span>
               <span className="w-20 text-right font-medium">₹{item.price * item.qty}</span>
             </li>
-          ))}
+            );
+          })}
         </ul>
         <div className="border-t border-border mt-3 pt-3 flex justify-between font-semibold">
           <span>Total</span>
