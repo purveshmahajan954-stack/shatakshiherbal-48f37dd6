@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as TrackRouteImport } from './routes/track'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShopRouteImport } from './routes/shop'
@@ -86,6 +87,11 @@ import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/publi
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -199,9 +205,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const TrackTrackingIdRoute = TrackTrackingIdRouteImport.update({
-  id: '/track/$trackingId',
-  path: '/track/$trackingId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$trackingId',
+  path: '/$trackingId',
+  getParentRoute: () => TrackRoute,
 } as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
@@ -475,6 +481,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/track': typeof TrackRouteWithChildren
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -549,6 +556,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/track': typeof TrackRouteWithChildren
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -625,6 +633,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/track': typeof TrackRouteWithChildren
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -702,6 +711,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/signup'
     | '/terms'
+    | '/track'
     | '/wishlist'
     | '/admin/customers'
     | '/admin/dashboard'
@@ -776,6 +786,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/signup'
     | '/terms'
+    | '/track'
     | '/wishlist'
     | '/admin/customers'
     | '/admin/dashboard'
@@ -851,6 +862,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/signup'
     | '/terms'
+    | '/track'
     | '/wishlist'
     | '/admin/customers'
     | '/admin/dashboard'
@@ -927,6 +939,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
+  TrackRoute: typeof TrackRouteWithChildren
   WishlistRoute: typeof WishlistRoute
   ApiContactRoute: typeof ApiContactRoute
   ApiDeliveryWebhookRoute: typeof ApiDeliveryWebhookRoute
@@ -934,7 +947,6 @@ export interface RootRouteChildren {
   ApiProductsRoute: typeof ApiProductsRoute
   ApiTrackOrderRoute: typeof ApiTrackOrderRoute
   ProductSlugRoute: typeof ProductSlugRoute
-  TrackTrackingIdRoute: typeof TrackTrackingIdRoute
   ApiAdminCustomersRoute: typeof ApiAdminCustomersRoute
   ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
   ApiAdminFirebasePhoneVerifyRoute: typeof ApiAdminFirebasePhoneVerifyRoute
@@ -978,6 +990,13 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1136,10 +1155,10 @@ declare module '@tanstack/react-router' {
     }
     '/track/$trackingId': {
       id: '/track/$trackingId'
-      path: '/track/$trackingId'
+      path: '/$trackingId'
       fullPath: '/track/$trackingId'
       preLoaderRoute: typeof TrackTrackingIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof TrackRoute
     }
     '/product/$slug': {
       id: '/product/$slug'
@@ -1515,6 +1534,16 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface TrackRouteChildren {
+  TrackTrackingIdRoute: typeof TrackTrackingIdRoute
+}
+
+const TrackRouteChildren: TrackRouteChildren = {
+  TrackTrackingIdRoute: TrackTrackingIdRoute,
+}
+
+const TrackRouteWithChildren = TrackRoute._addFileChildren(TrackRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1537,6 +1566,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
+  TrackRoute: TrackRouteWithChildren,
   WishlistRoute: WishlistRoute,
   ApiContactRoute: ApiContactRoute,
   ApiDeliveryWebhookRoute: ApiDeliveryWebhookRoute,
@@ -1544,7 +1574,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductsRoute: ApiProductsRoute,
   ApiTrackOrderRoute: ApiTrackOrderRoute,
   ProductSlugRoute: ProductSlugRoute,
-  TrackTrackingIdRoute: TrackTrackingIdRoute,
   ApiAdminCustomersRoute: ApiAdminCustomersRoute,
   ApiAdminDashboardRoute: ApiAdminDashboardRoute,
   ApiAdminFirebasePhoneVerifyRoute: ApiAdminFirebasePhoneVerifyRoute,
