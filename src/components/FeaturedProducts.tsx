@@ -149,7 +149,7 @@ export function FeaturedProducts() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((p) => (
+            {filtered.map((p, index) => (
               <Link to="/product/$slug" params={{ slug: p.slug }} key={p.slug} className="group bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-soft transition-all block">
                 <article>
                   <div className="relative bg-accent/30">
@@ -169,7 +169,7 @@ export function FeaturedProducts() {
                     >
                       <Heart className={`w-4 h-4 ${wishlist.has(p.slug) ? "fill-primary text-primary" : "text-foreground"}`} />
                     </button>
-                    <FastImage src={p.image} alt={p.name} wrapperClassName="group-hover:scale-105 transition-transform duration-500" />
+                    <FastImage src={p.image} alt={p.name} priority={index < 6} wrapperClassName="group-hover:scale-105 transition-transform duration-500" />
                     <button onClick={(e) => handleAdd(e, p)} className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground py-3 font-semibold tracking-wider text-sm opacity-0 group-hover:opacity-100 transition-opacity">QUICK ADD</button>
                   </div>
                   <div className="p-5">
