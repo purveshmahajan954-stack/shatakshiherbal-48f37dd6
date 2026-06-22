@@ -57,7 +57,7 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
   };
 }
 
-const CACHE_TTL = 30 * 1000;
+const CACHE_TTL = 5 * 1000;
 let _cache: { data: Product[]; at: number } | null = null;
 let _inflight: Promise<Product[]> | null = null;
 
@@ -66,11 +66,16 @@ export function clearProductCache() {
   _inflight = null;
 }
 
+function isCacheFresh() {
+  return _cache !== null && Date.now() - _cache.at < CACHE_TTL;
+}
+
 export async function fetchProductsFromDb(): Promise<Product[]> {
-  if (_cache && Date.now() - _cache.at < CACHE_TTL) return _cache.data;
+  if (isCacheFresh()) return _cache!.data;
   if (_inflight) return _inflight;
 
   _inflight = fetch("/api/products", {
+    cache: "no-store",
     headers: { Accept: "application/json" },
   })
     .then(async (res) => {
@@ -89,11 +94,11 @@ export async function fetchProductsFromDb(): Promise<Product[]> {
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
   try {
-    if (_cache) {
-      const hit = _cache.data.find((p) => p.slug === slug);
+    if (isCacheFresh()) {
+      const hit = _cache!.data.find((p) => p.slug === slug);
       if (hit) return hit;
     }
-    const res = await fetch(`/api/products?slug=${encodeURIComponent(slug)}`);
+    const res = await fetch(`/api/products?slug=${encodeURIComponent(slug)}`, { cache: "no-store" });
     if (!res.ok) return getProductBySlug(slug) ?? null;
     const data = await res.json();
     if (!data.product) return getProductBySlug(slug) ?? null;
@@ -126,8 +131,8 @@ export function useProducts() {
 
   useEffect(() => {
     mounted.current = true;
-    if (_cache && Date.now() - _cache.at < CACHE_TTL) {
-      setItems(_cache.data.length > 0 ? _cache.data : staticProducts);
+    if (isCacheFresh()) {
+      setItems(_cache!.data.length > 0 ? _cache!.data : staticProducts);
     } else {
       load(false);
     }
