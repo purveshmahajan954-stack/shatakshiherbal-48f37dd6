@@ -115,9 +115,16 @@ function ShippingPage() {
   const action = async (orderId: string, act: string, label: string) => {
     setBusyId(orderId + act);
     try {
-      const result = await adminPatch<{ ok: boolean; pending?: boolean; message?: string }>(`/api/admin/shipments?action=${act}&order_id=${orderId}`, {});
+      const result = await adminPatch<{ ok: boolean; pending?: boolean; message?: string; labelUrl?: string | null }>(`/api/admin/shipments?action=${act}&order_id=${orderId}`, {});
       if (result?.pending) {
         toast.info(result.message ?? "Tracking not yet active — check again in a few minutes");
+      } else if (act === "refresh-label") {
+        if (result?.labelUrl) {
+          window.open(result.labelUrl, "_blank", "noopener,noreferrer");
+          toast.success("Label ready — opening in new tab");
+        } else {
+          toast.warning("Label URL not yet available from CKShip — try again in a minute");
+        }
       } else {
         toast.success(label);
       }
@@ -132,8 +139,13 @@ function ShippingPage() {
   const createShipment = async (orderId: string) => {
     setBusyId(orderId + "create");
     try {
-      await adminPost("/api/admin/shipments", { order_id: orderId });
-      toast.success("Shipment created successfully");
+      const res = await adminPost<{ ok: boolean; result?: { labelUrl?: string | null; awbNumber?: string | null } }>("/api/admin/shipments", { order_id: orderId });
+      if (res?.result?.labelUrl) {
+        window.open(res.result.labelUrl, "_blank", "noopener,noreferrer");
+        toast.success("Shipment created! Label opening in new tab 🖨️");
+      } else {
+        toast.success("Shipment created successfully");
+      }
       await load();
     } catch (err: any) {
       toast.error(err.message || "Shipment creation failed");
