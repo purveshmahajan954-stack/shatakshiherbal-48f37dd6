@@ -39,6 +39,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
             shippingCost: orders.shippingCost,
             labelUrl: orders.labelUrl,
             shipmentStatus: orders.shipmentStatus,
+            paymentMethod: orders.paymentMethod,
             items: orders.items,
             createdAt: orders.createdAt,
           })
@@ -70,6 +71,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
             shippingAddress: order.shippingAddress,
             total: order.total,
             items: order.items as any,
+            paymentMethod: order.paymentMethod,
           });
 
           await db.update(orders)
@@ -211,6 +213,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
               shippingAddress: order.shippingAddress,
               total: order.total,
               items: order.items as any,
+              paymentMethod: order.paymentMethod,
             });
             await db.update(orders)
               .set({

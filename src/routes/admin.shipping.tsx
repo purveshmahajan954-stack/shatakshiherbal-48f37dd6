@@ -20,6 +20,7 @@ type Shipment = {
   email: string | null;
   total: string;
   paymentStatus: string;
+  paymentMethod: string;
   status: string;
   trackingId: string | null;
   trackingStatus: string;
@@ -87,7 +88,7 @@ function ShippingPage() {
 
   const stats = useMemo(() => {
     const total = shipments.length;
-    const notCreated = shipments.filter((s) => s.shipmentStatus === "Not Created" && s.paymentStatus === "paid").length;
+    const notCreated = shipments.filter((s) => s.shipmentStatus === "Not Created" && (s.paymentStatus === "paid" || s.paymentMethod === "cod")).length;
     const shipped = shipments.filter((s) => ["Shipped", "In Transit", "Out for Delivery"].includes(s.trackingStatus)).length;
     const delivered = shipments.filter((s) => s.trackingStatus === "Delivered").length;
     const returned = shipments.filter((s) => s.trackingStatus === "Returned").length;
@@ -303,7 +304,7 @@ function ShippingPage() {
                       <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmtDate(s.createdAt)}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 flex-wrap">
-                          {s.shipmentStatus === "Not Created" && s.paymentStatus === "paid" && (
+                          {s.shipmentStatus === "Not Created" && (s.paymentStatus === "paid" || s.paymentMethod === "cod") && (
                             <ActionBtn
                               label="Create"
                               icon={<Package className="w-3.5 h-3.5" />}

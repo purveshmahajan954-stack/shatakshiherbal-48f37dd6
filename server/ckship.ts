@@ -92,6 +92,8 @@ export async function createCKShipShipment(order: {
     // Weight: ~0.3 kg per item, min 0.1 kg
     const weight = Math.max(0.1, totalQty * 0.3);
 
+    const isCod = order.paymentMethod?.toLowerCase() === "cod";
+
     const payload = {
       address_id: 195,
       receiver_name: order.shippingName ?? "Customer",
@@ -109,6 +111,7 @@ export async function createCKShipShipment(order: {
       qty: totalQty,
       invoice_amount: Number(order.total),
       order_id: order.id,
+      ...(isCod ? { payment_mode: "cod", cod_amount: Number(order.total) } : {}),
     };
 
     console.log("[CKShip] createShipment payload:", JSON.stringify(payload));
