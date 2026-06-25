@@ -485,7 +485,7 @@ function CheckoutPage() {
 
             {payMethod === "online" ? (
               <button
-                onClick={handlePay}
+                onClick={() => handlePay()}
                 disabled={busy}
                 className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 disabled:opacity-60"
               >
@@ -496,7 +496,7 @@ function CheckoutPage() {
               </button>
             ) : (
               <button
-                onClick={handleCOD}
+                onClick={() => handleCOD()}
                 disabled={busy}
                 className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-amber-500 text-white py-3 rounded-full font-semibold hover:bg-amber-600 disabled:opacity-60"
               >
