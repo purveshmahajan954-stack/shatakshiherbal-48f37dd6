@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import type { SavedAddress } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { computeTotals } from "@/lib/payments.functions";
-import { Loader2, ShieldCheck, MapPin, Wallet, Search, Check, Banknote, CreditCard } from "lucide-react";
+import { Loader2, ShieldCheck, MapPin, Wallet, Search, Check, Banknote, CreditCard, Phone, X } from "lucide-react";
 
 const INDIAN_STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry"];
 
@@ -67,6 +67,10 @@ function CheckoutPage() {
   const [pincodeError, setPincodeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [payMethod, setPayMethod] = useState<"online" | "cod">("online");
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [pendingPayAction, setPendingPayAction] = useState<"online" | "cod" | null>(null);
+  const [modalPhone, setModalPhone] = useState("");
+  const [modalPhoneError, setModalPhoneError] = useState("");
   const pincodeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -158,11 +162,11 @@ function CheckoutPage() {
     return parts.join(", ");
   };
 
-  const validateAddress = () => {
+  const validateAddress = (skipPhone = false) => {
     if (items.length === 0) { toast.error("Your cart is empty"); return false; }
     if (name.trim().length < 2) { toast.error("Please enter your name"); return false; }
     if (!/^\S+@\S+\.\S+$/.test(email)) { toast.error("Please enter a valid email"); return false; }
-    if (phone.replace(/\D/g, "").length < 10) { toast.error("Please enter a valid phone number"); return false; }
+    if (!skipPhone && phone.replace(/\D/g, "").length < 10) { toast.error("Please enter a valid phone number"); return false; }
     if (flatHouse.trim().length < 3) { toast.error("Please enter your flat/house address"); return false; }
     if (pincode.length !== 6) { toast.error("Please enter a valid 6-digit pincode"); return false; }
     if (!city.trim()) { toast.error("Please enter your city"); return false; }
@@ -170,8 +174,37 @@ function CheckoutPage() {
     return true;
   };
 
-  const handleCOD = async () => {
-    if (!validateAddress()) return;
+  const openPhoneModalFor = (action: "online" | "cod") => {
+    setModalPhone("");
+    setModalPhoneError("");
+    setPendingPayAction(action);
+    setShowPhoneModal(true);
+  };
+
+  const handleModalPhoneSubmit = () => {
+    const digits = modalPhone.replace(/\D/g, "");
+    if (digits.length < 10) {
+      setModalPhoneError("Please enter a valid 10-digit phone number");
+      return;
+    }
+    const normalized = digits.slice(-10);
+    setPhone(normalized);
+    setShowPhoneModal(false);
+    if (pendingPayAction === "online") {
+      setTimeout(() => handlePay(normalized), 50);
+    } else if (pendingPayAction === "cod") {
+      setTimeout(() => handleCOD(normalized), 50);
+    }
+  };
+
+  const handleCOD = async (phoneOverride?: string) => {
+    const effectivePhone = phoneOverride ?? phone;
+    if (phoneOverride === undefined && effectivePhone.replace(/\D/g, "").length < 10) {
+      if (!validateAddress(true)) return;
+      openPhoneModalFor("cod");
+      return;
+    }
+    if (!validateAddress(true)) return;
     const token = localStorage.getItem("auth_token");
     if (!token) return toast.error("Please sign in first");
     const fullAddress = buildFullAddress();
@@ -179,7 +212,7 @@ function CheckoutPage() {
     try {
       const res = await apiPost("/api/payments/cod-order", {
         items: items.map((i) => ({ slug: i.slug, qty: i.qty, name: i.name, price: i.price, image: i.image })),
-        shipping: { name, email, phone, address: fullAddress },
+        shipping: { name, email, phone: effectivePhone, address: fullAddress },
       }, token) as { orderId: string; totals: any };
       clear();
       navigate({ to: "/payment-success", search: { o: res.orderId } });
@@ -189,8 +222,14 @@ function CheckoutPage() {
     }
   };
 
-  const handlePay = async () => {
-    if (!validateAddress()) return;
+  const handlePay = async (phoneOverride?: string) => {
+    const effectivePhone = phoneOverride ?? phone;
+    if (phoneOverride === undefined && effectivePhone.replace(/\D/g, "").length < 10) {
+      if (!validateAddress(true)) return;
+      openPhoneModalFor("online");
+      return;
+    }
+    if (!validateAddress(true)) return;
     const token = localStorage.getItem("auth_token");
     if (!token) return toast.error("Please sign in first");
 
@@ -208,7 +247,7 @@ function CheckoutPage() {
         }),
         apiPost("/api/payments/create-order", {
           items: items.map((i) => ({ slug: i.slug, qty: i.qty, name: i.name, price: i.price, image: i.image })),
-          shipping: { name, email, phone, address: fullAddress },
+          shipping: { name, email, phone: effectivePhone, address: fullAddress },
         }, token) as Promise<{ razorpayOrderId: string; amount: number; currency: string; orderId: string; totals: any }>,
       ]);
 
@@ -219,7 +258,7 @@ function CheckoutPage() {
         name: "Shatakshi Herbal",
         description: `Order #${order.orderId.slice(0, 8)}`,
         order_id: order.razorpayOrderId,
-        prefill: { name, email, contact: phone },
+        prefill: { name, email, contact: effectivePhone },
         notes: { address: fullAddress },
         theme: { color: "#2D5016" },
         method: { upi: true, card: true, netbanking: true, wallet: true },
@@ -479,6 +518,55 @@ function CheckoutPage() {
         </div>
       </main>
       <Footer />
+
+      {/* Phone number modal */}
+      {showPhoneModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPhoneModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setShowPhoneModal(false)}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mx-auto mb-4">
+              <Phone className="w-6 h-6 text-primary" />
+            </div>
+
+            <h3 className="font-display text-xl text-center mb-1">Phone number required</h3>
+            <p className="text-sm text-muted-foreground text-center mb-5">
+              We need your phone number to confirm your order and keep you updated on delivery.
+            </p>
+
+            <div className="space-y-1 mb-4">
+              <div className="flex items-center border border-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary">
+                <span className="px-3 py-2.5 bg-muted text-sm font-medium text-muted-foreground border-r border-border select-none">+91</span>
+                <input
+                  autoFocus
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={modalPhone}
+                  onChange={(e) => { setModalPhone(e.target.value.replace(/\D/g, "").slice(0, 10)); setModalPhoneError(""); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleModalPhoneSubmit()}
+                  placeholder="10-digit mobile number"
+                  className="flex-1 px-3 py-2.5 text-sm focus:outline-none"
+                />
+              </div>
+              {modalPhoneError && <p className="text-xs text-red-500">{modalPhoneError}</p>}
+            </div>
+
+            <button
+              onClick={handleModalPhoneSubmit}
+              className="w-full bg-primary text-primary-foreground py-2.5 rounded-full font-semibold text-sm hover:opacity-90 transition"
+            >
+              {pendingPayAction === "cod" ? "Continue & Place Order" : "Continue to Payment"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
