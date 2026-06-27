@@ -10,6 +10,7 @@
     "build:netlify": "vite build",
     "build:cloudflare": "vite build --config vite.config.cf.ts && node scripts/patch-cf-server.mjs",
     "deploy:cloudflare": "npm run build:cloudflare && wrangler deploy",
+    "deploy:cf": "bash scripts/deploy-cf.sh",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
