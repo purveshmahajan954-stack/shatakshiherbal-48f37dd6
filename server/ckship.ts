@@ -111,7 +111,8 @@ export async function createCKShipShipment(order: {
       qty: totalQty,
       invoice_amount: Number(order.total),
       order_id: order.id,
-      ...(isCod ? { payment_mode: "cod", cod_amount: Number(order.total) } : {}),
+      payment_method: isCod ? "COD" : "prepaid",
+      ...(isCod ? { cod_amount: Number(order.total) } : {}),
     };
 
     console.log("[CKShip] createShipment payload:", JSON.stringify(payload));

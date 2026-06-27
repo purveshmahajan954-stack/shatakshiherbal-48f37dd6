@@ -103,6 +103,7 @@ export const Route = createFileRoute("/api/payments/verify")({
               shippingAddress: order.shippingAddress,
               total: order.total,
               items: (order.items ?? []) as Array<{ name: string; qty: number; price: number }>,
+              paymentMethod: "prepaid",
             });
 
             await db.update(orders)
