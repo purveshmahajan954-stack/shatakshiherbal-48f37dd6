@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Shield, Loader2, Phone, KeyRound, Eye, EyeOff } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 
@@ -23,18 +23,15 @@ function AdminLoginPage() {
   const [tab, setTab] = useState<Tab>("otp");
   const [error, setError] = useState<string | null>(null);
 
-  // Password tab
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  // OTP tab
   const [otpStep, setOtpStep] = useState<OtpStep>("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [otpBusy, setOtpBusy] = useState(false);
-  const confirmationRef = useRef<any>(null);
 
   useEffect(() => {
     if (!loading && admin) navigate({ to: "/admin", replace: true });
@@ -68,16 +65,19 @@ function AdminLoginPage() {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!phone.trim()) return;
+    if (!phone.trim() || phone.length < 10) return;
     setOtpBusy(true);
     try {
-      const { sendPhoneOtp } = await import("@/lib/firebase");
-      confirmationRef.current = await sendPhoneOtp(phone.trim(), "admin-recaptcha-container");
+      const res = await fetch("/api/admin/otp-send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send OTP");
       setOtpStep("code");
     } catch (err: any) {
-      setError(err?.message || "OTP bhejne mein problem aayi. Dobara try karein.");
-      const { clearRecaptcha } = await import("@/lib/firebase");
-      clearRecaptcha();
+      setError(err?.message || "Failed to send OTP. Please try again.");
     } finally {
       setOtpBusy(false);
     }
@@ -86,26 +86,22 @@ function AdminLoginPage() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!code.trim() || !confirmationRef.current) return;
+    if (!code.trim() || code.length < 6) return;
     setOtpBusy(true);
     try {
-      const { confirmPhoneOtp } = await import("@/lib/firebase");
-      const idToken = await confirmPhoneOtp(confirmationRef.current, code.trim());
-
-      const res = await fetch("/api/admin/firebase-phone-verify", {
+      const res = await fetch("/api/admin/otp-verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ phone, code }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Verification failed");
-
       localStorage.setItem("admin_token", data.token);
       if (data.admin) localStorage.setItem("admin_data", JSON.stringify(data.admin));
       navigate({ to: "/admin", replace: true });
     } catch (err: any) {
-      setError(err?.message || "Galat OTP. Dobara try karein.");
-      if (err?.message?.toLowerCase().includes("invalid") || err?.message?.toLowerCase().includes("expired")) {
+      setError(err?.message || "Incorrect OTP. Please try again.");
+      if (err?.message?.toLowerCase().includes("expired") || err?.message?.toLowerCase().includes("not found")) {
         setCode("");
       }
     } finally {
@@ -113,25 +109,21 @@ function AdminLoginPage() {
     }
   };
 
-  const handleResend = async () => {
+  const handleResend = () => {
     setOtpStep("phone");
     setCode("");
     setError(null);
-    confirmationRef.current = null;
-    const { clearRecaptcha } = await import("@/lib/firebase");
-    clearRecaptcha();
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-cream to-primary/5 px-4 py-10">
-      <div id="admin-recaptcha-container" />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
             <Shield className="w-7 h-7 text-primary" />
           </div>
           <h1 className="font-display text-3xl text-foreground">Admin Sign In</h1>
-          <p className="text-sm text-muted-foreground mt-1">Restricted Area</p>
+          <p className="text-sm text-muted-foreground mt-1">Restricted Area — Authorized Personnel Only</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-card p-7 border border-border/50 space-y-5">
@@ -139,27 +131,21 @@ function AdminLoginPage() {
           <div className="flex rounded-xl border border-border overflow-hidden">
             <button
               type="button"
-              onClick={() => { setTab("otp"); setError(null); }}
+              onClick={() => { setTab("otp"); setError(null); setOtpStep("phone"); setCode(""); }}
               className={`flex-1 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition ${
-                tab === "otp"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-white text-muted-foreground hover:bg-gray-50"
+                tab === "otp" ? "bg-primary text-primary-foreground" : "bg-white text-muted-foreground hover:bg-gray-50"
               }`}
             >
-              <Phone className="w-4 h-4" />
-              Phone OTP
+              <Phone className="w-4 h-4" />Phone OTP
             </button>
             <button
               type="button"
               onClick={() => { setTab("password"); setError(null); }}
               className={`flex-1 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition ${
-                tab === "password"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-white text-muted-foreground hover:bg-gray-50"
+                tab === "password" ? "bg-primary text-primary-foreground" : "bg-white text-muted-foreground hover:bg-gray-50"
               }`}
             >
-              <KeyRound className="w-4 h-4" />
-              Password
+              <KeyRound className="w-4 h-4" />Password
             </button>
           </div>
 
@@ -178,16 +164,18 @@ function AdminLoginPage() {
                         required
                         type="tel"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                        onChange={(e) => { setPhone(e.target.value.replace(/\D/g, "").slice(0, 10)); setError(null); }}
                         placeholder="10-digit mobile number"
                         autoComplete="tel"
                         maxLength={10}
+                        inputMode="numeric"
                         className="flex-1 border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </div>
                   {error && (
-                    <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                    <div className={`text-sm rounded-lg px-3 py-2 border ${error.toLowerCase().includes("denied") || error.toLowerCase().includes("authorized") ? "text-red-700 bg-red-50 border-red-200 font-medium" : "text-red-600 bg-red-50 border-red-200"}`}>
+                      {error.toLowerCase().includes("denied") && "🚫 "}
                       {error}
                     </div>
                   )}
@@ -197,15 +185,15 @@ function AdminLoginPage() {
                     className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
                   >
                     {otpBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Phone className="w-4 h-4" />}
-                    {otpBusy ? "OTP bhej rahe hain…" : "Send OTP"}
+                    {otpBusy ? "Sending OTP…" : "Send OTP"}
                   </button>
                 </form>
               ) : (
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1.5">OTP Enter Karein</label>
+                    <label className="block text-sm font-medium mb-1.5">Enter OTP</label>
                     <p className="text-xs text-muted-foreground mb-3">
-                      +91 {phone} par code bheja gaya hai
+                      A 6-digit code was sent to +91 {phone}
                     </p>
                     <input
                       required
@@ -213,7 +201,7 @@ function AdminLoginPage() {
                       inputMode="numeric"
                       pattern="\d{6}"
                       value={code}
-                      onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      onChange={(e) => { setCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setError(null); }}
                       placeholder="6-digit OTP"
                       autoComplete="one-time-code"
                       maxLength={6}
@@ -232,14 +220,14 @@ function AdminLoginPage() {
                     className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
                   >
                     {otpBusy && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {otpBusy ? "Verify ho raha hai…" : "Verify & Sign In"}
+                    {otpBusy ? "Verifying…" : "Verify & Sign In"}
                   </button>
                   <button
                     type="button"
                     onClick={handleResend}
                     className="w-full text-sm text-muted-foreground hover:text-primary transition py-1"
                   >
-                    Number change karein / OTP dobara bhejein
+                    Change number / Resend OTP
                   </button>
                 </form>
               )}
@@ -250,9 +238,7 @@ function AdminLoginPage() {
           {tab === "password" && (
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1.5">
-                  Username or Email
-                </label>
+                <label className="block text-sm font-medium mb-1.5">Username or Email</label>
                 <input
                   type="text"
                   autoComplete="username"
@@ -264,9 +250,7 @@ function AdminLoginPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">
-                  Password
-                </label>
+                <label className="block text-sm font-medium mb-1.5">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -302,6 +286,10 @@ function AdminLoginPage() {
             </form>
           )}
         </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-4">
+          Only authorized admin numbers can access this panel.
+        </p>
       </div>
     </div>
   );

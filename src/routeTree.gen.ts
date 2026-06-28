@@ -77,6 +77,8 @@ import { Route as ApiAdminShipmentsRouteImport } from './routes/api/admin/shipme
 import { Route as ApiAdminRetryNotificationsRouteImport } from './routes/api/admin/retry-notifications'
 import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
 import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
+import { Route as ApiAdminOtpVerifyRouteImport } from './routes/api/admin/otp-verify'
+import { Route as ApiAdminOtpSendRouteImport } from './routes/api/admin/otp-send'
 import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
 import { Route as ApiAdminMigrateRouteImport } from './routes/api/admin/migrate'
 import { Route as ApiAdminMeRouteImport } from './routes/api/admin/me'
@@ -428,6 +430,16 @@ const ApiAdminProductsRoute = ApiAdminProductsRouteImport.update({
   path: '/api/admin/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminOtpVerifyRoute = ApiAdminOtpVerifyRouteImport.update({
+  id: '/api/admin/otp-verify',
+  path: '/api/admin/otp-verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminOtpSendRoute = ApiAdminOtpSendRouteImport.update({
+  id: '/api/admin/otp-send',
+  path: '/api/admin/otp-send',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
   id: '/api/admin/orders',
   path: '/api/admin/orders',
@@ -521,6 +533,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
+  '/api/admin/otp-send': typeof ApiAdminOtpSendRoute
+  '/api/admin/otp-verify': typeof ApiAdminOtpVerifyRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
   '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
@@ -598,6 +612,8 @@ export interface FileRoutesByTo {
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
+  '/api/admin/otp-send': typeof ApiAdminOtpSendRoute
+  '/api/admin/otp-verify': typeof ApiAdminOtpVerifyRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
   '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
@@ -677,6 +693,8 @@ export interface FileRoutesById {
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
   '/api/admin/orders': typeof ApiAdminOrdersRoute
+  '/api/admin/otp-send': typeof ApiAdminOtpSendRoute
+  '/api/admin/otp-verify': typeof ApiAdminOtpVerifyRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
   '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
@@ -757,6 +775,8 @@ export interface FileRouteTypes {
     | '/api/admin/me'
     | '/api/admin/migrate'
     | '/api/admin/orders'
+    | '/api/admin/otp-send'
+    | '/api/admin/otp-verify'
     | '/api/admin/products'
     | '/api/admin/reports'
     | '/api/admin/retry-notifications'
@@ -834,6 +854,8 @@ export interface FileRouteTypes {
     | '/api/admin/me'
     | '/api/admin/migrate'
     | '/api/admin/orders'
+    | '/api/admin/otp-send'
+    | '/api/admin/otp-verify'
     | '/api/admin/products'
     | '/api/admin/reports'
     | '/api/admin/retry-notifications'
@@ -912,6 +934,8 @@ export interface FileRouteTypes {
     | '/api/admin/me'
     | '/api/admin/migrate'
     | '/api/admin/orders'
+    | '/api/admin/otp-send'
+    | '/api/admin/otp-verify'
     | '/api/admin/products'
     | '/api/admin/reports'
     | '/api/admin/retry-notifications'
@@ -980,6 +1004,8 @@ export interface RootRouteChildren {
   ApiAdminMeRoute: typeof ApiAdminMeRoute
   ApiAdminMigrateRoute: typeof ApiAdminMigrateRoute
   ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
+  ApiAdminOtpSendRoute: typeof ApiAdminOtpSendRoute
+  ApiAdminOtpVerifyRoute: typeof ApiAdminOtpVerifyRoute
   ApiAdminProductsRoute: typeof ApiAdminProductsRoute
   ApiAdminReportsRoute: typeof ApiAdminReportsRoute
   ApiAdminRetryNotificationsRoute: typeof ApiAdminRetryNotificationsRoute
@@ -1487,6 +1513,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/otp-verify': {
+      id: '/api/admin/otp-verify'
+      path: '/api/admin/otp-verify'
+      fullPath: '/api/admin/otp-verify'
+      preLoaderRoute: typeof ApiAdminOtpVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/otp-send': {
+      id: '/api/admin/otp-send'
+      path: '/api/admin/otp-send'
+      fullPath: '/api/admin/otp-send'
+      preLoaderRoute: typeof ApiAdminOtpSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/orders': {
       id: '/api/admin/orders'
       path: '/api/admin/orders'
@@ -1623,6 +1663,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminMeRoute: ApiAdminMeRoute,
   ApiAdminMigrateRoute: ApiAdminMigrateRoute,
   ApiAdminOrdersRoute: ApiAdminOrdersRoute,
+  ApiAdminOtpSendRoute: ApiAdminOtpSendRoute,
+  ApiAdminOtpVerifyRoute: ApiAdminOtpVerifyRoute,
   ApiAdminProductsRoute: ApiAdminProductsRoute,
   ApiAdminReportsRoute: ApiAdminReportsRoute,
   ApiAdminRetryNotificationsRoute: ApiAdminRetryNotificationsRoute,
