@@ -4,7 +4,7 @@ import { adminGet, adminPost, adminPatch } from "@/lib/api-client";
 import {
   Loader2, Truck, Package, RefreshCw, XCircle, RotateCcw,
   Printer, Eye, Search, TrendingUp, Clock, CheckCircle2, AlertTriangle,
-  ExternalLink, ChevronDown, ChevronUp,
+  ExternalLink, ChevronDown, ChevronUp, ArrowRightLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -39,6 +39,7 @@ const STATUS_BADGE: Record<string, string> = {
   "Not Created": "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
   Created: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
   Recreated: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  "Recreated (COD)": "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
   Cancelled: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
   "Tracking Updated": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
 };
@@ -365,6 +366,15 @@ function ShippingPage() {
                               icon={<RotateCcw className="w-3.5 h-3.5" />}
                               busy={isBusy(s.id, "recreate")}
                               onClick={() => action(s.id, "recreate", "Shipment recreated")}
+                            />
+                          )}
+                          {s.paymentMethod === "cod" && s.awbNumber && s.shipmentStatus !== "Cancelled" && s.shipmentStatus !== "Recreated (COD)" && (
+                            <ActionBtn
+                              label="Re-push COD"
+                              icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
+                              busy={isBusy(s.id, "repush-as-cod")}
+                              onClick={() => action(s.id, "repush-as-cod", "Shipment re-pushed as COD")}
+                              cls="text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950/30"
                             />
                           )}
                           <a

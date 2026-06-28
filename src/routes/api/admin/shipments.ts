@@ -229,7 +229,6 @@ export const Route = createFileRoute("/api/admin/shipments")({
               })
               .where(eq(orders.id, orderId));
 
-            /* Re-send shipment SMS */
             if (order.shippingPhone && result.awbNumber && result.courierName) {
               sendSMS(
                 order.shippingPhone,
@@ -240,6 +239,59 @@ export const Route = createFileRoute("/api/admin/shipments")({
             return Response.json({ ok: true, result });
           } catch (err: any) {
             return Response.json({ error: err.message }, { status: 502 });
+          }
+        }
+
+        if (action === "repush-as-cod") {
+          if (order.paymentMethod?.toLowerCase() !== "cod") {
+            return Response.json({ error: "Order is not a COD order" }, { status: 400 });
+          }
+          try {
+            // Cancel existing CKShip shipment first (best-effort — don't fail if cancel errors)
+            if (order.awbNumber) {
+              try {
+                await cancelCKShipShipment(order.awbNumber);
+                console.log(`[admin/shipments] Cancelled existing AWB ${order.awbNumber} before COD re-push`);
+              } catch (cancelErr) {
+                console.warn(`[admin/shipments] Cancel AWB ${order.awbNumber} failed (proceeding anyway):`, cancelErr);
+              }
+            }
+
+            // Re-create with payment_method: "COD" explicitly
+            const result = await createCKShipShipment({
+              id: order.id,
+              shippingName: order.shippingName,
+              shippingPhone: order.shippingPhone,
+              shippingAddress: order.shippingAddress,
+              total: order.total,
+              items: order.items as any,
+              paymentMethod: "cod",
+            });
+
+            await db.update(orders)
+              .set({
+                ckshipShipmentId: result.shipmentId,
+                ckshipOrderNumber: result.orderNumber,
+                awbNumber: result.awbNumber,
+                courierName: result.courierName,
+                shippingCost: result.shippingCost !== null ? String(result.shippingCost) : null,
+                labelUrl: result.labelUrl,
+                shipmentStatus: "Recreated (COD)",
+                trackingStatus: "Packed",
+                trackingUpdatedAt: new Date(),
+              })
+              .where(eq(orders.id, orderId));
+
+            if (order.shippingPhone && result.awbNumber && result.courierName) {
+              sendSMS(
+                order.shippingPhone,
+                smsShipmentCreated(order.shippingName ?? "Customer", result.awbNumber, result.courierName, order.trackingId)
+              ).catch(console.error);
+            }
+
+            return Response.json({ ok: true, result });
+          } catch (err: any) {
+            return Response.json({ error: err.message || "Re-push as COD failed" }, { status: 502 });
           }
         }
 
