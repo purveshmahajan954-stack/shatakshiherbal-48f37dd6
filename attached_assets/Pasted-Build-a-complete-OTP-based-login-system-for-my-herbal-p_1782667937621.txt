@@ -1,0 +1,53 @@
+Build a complete OTP-based login system for my herbal products website "Shatakshi Herbal" using Node.js and Express on Replit.
+
+## Requirements:
+
+Use Fast2SMS API to send OTP SMS to Indian mobile numbers.
+No DLT registration needed (use Quick SMS / OTP route).
+
+## Project Structure:
+- server.js (main backend)
+- otp.js (Fast2SMS OTP logic)
+- public/login.html (frontend login page)
+- package.json
+
+## Environment Variables (already set in Replit Secrets):
+- FAST2SMS_API_KEY = (user will add their own key)
+- SESSION_SECRET = shatakshi123
+
+## Backend (server.js):
+- Use express, axios, express-session
+- POST /send-otp → takes { phone } (10 digit), generates 6-digit OTP, stores in session with 5 min expiry, calls Fast2SMS API
+- POST /verify-otp → checks OTP from session, returns success/fail
+- GET /check-auth → returns { loggedIn: true/false }
+- POST /logout → destroys session
+- Serve static files from /public folder
+
+## Fast2SMS API call (otp.js):
+GET https://www.fast2sms.com/dev/bulkV2
+params:
+  authorization: process.env.FAST2SMS_API_KEY
+  variables_values: <6 digit otp>
+  route: "otp"
+  numbers: <10 digit phone>
+
+If response.data.return === true, OTP sent successfully.
+
+## Frontend (public/login.html):
+- Green color theme matching herbal/nature brand (#2d6a2d)
+- Step 1: Input for 10-digit phone number + "OTP Bhejo" button
+- Step 2 (shown after OTP sent): Input for 6-digit OTP + "Verify Karo" button
+- Show countdown timer of 5 minutes
+- Show "Dobara OTP Bhejo" resend option
+- Show success/error messages in Hindi
+- After successful login, redirect to index.html
+- Mobile responsive design
+- All text in Hindi/Hinglish
+
+## Important:
+- Install packages: npm install express axios express-session
+- Session cookie maxAge: 10 minutes
+- Validate phone: must be exactly 10 digits, numbers only
+- Validate OTP: must be exactly 6 digits
+- After OTP verified, set req.session.verified = true
+- console.log Fast2SMS response for debugging
