@@ -61,10 +61,13 @@ app.post("/place-order", async (req, res) => {
       return res.status(500).json({ error: "CKShip API token not configured on server." });
     }
 
+    const isCod = payment_mode.toLowerCase() === "cod";
+
     const shipmentPayload = {
       order_number: generateOrderNumber(),
       order_date: todayDate(),
-      payment_mode: payment_mode.toLowerCase(),
+      payment_method: isCod ? "COD" : "prepaid",
+      ...(isCod ? { cod_amount: Number(order_amount) } : {}),
       order_amount: Number(order_amount),
       consignee_name: customer_name.trim(),
       consignee_phone: customer_phone.trim(),
