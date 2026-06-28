@@ -20,6 +20,23 @@ async function requireUser(request: Request) {
 export const Route = createFileRoute("/api/user/profile")({
   server: {
     handlers: {
+      GET: async ({ request }) => {
+        try {
+          const user = await requireUser(request);
+          if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+          return Response.json({
+            user: {
+              id: user.id,
+              phone: user.phone,
+              email: user.email,
+              fullName: user.fullName,
+              address: (user as any).address ?? null,
+            },
+          });
+        } catch (err: any) {
+          return Response.json({ error: "Failed to fetch profile" }, { status: 500 });
+        }
+      },
       PATCH: async ({ request }) => {
         try {
           const user = await requireUser(request);

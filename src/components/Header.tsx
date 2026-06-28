@@ -169,11 +169,16 @@ export function Header() {
               </SheetContent>
             </Sheet>
 
-            {/* My Account (logged in) */}
+            {/* Dashboard + Profile (logged in) */}
             {user && (
-              <Link to="/account" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold text-foreground hover:bg-accent transition">
-                <UserCircle className="w-3.5 h-3.5" />My Account
-              </Link>
+              <>
+                <Link to="/dashboard" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold text-foreground hover:bg-accent transition">
+                  <UserCircle className="w-3.5 h-3.5" />Dashboard
+                </Link>
+                <Link to="/orders" className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold text-foreground hover:bg-accent transition">
+                  Orders
+                </Link>
+              </>
             )}
 
             {/* Admin link */}
@@ -238,7 +243,10 @@ export function Header() {
             )}
             {user ? (
               <>
-                <Link to="/account" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-foreground hover:text-primary">My Account</Link>
+                <Link to="/dashboard" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-foreground hover:text-primary">Dashboard</Link>
+                <Link to="/profile" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-foreground hover:text-primary">My Profile</Link>
+                <Link to="/orders" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-foreground hover:text-primary">My Orders</Link>
+                <Link to="/account" onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-foreground hover:text-primary">Account Settings</Link>
                 <button onClick={() => { signOut(); setOpen(false); }} className="py-2 text-sm font-medium text-primary text-left">Sign Out</button>
               </>
             ) : (

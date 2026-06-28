@@ -17,12 +17,14 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RefundRouteImport } from './routes/refund'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProductInfoRouteImport } from './routes/product-info'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
 import { Route as PaymentFailedRouteImport } from './routes/payment-failed'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
@@ -124,6 +126,11 @@ const RefundRoute = RefundRouteImport.update({
   path: '/refund',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductInfoRoute = ProductInfoRouteImport.update({
   id: '/product-info',
   path: '/product-info',
@@ -152,6 +159,11 @@ const OrdersRoute = OrdersRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -469,12 +481,14 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
+  '/profile': typeof ProfileRoute
   '/refund': typeof RefundRoute
   '/search': typeof SearchRoute
   '/shipping': typeof ShippingRoute
@@ -544,12 +558,14 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
+  '/profile': typeof ProfileRoute
   '/refund': typeof RefundRoute
   '/search': typeof SearchRoute
   '/shipping': typeof ShippingRoute
@@ -621,12 +637,14 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/product-info': typeof ProductInfoRoute
+  '/profile': typeof ProfileRoute
   '/refund': typeof RefundRoute
   '/search': typeof SearchRoute
   '/shipping': typeof ShippingRoute
@@ -699,12 +717,14 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/dashboard'
     | '/login'
     | '/orders'
     | '/payment-failed'
     | '/payment-success'
     | '/privacy'
     | '/product-info'
+    | '/profile'
     | '/refund'
     | '/search'
     | '/shipping'
@@ -774,12 +794,14 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/dashboard'
     | '/login'
     | '/orders'
     | '/payment-failed'
     | '/payment-success'
     | '/privacy'
     | '/product-info'
+    | '/profile'
     | '/refund'
     | '/search'
     | '/shipping'
@@ -850,12 +872,14 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/dashboard'
     | '/login'
     | '/orders'
     | '/payment-failed'
     | '/payment-success'
     | '/privacy'
     | '/product-info'
+    | '/profile'
     | '/refund'
     | '/search'
     | '/shipping'
@@ -927,12 +951,14 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   OrdersRoute: typeof OrdersRoute
   PaymentFailedRoute: typeof PaymentFailedRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductInfoRoute: typeof ProductInfoRoute
+  ProfileRoute: typeof ProfileRoute
   RefundRoute: typeof RefundRoute
   SearchRoute: typeof SearchRoute
   ShippingRoute: typeof ShippingRoute
@@ -1041,6 +1067,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product-info': {
       id: '/product-info'
       path: '/product-info'
@@ -1081,6 +1114,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1554,12 +1594,14 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   OrdersRoute: OrdersRoute,
   PaymentFailedRoute: PaymentFailedRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
   PrivacyRoute: PrivacyRoute,
   ProductInfoRoute: ProductInfoRoute,
+  ProfileRoute: ProfileRoute,
   RefundRoute: RefundRoute,
   SearchRoute: SearchRoute,
   ShippingRoute: ShippingRoute,
