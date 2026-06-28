@@ -27,71 +27,38 @@ function generateOtp(): string {
 
 function normalizePhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, "");
-  if (digits.length === 10) return `+91${digits}`;
-  if (digits.length === 12 && digits.startsWith("91")) return `+${digits}`;
-  if (digits.length === 13 && raw.startsWith("+91")) return `+91${digits.slice(2)}`;
+  if (digits.length === 10) return digits;
+  if (digits.length === 12 && digits.startsWith("91")) return digits.slice(2);
+  if (digits.length === 13 && raw.startsWith("+91")) return digits.slice(2);
   return null;
 }
 
-class TwilioError extends Error {
-  code: number;
-  constructor(message: string, code: number) {
-    super(message);
-    this.code = code;
-  }
-}
-
-function friendlyTwilioError(code: number): string {
-  switch (code) {
-    case 21608:
-      return "This phone number hasn't been verified with our SMS provider yet. Please sign up using Google, or contact support to get your number added.";
-    case 21211:
-      return "Invalid phone number. Please check the number and try again.";
-    case 21614:
-      return "This number cannot receive SMS. Please use a different number or sign up with Google.";
-    case 21610:
-      return "This number has opted out of SMS. Please sign up with Google instead.";
-    case 30003:
-    case 30005:
-      return "Your number is unreachable right now. Please try again later or sign up with Google.";
-    default:
-      return "Failed to send OTP. Please try again or sign up using Google.";
-  }
-}
-
-async function sendViaTwilio(phone: string, otp: string) {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  const from = process.env.TWILIO_PHONE_NUMBER;
-  if (!sid || !token || !from) {
+async function sendViaFast2SMS(phone10: string, otp: string) {
+  const apiKey = process.env.FAST2SMS_API_KEY;
+  if (!apiKey) {
     throw new Error("SMS service not configured");
   }
 
-  const formBody = new URLSearchParams({
-    Body: `Your Shatakshi Herbal verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`,
-    From: from,
-    To: phone,
+  const url = new URL("https://www.fast2sms.com/dev/bulkV2");
+  url.searchParams.set("authorization", apiKey);
+  url.searchParams.set("variables_values", otp);
+  url.searchParams.set("route", "otp");
+  url.searchParams.set("numbers", phone10);
+
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: { "cache-control": "no-cache" },
   });
 
-  const credentials = btoa(`${sid}:${token}`);
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${credentials}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: formBody.toString(),
-    }
-  );
+  const data: any = await res.json().catch(() => ({}));
+  console.log("[otp-send] Fast2SMS response:", JSON.stringify(data));
 
-  if (!res.ok) {
-    let data: any;
-    try { data = await res.json(); } catch { data = {}; }
-    const code = data?.code ?? 0;
-    console.error("[otp-send] Twilio error code:", code, data?.message);
-    throw new TwilioError(friendlyTwilioError(code), code);
+  if (!res.ok || data?.return !== true) {
+    const msg =
+      Array.isArray(data?.message)
+        ? data.message.join(", ")
+        : data?.message || `Fast2SMS error (HTTP ${res.status})`;
+    throw new Error(msg);
   }
 }
 
@@ -143,9 +110,9 @@ export const Route = createFileRoute("/api/auth/otp-send")({
           await db.insert(otpCodes).values({ phone, code: otp, expiresAt });
 
           try {
-            await sendViaTwilio(phone, otp);
+            await sendViaFast2SMS(phone, otp);
           } catch (err: any) {
-            console.error("[otp-send] Twilio error:", err);
+            console.error("[otp-send] Fast2SMS error:", err);
             return Response.json(
               { error: err?.message || "Failed to send OTP. Please check the phone number and try again." },
               { status: 500 }

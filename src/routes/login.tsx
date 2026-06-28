@@ -54,7 +54,7 @@ function LoginPage() {
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [otpBusy, setOtpBusy] = useState(false);
-  const confirmationRef = useRef<any>(null);
+  const confirmationRef = useRef<any>(null); // kept for type compat, unused
 
   useEffect(() => {
     if (urlError) toast.error(GOOGLE_ERROR_MESSAGES[urlError] ?? "Sign-in failed. Please try again.");
@@ -97,14 +97,17 @@ function LoginPage() {
     if (!phone.trim()) return;
     setOtpBusy(true);
     try {
-      const { sendPhoneOtp } = await import("@/lib/firebase");
-      confirmationRef.current = await sendPhoneOtp(phone.trim(), "recaptcha-container");
+      const res = await fetch("/api/auth/otp-send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send OTP");
       setOtpStep("code");
       toast.success("OTP sent to your phone!");
     } catch (err: any) {
       toast.error(err?.message || "Failed to send OTP. Please try again.");
-      const { clearRecaptcha } = await import("@/lib/firebase");
-      clearRecaptcha();
     } finally {
       setOtpBusy(false);
     }
@@ -112,16 +115,13 @@ function LoginPage() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim() || !confirmationRef.current) return;
+    if (!code.trim()) return;
     setOtpBusy(true);
     try {
-      const { confirmPhoneOtp } = await import("@/lib/firebase");
-      const idToken = await confirmPhoneOtp(confirmationRef.current, code.trim());
-
-      const res = await fetch("/api/auth/firebase-phone-verify", {
+      const res = await fetch("/api/auth/otp-verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ phone: phone.trim(), code: code.trim() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Verification failed");
@@ -134,7 +134,7 @@ function LoginPage() {
     } catch (err: any) {
       const msg = err?.message || "Invalid OTP. Please try again.";
       toast.error(msg);
-      if (msg.toLowerCase().includes("invalid") || msg.toLowerCase().includes("expired")) {
+      if (msg.toLowerCase().includes("incorrect") || msg.toLowerCase().includes("expired")) {
         setCode("");
       }
     } finally {
@@ -146,14 +146,11 @@ function LoginPage() {
     setOtpStep("phone");
     setCode("");
     confirmationRef.current = null;
-    const { clearRecaptcha } = require("@/lib/firebase");
-    clearRecaptcha?.();
   };
 
   return (
     <div className="min-h-screen bg-cream flex flex-col">
       <Header />
-      <div id="recaptcha-container" />
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
