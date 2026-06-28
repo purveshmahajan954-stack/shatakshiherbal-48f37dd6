@@ -368,7 +368,7 @@ function ShippingPage() {
                               onClick={() => action(s.id, "recreate", "Shipment recreated")}
                             />
                           )}
-                          {s.paymentMethod === "cod" && s.awbNumber && s.shipmentStatus !== "Cancelled" && s.shipmentStatus !== "Recreated (COD)" && (
+                          {s.paymentMethod === "cod" && s.paymentStatus === "cod_pending" && s.awbNumber && s.shipmentStatus !== "Cancelled" && s.shipmentStatus !== "Recreated (COD)" && (
                             <ActionBtn
                               label="Re-push COD"
                               icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
