@@ -7,7 +7,7 @@ import { getProductBySlug } from "@/lib/products";
 import { randomHex } from "@server/password";
 import { createCKShipShipment } from "@server/ckship";
 
-const COURIER_CHARGE = 150;
+const COURIER_CHARGE = 220; // COD handling charge
 
 function computeTotals(subtotal: number) {
   const sub = Math.max(0, Math.round(subtotal));

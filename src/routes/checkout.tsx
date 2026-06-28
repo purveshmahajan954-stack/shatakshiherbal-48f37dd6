@@ -155,7 +155,7 @@ function CheckoutPage() {
   );
   if (!user) return <LoginScreen title="Sign in to checkout" subtitle="Your cart is saved — sign in to complete your order securely" />;
 
-  const totals = computeTotals(total);
+  const totals = computeTotals(total, payMethod);
 
   const buildFullAddress = () => {
     const parts = [flatHouse.trim(), areaStreet.trim(), landmark.trim(), district.trim(), city.trim(), state.trim(), pincode].filter(Boolean);

@@ -74,12 +74,14 @@ export const getRazorpayKeyId = createServerFn({ method: "GET" }).handler(async 
 });
 
 export const GST_RATE = 0;
-export const COURIER_CHARGE = 150;
+export const PREPAID_CHARGE = 150;
+export const COD_CHARGE = 220;
+export const COURIER_CHARGE = PREPAID_CHARGE; // backward compat alias
 
-export function computeTotals(subtotal: number) {
+export function computeTotals(subtotal: number, paymentMethod: "online" | "cod" = "online") {
   const sub = Math.max(0, Math.round(subtotal));
   const gst = 0;
-  const delivery = sub === 0 ? 0 : COURIER_CHARGE;
+  const delivery = sub === 0 ? 0 : (paymentMethod === "cod" ? COD_CHARGE : PREPAID_CHARGE);
   const total = sub + delivery;
   return { subtotal: sub, gst, delivery, total };
 }
