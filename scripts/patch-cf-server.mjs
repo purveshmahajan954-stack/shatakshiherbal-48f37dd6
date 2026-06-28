@@ -18,6 +18,7 @@ function patchEnv(env) {
     "GMAIL_USER","GMAIL_APP_PASSWORD","ADMIN_NOTIFY_EMAIL",
     "TELEGRAM_BOT_TOKEN","TELEGRAM_CHAT_ID",
     "CALLMEBOT_PHONE","CALLMEBOT_API_KEY",
+    "TWOFACTOR_API_KEY","FAST2SMS_API_KEY",
     "NODE_ENV"
   ];
   for (const k of keys) {
