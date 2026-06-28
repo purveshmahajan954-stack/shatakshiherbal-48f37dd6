@@ -33,31 +33,21 @@ function normalizePhone(raw: string): string | null {
   return null;
 }
 
-async function sendViaFast2SMS(phone10: string, otp: string) {
-  const apiKey = process.env.FAST2SMS_API_KEY;
+async function sendVia2Factor(phone10: string, otp: string) {
+  const apiKey = process.env.TWOFACTOR_API_KEY;
   if (!apiKey) {
     throw new Error("SMS service not configured");
   }
 
-  const url = new URL("https://www.fast2sms.com/dev/bulkV2");
-  url.searchParams.set("authorization", apiKey);
-  url.searchParams.set("message", `Your Shatakshi Herbal OTP is: ${otp}. Valid for 5 minutes. Do not share.`);
-  url.searchParams.set("route", "q");
-  url.searchParams.set("numbers", phone10);
+  const url = `https://2factor.in/API/V1/${apiKey}/SMS/${phone10}/${otp}/AUTOGEN`;
 
-  const res = await fetch(url.toString(), {
-    method: "GET",
-    headers: { "cache-control": "no-cache" },
-  });
+  const res = await fetch(url, { method: "GET" });
 
   const data: any = await res.json().catch(() => ({}));
-  console.log("[otp-send] Fast2SMS response:", JSON.stringify(data));
+  console.log("[otp-send] 2Factor response:", JSON.stringify(data));
 
-  if (!res.ok || data?.return !== true) {
-    const msg =
-      Array.isArray(data?.message)
-        ? data.message.join(", ")
-        : data?.message || `Fast2SMS error (HTTP ${res.status})`;
+  if (data?.Status !== "Success") {
+    const msg = data?.Details || data?.Status || `2Factor error (HTTP ${res.status})`;
     throw new Error(msg);
   }
 }
@@ -110,9 +100,9 @@ export const Route = createFileRoute("/api/auth/otp-send")({
           await db.insert(otpCodes).values({ phone, code: otp, expiresAt });
 
           try {
-            await sendViaFast2SMS(phone, otp);
+            await sendVia2Factor(phone, otp);
           } catch (err: any) {
-            console.error("[otp-send] Fast2SMS error:", err);
+            console.error("[otp-send] 2Factor error:", err);
             return Response.json(
               { error: err?.message || "Failed to send OTP. Please check the phone number and try again." },
               { status: 500 }
