@@ -41,8 +41,8 @@ async function sendViaFast2SMS(phone10: string, otp: string) {
 
   const url = new URL("https://www.fast2sms.com/dev/bulkV2");
   url.searchParams.set("authorization", apiKey);
-  url.searchParams.set("variables_values", otp);
-  url.searchParams.set("route", "otp");
+  url.searchParams.set("message", `Your Shatakshi Herbal OTP is: ${otp}. Valid for 5 minutes. Do not share.`);
+  url.searchParams.set("route", "q");
   url.searchParams.set("numbers", phone10);
 
   const res = await fetch(url.toString(), {
