@@ -1,10 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, Menu, X, Trash2, LogOut, Shield, Package, ArrowRight, Heart, Search, LogIn, UserCircle } from "lucide-react";
+import { ShoppingBag, Menu, X, LogOut, Shield, Heart, Search, LogIn, UserCircle } from "lucide-react";
 import { useState, useRef } from "react";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import logoImg from "@/assets/logo.png";
 
 const navItems = [
@@ -17,13 +16,12 @@ const navItems = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const { count, total, items, remove, clear } = useCart();
+  const { count } = useCart();
   const { count: wishCount } = useWishlist();
   const { user, isAdmin, signOut, loading } = useAuth();
 
@@ -114,60 +112,14 @@ export function Header() {
             </Link>
 
             {/* Cart */}
-            <Sheet open={cartOpen} onOpenChange={setCartOpen}>
-              <SheetTrigger asChild>
-                <button aria-label="Cart" className="relative p-2 hover:text-primary transition-colors">
-                  <ShoppingBag className="w-5 h-5" />
-                  {count > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                      {count}
-                    </span>
-                  )}
-                </button>
-              </SheetTrigger>
-              <SheetContent className="w-full sm:max-w-md flex flex-col">
-                <SheetHeader>
-                  <SheetTitle className="font-display text-2xl">Your Cart ({count})</SheetTitle>
-                </SheetHeader>
-                <div className="flex-1 overflow-y-auto py-4">
-                  {items.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-12">
-                      <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                      <p>Your cart is empty</p>
-                    </div>
-                  ) : (
-                    <ul className="space-y-3">
-                      {items.map((i) => (
-                        <li key={i.name} className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
-                          <div className="min-w-0">
-                            <div className="font-medium truncate">{i.name}</div>
-                            <div className="text-sm text-muted-foreground">₹{i.price} × {i.qty}</div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold">₹{i.price * i.qty}</span>
-                            <button onClick={() => remove(i.name)} aria-label={`Remove ${i.name}`} className="p-1.5 text-muted-foreground hover:text-destructive">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                {items.length > 0 && (
-                  <div className="border-t border-border pt-4 space-y-3">
-                    <div className="flex justify-between font-semibold text-lg">
-                      <span>Subtotal</span><span>₹{total}</span>
-                    </div>
-                    <Link to="/checkout" onClick={() => setCartOpen(false)} className="w-full bg-primary text-primary-foreground py-3 rounded-full font-semibold hover:opacity-90 transition inline-flex items-center justify-center gap-2">
-                      Checkout <ArrowRight className="w-4 h-4" />
-                    </Link>
-                    <Link to="/cart" onClick={() => setCartOpen(false)} className="w-full block text-center text-sm text-muted-foreground hover:text-foreground">View full cart</Link>
-                    <button onClick={clear} className="w-full text-sm text-muted-foreground hover:text-foreground">Clear cart</button>
-                  </div>
-                )}
-              </SheetContent>
-            </Sheet>
+            <Link to="/cart" aria-label="Cart" className="relative p-2 hover:text-primary transition-colors">
+              <ShoppingBag className="w-5 h-5" />
+              {count > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {count}
+                </span>
+              )}
+            </Link>
 
             {/* Dashboard + Profile (logged in) */}
             {user && (

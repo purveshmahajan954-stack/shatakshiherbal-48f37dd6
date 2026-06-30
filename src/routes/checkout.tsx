@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import type { SavedAddress } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { computeTotals } from "@/lib/payments.functions";
-import { Loader2, ShieldCheck, MapPin, Wallet, Search, Check, Banknote, CreditCard, Phone, X } from "lucide-react";
+import { Loader2, ShieldCheck, MapPin, Wallet, Search, Check, Banknote, CreditCard, Phone, X, Minus, Plus, Trash2 } from "lucide-react";
 
 const INDIAN_STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry"];
 
@@ -48,7 +48,7 @@ async function apiPost(path: string, body: unknown, token: string) {
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, total, clear } = useCart();
+  const { items, total, clear, setQty, remove } = useCart();
   const { user, loading } = useAuth();
 
   const [name, setName] = useState("");
@@ -81,6 +81,27 @@ function CheckoutPage() {
         const digits = user.phone.replace(/\D/g, "");
         setPhone(digits.length === 12 && digits.startsWith("91") ? digits.slice(2) : digits.slice(-10));
       }
+
+      // Check for reorder prefill data
+      try {
+        const prefillRaw = typeof window !== "undefined" ? localStorage.getItem("reorder_prefill") : null;
+        if (prefillRaw) {
+          const prefill = JSON.parse(prefillRaw);
+          localStorage.removeItem("reorder_prefill");
+          if (prefill.name) setName(prefill.name);
+          if (prefill.phone) setPhone(prefill.phone);
+          if (prefill.email) setEmail(prefill.email);
+          if (prefill.flatHouse) setFlatHouse(prefill.flatHouse);
+          if (prefill.areaStreet) setAreaStreet(prefill.areaStreet);
+          if (prefill.landmark) setLandmark(prefill.landmark ?? "");
+          if (prefill.pincode) setPincode(prefill.pincode);
+          if (prefill.district) setDistrict(prefill.district);
+          if (prefill.city) setCity(prefill.city);
+          if (prefill.state) setState(prefill.state);
+          return;
+        }
+      } catch {}
+
       // Fetch fresh saved addresses directly from API
       const token = localStorage.getItem("auth_token");
       if (token) {
@@ -434,13 +455,41 @@ function CheckoutPage() {
               <h2 className="font-display text-xl mb-4">Order Items ({items.length})</h2>
               <ul className="divide-y divide-border">
                 {items.map((i) => (
-                  <li key={i.name} className="py-3 flex items-center gap-4">
-                    {i.image && <img src={i.image} alt={i.name} className="w-14 h-14 rounded-md object-cover bg-accent/30" />}
+                  <li key={i.name} className="py-3 flex items-center gap-3">
+                    {i.image && <img src={i.image} alt={i.name} className="w-14 h-14 rounded-md object-cover bg-accent/30 shrink-0" />}
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{i.name}</div>
-                      <div className="text-xs text-muted-foreground">Qty {i.qty} · ₹{i.price}</div>
+                      <div className="font-medium truncate text-sm">{i.name}</div>
+                      <div className="text-xs text-muted-foreground">₹{i.price} each</div>
+                      <div className="mt-1.5 inline-flex items-center border border-border rounded-full bg-white">
+                        <button
+                          type="button"
+                          onClick={() => setQty(i.name, i.qty - 1)}
+                          aria-label="Decrease"
+                          className="p-1.5 hover:text-primary transition-colors"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="px-2.5 text-sm font-semibold min-w-[1.75rem] text-center">{i.qty}</span>
+                        <button
+                          type="button"
+                          onClick={() => setQty(i.name, i.qty + 1)}
+                          aria-label="Increase"
+                          className="p-1.5 hover:text-primary transition-colors"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="font-semibold">₹{i.price * i.qty}</div>
+                    <div className="text-right shrink-0">
+                      <div className="font-semibold">₹{i.price * i.qty}</div>
+                      <button
+                        type="button"
+                        onClick={() => remove(i.name)}
+                        className="text-[11px] text-muted-foreground hover:text-destructive inline-flex items-center gap-0.5 mt-1"
+                      >
+                        <Trash2 className="w-3 h-3" /> Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>

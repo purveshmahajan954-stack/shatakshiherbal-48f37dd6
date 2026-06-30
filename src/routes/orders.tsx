@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
@@ -6,9 +6,10 @@ import { Footer } from "@/components/Footer";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { getMyOrders } from "@/lib/payments.functions";
+import { useCart } from "@/lib/cart";
 import {
   Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle,
-  Copy, Truck, FileDown, MapPin,
+  Copy, Truck, FileDown, MapPin, RefreshCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { downloadInvoice } from "@/lib/invoice";
@@ -62,6 +63,8 @@ const TRACK_BADGE: Record<string, string> = {
 
 function OrdersPage() {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const { clear, add } = useCart();
   const fetchOrders = useServerFn(getMyOrders);
   const { data, isLoading } = useQuery({
     queryKey: ["my-orders"],
@@ -69,6 +72,43 @@ function OrdersPage() {
     enabled: !!user,
     staleTime: 60_000,
   });
+
+  const handleReorder = (order: any) => {
+    const items = Array.isArray(order.items) ? order.items : [];
+    if (items.length === 0) { toast.error("No items found in this order"); return; }
+
+    clear();
+    items.forEach((i: any) => {
+      add({ name: i.name, price: i.price, image: i.image, slug: i.slug }, i.qty ?? 1);
+    });
+
+    // Parse shipping address from order to pre-fill checkout
+    try {
+      const shipping = order.shipping_address ?? order.shippingAddress ?? "";
+      const parts = typeof shipping === "string" ? shipping.split(",").map((s: string) => s.trim()) : [];
+      const prefill: Record<string, string> = {
+        name: order.shipping_name ?? order.shippingName ?? user?.fullName ?? "",
+        phone: order.shipping_phone ?? order.shippingPhone ?? user?.phone ?? "",
+        email: order.shipping_email ?? order.shippingEmail ?? user?.email ?? "",
+      };
+      if (parts.length >= 4) {
+        prefill.flatHouse = parts[0] ?? "";
+        prefill.areaStreet = parts[1] ?? "";
+        prefill.landmark = parts.length > 5 ? parts[2] ?? "" : "";
+        const offset = parts.length > 5 ? 1 : 0;
+        prefill.district = parts[2 + offset] ?? "";
+        prefill.city = parts[3 + offset] ?? "";
+        prefill.state = parts[4 + offset] ?? "";
+        prefill.pincode = parts[parts.length - 1]?.replace(/\D/g, "").slice(0, 6) ?? "";
+      }
+      if (typeof window !== "undefined") {
+        localStorage.setItem("reorder_prefill", JSON.stringify(prefill));
+      }
+    } catch {}
+
+    toast.success("Items added to cart! Redirecting to checkout…");
+    navigate({ to: "/checkout" });
+  };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
   if (!user) return <LoginScreen />;
@@ -222,12 +262,20 @@ function OrdersPage() {
                   {/* Action buttons */}
                   <div className="mt-4 flex flex-wrap justify-end gap-3">
                     {(o.payment_status === "paid" || o.payment_status === "confirmed" || o.paymentStatus === "paid" || o.paymentStatus === "confirmed") && (
-                      <button
-                        onClick={() => downloadInvoice(o)}
-                        className="inline-flex items-center gap-2 border border-primary/40 text-primary bg-primary/5 px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary/10 transition"
-                      >
-                        <FileDown className="w-4 h-4" /> Invoice
-                      </button>
+                      <>
+                        <button
+                          onClick={() => downloadInvoice(o)}
+                          className="inline-flex items-center gap-2 border border-primary/40 text-primary bg-primary/5 px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary/10 transition"
+                        >
+                          <FileDown className="w-4 h-4" /> Invoice
+                        </button>
+                        <button
+                          onClick={() => handleReorder(o)}
+                          className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary/20 transition"
+                        >
+                          <RefreshCcw className="w-4 h-4" /> Reorder
+                        </button>
+                      </>
                     )}
                     {trackingId && (
                       <Link
