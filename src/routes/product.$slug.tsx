@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { sampleReviews, products as staticProducts, type Product } from "@/lib/products";
-import { fetchProductBySlug } from "@/lib/use-products";
+import { fetchProductBySlug, fetchProductsFromDb } from "@/lib/use-products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import badgeNoSugar from "@/assets/badge-no-sugar.jpg";
@@ -116,7 +116,18 @@ function ProductDetailPage() {
     navigate({ to: "/checkout" });
   };
 
-  const related = staticProducts.filter((p: Product) => p.slug !== product.slug).slice(0, 4);
+  const [related, setRelated] = useState<Product[]>(
+    staticProducts.filter((p: Product) => p.slug !== product.slug).slice(0, 4)
+  );
+
+  useEffect(() => {
+    fetchProductsFromDb()
+      .then((list) => {
+        const live = list.filter((p) => p.slug !== product.slug).slice(0, 4);
+        if (live.length > 0) setRelated(live);
+      })
+      .catch(() => {/* keep static fallback */});
+  }, [product.slug]);
   const ratingBreakdown = [5, 4, 3, 2, 1].map((star) => ({
     star,
     pct: star === 5 ? 70 : star === 4 ? 20 : star === 3 ? 7 : star === 2 ? 2 : 1,
