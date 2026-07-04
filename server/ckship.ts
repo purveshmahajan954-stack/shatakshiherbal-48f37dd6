@@ -107,7 +107,7 @@ export async function createCKShipShipment(order: {
       shipment_breadth: 10,
       shipment_height: 10,
       parcel_content_description: productDesc,
-      parcel_type: 1,
+      parcel_type: isCod ? 1 : 0,
       qty: totalQty,
       invoice_amount: Number(order.total),
       order_id: order.id,
