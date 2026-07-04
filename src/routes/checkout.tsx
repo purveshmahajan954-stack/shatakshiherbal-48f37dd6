@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useCart } from "@/lib/cart";
+import { fetchProductsFromDb } from "@/lib/use-products";
 import { useAuth } from "@/lib/auth";
 import type { SavedAddress } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
@@ -48,8 +49,17 @@ async function apiPost(path: string, body: unknown, token: string) {
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, total, clear, setQty, remove } = useCart();
+  const { items, total, clear, setQty, remove, updatePrices } = useCart();
   const { user, loading } = useAuth();
+
+  // Refresh cart prices from DB on mount so stale localStorage prices are corrected
+  useEffect(() => {
+    fetchProductsFromDb().then((list) => {
+      const priceMap: Record<string, number> = {};
+      list.forEach((p) => { if (p.slug) priceMap[p.slug] = p.price; });
+      updatePrices(priceMap);
+    }).catch(() => {});
+  }, []);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
