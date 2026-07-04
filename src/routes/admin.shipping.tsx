@@ -4,9 +4,10 @@ import { adminGet, adminPost, adminPatch } from "@/lib/api-client";
 import {
   Loader2, Truck, Package, RefreshCw, XCircle, RotateCcw,
   Printer, Eye, Search, TrendingUp, Clock, CheckCircle2, AlertTriangle,
-  ExternalLink, ChevronDown, ChevronUp, ArrowRightLeft,
+  ExternalLink, ChevronDown, ChevronUp, ArrowRightLeft, FileText,
 } from "lucide-react";
 import { toast } from "sonner";
+import { printShippingLabel } from "@/lib/shipping-label";
 
 export const Route = createFileRoute("/admin/shipping")({
   component: ShippingPage,
@@ -351,6 +352,26 @@ function ShippingPage() {
                                   onClick={() => action(s.id, "refresh-label", "Label fetched")}
                                 />
                               )}
+                              <ActionBtn
+                                label="Print"
+                                icon={<FileText className="w-3.5 h-3.5" />}
+                                busy={false}
+                                onClick={() => printShippingLabel({
+                                  id: s.id,
+                                  awbNumber: s.awbNumber!,
+                                  courierName: s.courierName,
+                                  shippingName: s.shippingName,
+                                  shippingPhone: s.shippingPhone,
+                                  shippingAddress: s.shippingAddress,
+                                  total: s.total,
+                                  paymentMethod: s.paymentMethod,
+                                  paymentStatus: s.paymentStatus,
+                                  items: s.items,
+                                  createdAt: s.createdAt,
+                                  trackingId: s.trackingId,
+                                })}
+                                cls="text-primary border-primary/30 hover:bg-primary/10"
+                              />
                               <ActionBtn
                                 label="Cancel"
                                 icon={<XCircle className="w-3.5 h-3.5" />}
