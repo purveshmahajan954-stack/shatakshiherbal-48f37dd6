@@ -5,8 +5,6 @@ import { WishlistProvider } from "@/lib/wishlist";
 import { AuthProvider } from "@/lib/auth";
 import { AdminAuthProvider } from "@/lib/admin-auth";
 import { ThemeProvider } from "@/lib/theme";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
-
 import {
   Outlet,
   Link,
@@ -134,7 +132,6 @@ function RootComponent() {
             <CartProvider>
               <WishlistProvider>
                 <Outlet />
-                <WhatsAppButton />
                 <Toaster position="top-center" />
               </WishlistProvider>
             </CartProvider>
