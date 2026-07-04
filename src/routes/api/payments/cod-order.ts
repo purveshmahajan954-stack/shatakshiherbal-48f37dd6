@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
-import { orders, userSessions, profiles } from "@shared/schema";
-import { eq, and, gt } from "drizzle-orm";
+import { orders, userSessions, profiles, products as productsTable } from "@shared/schema";
+import { eq, and, gt, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { getProductBySlug } from "@/lib/products";
 import { randomHex } from "@server/password";
 import { createCKShipShipment } from "@server/ckship";
 
@@ -62,11 +61,24 @@ export const Route = createFileRoute("/api/payments/cod-order")({
 
         const { items, shipping } = parsed.data;
 
-        const trustedItems = items.map((i) => {
-          const product = getProductBySlug(i.slug);
-          if (!product) throw new Error(`Unknown product: ${i.slug}`);
-          return { slug: product.slug, name: product.name, price: Math.round(product.price), qty: i.qty, image: product.image };
-        });
+        const slugs = items.map((i) => i.slug);
+        let trustedItems: Array<{ slug: string; name: string; price: number; qty: number; image: string }>;
+        try {
+          const dbProducts = await db
+            .select({ slug: productsTable.slug, name: productsTable.name, price: productsTable.price, imageUrl: productsTable.imageUrl, active: productsTable.active })
+            .from(productsTable)
+            .where(inArray(productsTable.slug, slugs));
+          const dbMap = new Map(dbProducts.map((p) => [p.slug, p]));
+          trustedItems = items.map((i) => {
+            const product = dbMap.get(i.slug);
+            if (!product || !product.active) throw new Error(`Unknown product: ${i.slug}`);
+            const price = Math.round(Number(product.price));
+            if (!Number.isFinite(price) || price < 0) throw new Error(`Invalid price for product: ${i.slug}`);
+            return { slug: product.slug, name: product.name, price, qty: i.qty, image: product.imageUrl || i.image || "" };
+          });
+        } catch (err: any) {
+          return Response.json({ error: err?.message ?? "Invalid cart items" }, { status: 400 });
+        }
 
         const subtotal = trustedItems.reduce((s, i) => s + i.price * i.qty, 0);
         const totals = computeTotals(subtotal);
