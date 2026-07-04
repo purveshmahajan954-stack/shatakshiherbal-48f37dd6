@@ -261,189 +261,15 @@ function ShippingPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {filtered.map((s) => (
-                  <>
-                    <tr
-                      key={s.id}
-                      className="hover:bg-muted/30 transition-colors"
-                    >
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => setExpanded(expanded === s.id ? null : s.id)}
-                          className="text-muted-foreground hover:text-foreground"
-                        >
-                          {expanded === s.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="font-medium">{s.shippingName ?? "—"}</div>
-                        <div className="text-xs text-muted-foreground">{s.shippingPhone ?? s.email ?? "—"}</div>
-                      </td>
-                      <td className="px-4 py-3">
-                        {s.awbNumber ? (
-                          <>
-                            <div className="font-mono text-xs font-semibold">{s.awbNumber}</div>
-                            <div className="text-xs text-muted-foreground">{s.courierName ?? "—"}</div>
-                          </>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">Not assigned</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${TRACK_BADGE[s.trackingStatus] ?? "bg-muted text-muted-foreground"}`}>
-                          {s.trackingStatus}
-                        </span>
-                        {s.trackingId && (
-                          <a
-                            href={`/track/${s.trackingId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block text-xs text-primary mt-0.5 hover:underline font-mono"
-                          >
-                            {s.trackingId} ↗
-                          </a>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_BADGE[s.shipmentStatus] ?? "bg-muted text-muted-foreground"}`}>
-                          {s.shipmentStatus}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${s.paymentStatus === "paid" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : s.paymentStatus === "failed" ? "bg-red-100 text-red-700" : "bg-muted text-muted-foreground"}`}>
-                          {s.paymentStatus}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right font-medium">{fmt(s.total)}</td>
-                      <td className="px-4 py-3 text-right">{fmt(s.shippingCost)}</td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmtDate(s.createdAt)}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1 flex-wrap">
-                          {s.shipmentStatus === "Not Created" && (s.paymentStatus === "paid" || s.paymentMethod === "cod") && (
-                            <ActionBtn
-                              label="Create"
-                              icon={<Package className="w-3.5 h-3.5" />}
-                              busy={isBusy(s.id, "create")}
-                              onClick={() => createShipment(s.id)}
-                              cls="bg-primary text-primary-foreground"
-                            />
-                          )}
-                          {s.awbNumber && (
-                            <>
-                              <ActionBtn
-                                label="Track"
-                                icon={<Truck className="w-3.5 h-3.5" />}
-                                busy={isBusy(s.id, "refresh")}
-                                onClick={() => action(s.id, "refresh", "Tracking refreshed")}
-                              />
-                              {s.labelUrl ? (
-                                <a
-                                  href={s.labelUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium"
-                                >
-                                  <Printer className="w-3.5 h-3.5" /> Label
-                                </a>
-                              ) : (
-                                <ActionBtn
-                                  label="Label"
-                                  icon={<Printer className="w-3.5 h-3.5" />}
-                                  busy={isBusy(s.id, "refresh-label")}
-                                  onClick={() => action(s.id, "refresh-label", "Label fetched")}
-                                />
-                              )}
-                              <ActionBtn
-                                label="Print"
-                                icon={<FileText className="w-3.5 h-3.5" />}
-                                busy={false}
-                                onClick={() => printShippingLabel({
-                                  id: s.id,
-                                  awbNumber: s.awbNumber!,
-                                  courierName: s.courierName,
-                                  shippingName: s.shippingName,
-                                  shippingPhone: s.shippingPhone,
-                                  shippingAddress: s.shippingAddress,
-                                  total: s.total,
-                                  paymentMethod: s.paymentMethod,
-                                  paymentStatus: s.paymentStatus,
-                                  items: s.items,
-                                  createdAt: s.createdAt,
-                                  trackingId: s.trackingId,
-                                })}
-                                cls="text-primary border-primary/30 hover:bg-primary/10"
-                              />
-                              <ActionBtn
-                                label="Cancel"
-                                icon={<XCircle className="w-3.5 h-3.5" />}
-                                busy={isBusy(s.id, "cancel")}
-                                onClick={() => action(s.id, "cancel", "Shipment cancelled")}
-                                cls="text-destructive border-destructive/30 hover:bg-destructive/10"
-                              />
-                            </>
-                          )}
-                          {(s.shipmentStatus === "Cancelled" || (s.awbNumber && s.shipmentStatus !== "Not Created")) && (
-                            <ActionBtn
-                              label="Recreate"
-                              icon={<RotateCcw className="w-3.5 h-3.5" />}
-                              busy={isBusy(s.id, "recreate")}
-                              onClick={() => action(s.id, "recreate", "Shipment recreated")}
-                            />
-                          )}
-                          {s.paymentMethod === "cod" && s.paymentStatus === "cod_pending" && s.awbNumber && s.shipmentStatus !== "Cancelled" && s.shipmentStatus !== "Recreated (COD)" && (
-                            <ActionBtn
-                              label="Re-push COD"
-                              icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
-                              busy={isBusy(s.id, "repush-as-cod")}
-                              onClick={() => action(s.id, "repush-as-cod", "Shipment re-pushed as COD")}
-                              cls="text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950/30"
-                            />
-                          )}
-                          <a
-                            href={`/track/${s.trackingId ?? s.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium"
-                          >
-                            <Eye className="w-3.5 h-3.5" /> View
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                    {expanded === s.id && (
-                      <tr key={s.id + "-expanded"} className="bg-muted/20">
-                        <td colSpan={10} className="px-6 py-4">
-                          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <div className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">Shipping Address</div>
-                              <p className="text-foreground">{s.shippingAddress ?? "—"}</p>
-                            </div>
-                            <div>
-                              <div className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">Order Items</div>
-                              <ul className="space-y-0.5">
-                                {(s.items ?? []).map((item, idx) => (
-                                  <li key={idx}>{item.name} × {item.qty} — ₹{item.price * item.qty}</li>
-                                ))}
-                              </ul>
-                            </div>
-                            <div>
-                              <div className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">CKShip Details</div>
-                              <div className="space-y-0.5 text-muted-foreground">
-                                <div>Shipment ID: {s.ckshipShipmentId ?? "—"}</div>
-                                <div>Order #: {s.ckshipOrderNumber ?? "—"}</div>
-                                <div>AWB: {s.awbNumber ?? "—"}</div>
-                                <div>Courier: {s.courierName ?? "—"}</div>
-                                {s.labelUrl && (
-                                  <a href={s.labelUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline mt-1">
-                                    <ExternalLink className="w-3 h-3" /> Download Label PDF
-                                  </a>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </>
+                  <ShipmentRow
+                    key={s.id}
+                    s={s}
+                    expanded={expanded}
+                    setExpanded={setExpanded}
+                    isBusy={isBusy}
+                    createShipment={createShipment}
+                    action={action}
+                  />
                 ))}
               </tbody>
             </table>
@@ -451,6 +277,142 @@ function ShippingPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function ShipmentRow({
+  s, expanded, setExpanded, isBusy, createShipment, action,
+}: {
+  s: Shipment;
+  expanded: string | null;
+  setExpanded: (id: string | null) => void;
+  isBusy: (id: string, act: string) => boolean;
+  createShipment: (id: string) => void;
+  action: (id: string, act: string, label: string) => void;
+}) {
+  return (
+    <>
+      <tr className="hover:bg-muted/30 transition-colors">
+        <td className="px-4 py-3">
+          <button onClick={() => setExpanded(expanded === s.id ? null : s.id)} className="text-muted-foreground hover:text-foreground">
+            {expanded === s.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        </td>
+        <td className="px-4 py-3">
+          <div className="font-medium">{s.shippingName ?? "—"}</div>
+          <div className="text-xs text-muted-foreground">{s.shippingPhone ?? s.email ?? "—"}</div>
+        </td>
+        <td className="px-4 py-3">
+          {s.awbNumber ? (
+            <>
+              <div className="font-mono text-xs font-semibold">{s.awbNumber}</div>
+              <div className="text-xs text-muted-foreground">{s.courierName ?? "—"}</div>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground">Not assigned</span>
+          )}
+        </td>
+        <td className="px-4 py-3">
+          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${TRACK_BADGE[s.trackingStatus] ?? "bg-muted text-muted-foreground"}`}>
+            {s.trackingStatus}
+          </span>
+          {s.trackingId && (
+            <a href={`/track/${s.trackingId}`} target="_blank" rel="noopener noreferrer" className="block text-xs text-primary mt-0.5 hover:underline font-mono">
+              {s.trackingId} ↗
+            </a>
+          )}
+        </td>
+        <td className="px-4 py-3">
+          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_BADGE[s.shipmentStatus] ?? "bg-muted text-muted-foreground"}`}>
+            {s.shipmentStatus}
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${s.paymentStatus === "paid" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : s.paymentStatus === "failed" ? "bg-red-100 text-red-700" : "bg-muted text-muted-foreground"}`}>
+            {s.paymentStatus}
+          </span>
+        </td>
+        <td className="px-4 py-3 text-right font-medium">{fmt(s.total)}</td>
+        <td className="px-4 py-3 text-right">{fmt(s.shippingCost)}</td>
+        <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmtDate(s.createdAt)}</td>
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-1 flex-wrap">
+            {s.shipmentStatus === "Not Created" && (s.paymentStatus === "paid" || s.paymentMethod === "cod") && (
+              <ActionBtn label="Create" icon={<Package className="w-3.5 h-3.5" />} busy={isBusy(s.id, "create")} onClick={() => createShipment(s.id)} cls="bg-primary text-primary-foreground" />
+            )}
+            {s.awbNumber && (
+              <>
+                <ActionBtn label="Track" icon={<Truck className="w-3.5 h-3.5" />} busy={isBusy(s.id, "refresh")} onClick={() => action(s.id, "refresh", "Tracking refreshed")} />
+                {s.labelUrl ? (
+                  <a href={s.labelUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium">
+                    <Printer className="w-3.5 h-3.5" /> Label
+                  </a>
+                ) : (
+                  <ActionBtn label="Label" icon={<Printer className="w-3.5 h-3.5" />} busy={isBusy(s.id, "refresh-label")} onClick={() => action(s.id, "refresh-label", "Label fetched")} />
+                )}
+                <ActionBtn
+                  label="Print"
+                  icon={<FileText className="w-3.5 h-3.5" />}
+                  busy={false}
+                  onClick={() => printShippingLabel({
+                    id: s.id, awbNumber: s.awbNumber!, courierName: s.courierName,
+                    shippingName: s.shippingName, shippingPhone: s.shippingPhone,
+                    shippingAddress: s.shippingAddress, total: s.total,
+                    paymentMethod: s.paymentMethod, paymentStatus: s.paymentStatus,
+                    items: s.items, createdAt: s.createdAt, trackingId: s.trackingId,
+                  })}
+                  cls="text-primary border-primary/30 hover:bg-primary/10"
+                />
+                <ActionBtn label="Cancel" icon={<XCircle className="w-3.5 h-3.5" />} busy={isBusy(s.id, "cancel")} onClick={() => action(s.id, "cancel", "Shipment cancelled")} cls="text-destructive border-destructive/30 hover:bg-destructive/10" />
+              </>
+            )}
+            {(s.shipmentStatus === "Cancelled" || (s.awbNumber && s.shipmentStatus !== "Not Created")) && (
+              <ActionBtn label="Recreate" icon={<RotateCcw className="w-3.5 h-3.5" />} busy={isBusy(s.id, "recreate")} onClick={() => action(s.id, "recreate", "Shipment recreated")} />
+            )}
+            {s.paymentMethod === "cod" && s.paymentStatus === "cod_pending" && s.awbNumber && s.shipmentStatus !== "Cancelled" && s.shipmentStatus !== "Recreated (COD)" && (
+              <ActionBtn label="Re-push COD" icon={<ArrowRightLeft className="w-3.5 h-3.5" />} busy={isBusy(s.id, "repush-as-cod")} onClick={() => action(s.id, "repush-as-cod", "Shipment re-pushed as COD")} cls="text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950/30" />
+            )}
+            <a href={`/track/${s.trackingId ?? s.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium">
+              <Eye className="w-3.5 h-3.5" /> View
+            </a>
+          </div>
+        </td>
+      </tr>
+      {expanded === s.id && (
+        <tr className="bg-muted/20">
+          <td colSpan={10} className="px-6 py-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+              <div>
+                <div className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">Shipping Address</div>
+                <p className="text-foreground">{s.shippingAddress ?? "—"}</p>
+              </div>
+              <div>
+                <div className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">Order Items</div>
+                <ul className="space-y-0.5">
+                  {(s.items ?? []).map((item, idx) => (
+                    <li key={idx}>{item.name} × {item.qty} — ₹{item.price * item.qty}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <div className="font-medium mb-1 text-xs uppercase tracking-wider text-muted-foreground">CKShip Details</div>
+                <div className="space-y-0.5 text-muted-foreground">
+                  <div>Shipment ID: {s.ckshipShipmentId ?? "—"}</div>
+                  <div>Order #: {s.ckshipOrderNumber ?? "—"}</div>
+                  <div>AWB: {s.awbNumber ?? "—"}</div>
+                  <div>Courier: {s.courierName ?? "—"}</div>
+                  {s.labelUrl && (
+                    <a href={s.labelUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline mt-1">
+                      <ExternalLink className="w-3 h-3" /> Download Label PDF
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }
 
