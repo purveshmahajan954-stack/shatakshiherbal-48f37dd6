@@ -5,6 +5,7 @@ import {
   Loader2, Truck, Package, RefreshCw, XCircle, RotateCcw,
   Printer, Eye, Search, TrendingUp, Clock, CheckCircle2, AlertTriangle,
   ExternalLink, ChevronDown, ChevronUp, ArrowRightLeft, FileText,
+  Pencil, Check, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { printShippingLabel } from "@/lib/shipping-label";
@@ -290,6 +291,27 @@ function ShipmentRow({
   createShipment: (id: string) => void;
   action: (id: string, act: string, label: string) => void;
 }) {
+  const [editingAwb, setEditingAwb] = useState(false);
+  const [awbInput, setAwbInput] = useState(s.awbNumber ?? "");
+  const [savingAwb, setSavingAwb] = useState(false);
+
+  const saveAwb = async () => {
+    const val = awbInput.trim();
+    if (!val) { toast.error("AWB number cannot be empty"); return; }
+    setSavingAwb(true);
+    try {
+      await adminPatch(`/api/admin/shipments?action=update-awb&order_id=${s.id}`, { awb_number: val });
+      toast.success("AWB updated — page will reload");
+      setEditingAwb(false);
+      // reload to reflect change
+      setTimeout(() => window.location.reload(), 800);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update AWB");
+    } finally {
+      setSavingAwb(false);
+    }
+  };
+
   return (
     <>
       <tr className="hover:bg-muted/30 transition-colors">
@@ -303,13 +325,39 @@ function ShipmentRow({
           <div className="text-xs text-muted-foreground">{s.shippingPhone ?? s.email ?? "—"}</div>
         </td>
         <td className="px-4 py-3">
-          {s.awbNumber ? (
-            <>
-              <div className="font-mono text-xs font-semibold">{s.awbNumber}</div>
-              <div className="text-xs text-muted-foreground">{s.courierName ?? "—"}</div>
-            </>
+          {editingAwb ? (
+            <div className="flex items-center gap-1">
+              <input
+                autoFocus
+                value={awbInput}
+                onChange={(e) => setAwbInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") saveAwb(); if (e.key === "Escape") setEditingAwb(false); }}
+                className="w-32 px-2 py-1 text-xs border border-primary rounded font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                placeholder="AWB number"
+              />
+              <button onClick={saveAwb} disabled={savingAwb} className="text-emerald-600 hover:text-emerald-700 disabled:opacity-50">
+                {savingAwb ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+              </button>
+              <button onClick={() => { setEditingAwb(false); setAwbInput(s.awbNumber ?? ""); }} className="text-muted-foreground hover:text-foreground">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           ) : (
-            <span className="text-xs text-muted-foreground">Not assigned</span>
+            <div className="flex items-start gap-1 group">
+              <div>
+                {s.awbNumber
+                  ? <><div className="font-mono text-xs font-semibold">{s.awbNumber}</div><div className="text-xs text-muted-foreground">{s.courierName ?? "—"}</div></>
+                  : <span className="text-xs text-muted-foreground">Not assigned</span>
+                }
+              </div>
+              <button
+                onClick={() => { setAwbInput(s.awbNumber ?? ""); setEditingAwb(true); }}
+                className="mt-0.5 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-opacity"
+                title="Edit AWB"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+            </div>
           )}
         </td>
         <td className="px-4 py-3">

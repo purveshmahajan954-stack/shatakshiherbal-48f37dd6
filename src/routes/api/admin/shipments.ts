@@ -295,6 +295,24 @@ export const Route = createFileRoute("/api/admin/shipments")({
           }
         }
 
+        if (action === "update-awb") {
+          let body: any;
+          try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON" }, { status: 400 }); }
+          const newAwb = (body?.awb_number ?? "").toString().trim();
+          if (!newAwb) return Response.json({ error: "awb_number is required" }, { status: 400 });
+
+          await db.update(orders)
+            .set({
+              awbNumber: newAwb,
+              shipmentStatus: "Created",
+              trackingStatus: order.trackingStatus === "Order Placed" ? "Packed" : order.trackingStatus,
+              trackingUpdatedAt: new Date(),
+            })
+            .where(eq(orders.id, orderId));
+
+          return Response.json({ ok: true, awbNumber: newAwb });
+        }
+
         return Response.json({ error: "Unknown action" }, { status: 400 });
       },
     },
