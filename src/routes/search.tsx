@@ -127,9 +127,6 @@ function SearchPage() {
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <span className="font-semibold text-foreground">₹{p.price}</span>
-                    {p.oldPrice > p.price && (
-                      <span className="text-xs text-muted-foreground line-through ml-1">₹{p.oldPrice}</span>
-                    )}
                   </div>
                   <button
                     onClick={() => {
