@@ -93,6 +93,7 @@ export async function createCKShipShipment(order: {
     const weight = Math.max(0.1, totalQty * 0.3);
 
     const isCod = order.paymentMethod?.toLowerCase() === "cod";
+    const orderTotal = Number(order.total);
 
     const payload = {
       address_id: 195,
@@ -107,15 +108,32 @@ export async function createCKShipShipment(order: {
       shipment_breadth: 10,
       shipment_height: 10,
       parcel_content_description: productDesc,
+      // parcel_type: 1 = COD, 0 = Prepaid
       parcel_type: isCod ? 1 : 0,
       qty: totalQty,
-      invoice_amount: Number(order.total),
+      invoice_amount: orderTotal,
       order_id: order.id,
-      payment_method: isCod ? "COD" : "prepaid",
-      ...(isCod ? { cod_amount: Number(order.total) } : {}),
+      // CKShip uses payment_mode (NOT payment_method) — wrong field name was causing COD→Prepaid
+      payment_mode: isCod ? "COD" : "Prepaid",
+      // CKShip uses collectable_amount (NOT cod_amount) — missing field caused COD to be treated as Prepaid
+      ...(isCod ? { collectable_amount: orderTotal } : {}),
     };
 
-    console.log("[CKShip] createShipment payload:", JSON.stringify(payload));
+    console.log(
+      `[CKShip] createShipment payload for order ${order.id}:`,
+      JSON.stringify({
+        order_id: order.id,
+        isCod,
+        paymentMethod: order.paymentMethod,
+        parcel_type: payload.parcel_type,
+        payment_mode: payload.payment_mode,
+        invoice_amount: payload.invoice_amount,
+        collectable_amount: isCod ? orderTotal : "(not sent — prepaid)",
+        receiver_pin: payload.receiver_pin,
+        receiver_city: payload.receiver_city,
+        receiver_state_id: payload.receiver_state_id,
+      }, null, 2)
+    );
 
     const res = await fetch(`${CKSHIP_BASE}/api/shipment/add-update`, {
       method: "POST",
