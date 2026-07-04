@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Search, ShoppingBag, X } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { products, CATEGORY_LABELS } from "@/lib/products";
+import { CATEGORY_LABELS } from "@/lib/products";
+import { useProducts } from "@/lib/use-products";
 import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
 
@@ -31,6 +32,7 @@ function SearchPage() {
   const navigate = useNavigate();
   const { add } = useCart();
   const [inputValue, setInputValue] = useState(q ?? "");
+  const { items: products } = useProducts();
 
   const query = inputValue.trim().toLowerCase();
 

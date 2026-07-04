@@ -16,6 +16,7 @@ type CartCtx = {
   setQty: (name: string, qty: number) => void;
   remove: (name: string) => void;
   clear: () => void;
+  updatePrices: (priceMap: Record<string, number>) => void;
 };
 
 const Ctx = createContext<CartCtx | null>(null);
@@ -50,12 +51,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   const remove = (name: string) => setItems((prev) => prev.filter((i) => i.name !== name));
   const clear = () => setItems([]);
+  const updatePrices = (priceMap: Record<string, number>) =>
+    setItems((prev) =>
+      prev.map((i) =>
+        i.slug && priceMap[i.slug] !== undefined ? { ...i, price: priceMap[i.slug] } : i
+      )
+    );
 
   const count = items.reduce((s, i) => s + i.qty, 0);
   const total = items.reduce((s, i) => s + i.qty * i.price, 0);
 
   return (
-    <Ctx.Provider value={{ items, count, total, add, setQty, remove, clear }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ items, count, total, add, setQty, remove, clear, updatePrices }}>{children}</Ctx.Provider>
   );
 }
 
