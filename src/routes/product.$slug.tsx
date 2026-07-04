@@ -50,7 +50,13 @@ export const Route = createFileRoute("/product/$slug")({
   ),
 });
 
+// Wrapper: forces full remount when slug changes so all state resets cleanly
 function ProductDetailPage() {
+  const { slug } = Route.useParams();
+  return <ProductDetailContent key={slug} />;
+}
+
+function ProductDetailContent() {
   const loaderData = Route.useLoaderData() as { product: Product | null };
   const { slug } = Route.useParams();
   const [product, setProduct] = useState<Product | null>(loaderData.product);
