@@ -103,7 +103,10 @@ function ProductDetailPage() {
   }
 
   const inWishlist = wishlist.has(product.slug);
-  const gallery = [product.image, badgeNoSugar, badgeGmp, badgeNoExtracts, badgeNoFlavours, badgeBpaFree];
+  const extraImages = product.galleryImages && product.galleryImages.length > 0
+    ? product.galleryImages
+    : [badgeNoSugar, badgeGmp, badgeNoExtracts, badgeNoFlavours, badgeBpaFree];
+  const gallery = [product.image, ...extraImages];
 
 
   const handleAdd = () => {

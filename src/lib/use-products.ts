@@ -11,6 +11,7 @@ export type DbProduct = {
   mrp: number | null;
   stock: number;
   imageUrl: string | null;
+  galleryImages: string[] | null;
   category: string | null;
   active: boolean;
 };
@@ -54,6 +55,7 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
     usage: base?.usage ?? DEFAULTS.usage,
     ingredients: base?.ingredients ?? DEFAULTS.ingredients,
     categories: base?.categories ?? (db.category ? [db.category] : DEFAULTS.categories),
+    galleryImages: db.galleryImages ?? [],
   };
 }
 

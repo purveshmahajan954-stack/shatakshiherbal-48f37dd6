@@ -23,6 +23,7 @@ export const Route = createFileRoute("/api/products")({
               mrp: products.mrp,
               stock: products.stock,
               imageUrl: products.imageUrl,
+              galleryImages: products.galleryImages,
               category: products.category,
               active: products.active,
             })
@@ -47,6 +48,7 @@ export const Route = createFileRoute("/api/products")({
             mrp: products.mrp,
             stock: products.stock,
             imageUrl: products.imageUrl,
+            galleryImages: products.galleryImages,
             category: products.category,
             active: products.active,
           })

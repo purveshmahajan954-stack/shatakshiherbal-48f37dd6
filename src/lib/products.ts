@@ -57,6 +57,7 @@ export type Product = {
   name: string;
   image: string;
   publicImage: string;
+  galleryImages?: string[];
   desc: string;
   longDesc: string;
   price: number;

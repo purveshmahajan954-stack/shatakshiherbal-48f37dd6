@@ -19,13 +19,14 @@ type Product = {
   mrp: number | null;
   stock: number;
   imageUrl: string | null;
+  galleryImages: string[] | null;
   category: string | null;
   active: boolean;
   createdAt: string;
   updatedAt: string;
 };
 
-const emptyForm = { name: "", slug: "", description: "", price: 0, mrp: 0, stock: 0, image_url: "", category: "", active: true };
+const emptyForm = { name: "", slug: "", description: "", price: 0, mrp: 0, stock: 0, image_url: "", gallery_images: [] as string[], category: "", active: true };
 type FormState = typeof emptyForm;
 
 function ProductsPage() {
@@ -60,7 +61,7 @@ function ProductsPage() {
 
   const onSave = async (form: FormState) => {
     if (!form.name.trim() || !form.slug.trim()) { toast.error("Name and slug are required"); return; }
-    const payload = { name: form.name.trim(), slug: form.slug.trim().toLowerCase().replace(/\s+/g, "-"), description: form.description.trim() || null, price: Number(form.price) || 0, mrp: form.mrp ? Number(form.mrp) : null, stock: Number(form.stock) || 0, image_url: form.image_url.trim() || null, category: form.category.trim() || null, active: form.active };
+    const payload = { name: form.name.trim(), slug: form.slug.trim().toLowerCase().replace(/\s+/g, "-"), description: form.description.trim() || null, price: Number(form.price) || 0, mrp: form.mrp ? Number(form.mrp) : null, stock: Number(form.stock) || 0, image_url: form.image_url.trim() || null, gallery_images: form.gallery_images, category: form.category.trim() || null, active: form.active };
     if (editing) {
       await adminPatch(`/api/admin/products?id=${editing.id}`, payload).catch((e) => { toast.error(e?.message); return; });
       toast.success("Updated");
@@ -138,13 +139,20 @@ function ProductsPage() {
 
 function ProductForm({ initial, onCancel, onSave }: { initial: Product | null; onCancel: () => void; onSave: (f: FormState) => void }) {
   const [form, setForm] = useState<FormState>(
-    initial ? { name: initial.name, slug: initial.slug, description: initial.description || "", price: initial.price, mrp: initial.mrp ?? 0, stock: initial.stock, image_url: initial.imageUrl || "", category: initial.category || "", active: initial.active } : emptyForm
+    initial ? { name: initial.name, slug: initial.slug, description: initial.description || "", price: initial.price, mrp: initial.mrp ?? 0, stock: initial.stock, image_url: initial.imageUrl || "", gallery_images: initial.galleryImages || [], category: initial.category || "", active: initial.active } : emptyForm
   );
   const [saving, setSaving] = useState(false);
   const [imageTab, setImageTab] = useState<"upload" | "url">("upload");
   const [imagePreview, setImagePreview] = useState<string>(initial?.imageUrl || "");
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Gallery state
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [showGalleryAdd, setShowGalleryAdd] = useState(false);
+  const [galleryTab, setGalleryTab] = useState<"upload" | "url">("upload");
+  const [galleryUrlInput, setGalleryUrlInput] = useState("");
+  const galleryFileRef = useRef<HTMLInputElement>(null);
 
   const submit = async (e: React.FormEvent) => { e.preventDefault(); setSaving(true); await onSave(form); setSaving(false); };
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((p) => ({ ...p, [k]: v }));
@@ -184,6 +192,45 @@ function ProductForm({ initial, onCancel, onSave }: { initial: Product | null; o
     set("image_url", "");
     setImagePreview("");
     if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const handleGalleryFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5 MB"); return; }
+    setGalleryUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const token = localStorage.getItem("admin_token");
+      const res = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        headers: token ? { "X-Admin-Token": token } : {},
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error || "Upload failed"); return; }
+      set("gallery_images", [...form.gallery_images, data.url]);
+      setShowGalleryAdd(false);
+      if (galleryFileRef.current) galleryFileRef.current.value = "";
+      toast.success("Image added to gallery");
+    } catch {
+      toast.error("Upload failed");
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
+
+  const addGalleryUrl = () => {
+    const url = galleryUrlInput.trim();
+    if (!url) return;
+    set("gallery_images", [...form.gallery_images, url]);
+    setGalleryUrlInput("");
+    setShowGalleryAdd(false);
+  };
+
+  const removeGalleryImage = (idx: number) => {
+    set("gallery_images", form.gallery_images.filter((_, i) => i !== idx));
   };
 
   return (
@@ -245,6 +292,60 @@ function ProductForm({ initial, onCancel, onSave }: { initial: Product | null; o
                 <button type="button" onClick={clearImage} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
                   <X className="w-3 h-3" />
                 </button>
+              </div>
+            )}
+          </div>
+
+          {/* Gallery Images */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-medium">Gallery Images ({form.gallery_images.length})</label>
+              <button type="button" onClick={() => { setShowGalleryAdd((v) => !v); setGalleryTab("upload"); setGalleryUrlInput(""); }} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-muted hover:bg-muted/80 rounded-md">
+                <Plus className="w-3 h-3" /> Add image
+              </button>
+            </div>
+
+            {/* Existing gallery thumbnails */}
+            {form.gallery_images.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {form.gallery_images.map((url, idx) => (
+                  <div key={idx} className="relative group">
+                    <img src={url} alt={`Gallery ${idx + 1}`} className="w-20 h-20 object-cover rounded-lg border border-border" onError={(e) => { (e.currentTarget as HTMLImageElement).src = ""; }} />
+                    <button type="button" onClick={() => removeGalleryImage(idx)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-3 h-3" />
+                    </button>
+                    <span className="absolute bottom-0 left-0 right-0 text-center text-[10px] bg-black/50 text-white rounded-b-lg py-0.5">{idx + 1}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add gallery image panel */}
+            {showGalleryAdd && (
+              <div className="border border-border rounded-lg p-3 bg-muted/30 space-y-2">
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setGalleryTab("upload")} className={`px-3 py-1.5 text-xs rounded-md font-medium transition-colors ${galleryTab === "upload" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                    <Upload className="w-3 h-3 inline mr-1" />Upload
+                  </button>
+                  <button type="button" onClick={() => setGalleryTab("url")} className={`px-3 py-1.5 text-xs rounded-md font-medium transition-colors ${galleryTab === "url" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                    URL
+                  </button>
+                </div>
+                {galleryTab === "upload" ? (
+                  <div className="border-2 border-dashed border-border rounded-lg p-3 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors" onClick={() => galleryFileRef.current?.click()}>
+                    <input ref={galleryFileRef} type="file" accept="image/*" className="hidden" onChange={handleGalleryFileChange} />
+                    {galleryUploading ? (
+                      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</div>
+                    ) : (
+                      <div><Upload className="w-5 h-5 mx-auto mb-1 text-muted-foreground" /><p className="text-xs text-muted-foreground">Click to upload</p></div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input value={galleryUrlInput} onChange={(e) => setGalleryUrlInput(e.target.value)} placeholder="https://example.com/image.jpg" className="flex-1 border border-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addGalleryUrl())} />
+                    <button type="button" onClick={addGalleryUrl} className="px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90">Add</button>
+                  </div>
+                )}
               </div>
             )}
           </div>

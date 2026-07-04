@@ -31,6 +31,7 @@ export const Route = createFileRoute("/api/admin/products")({
           mrp: body.mrp ? String(Number(body.mrp)) : null,
           stock: Number(body.stock) || 0,
           imageUrl: body.image_url?.trim() || null,
+          galleryImages: Array.isArray(body.gallery_images) ? body.gallery_images : [],
           category: body.category?.trim() || null,
           active: body.active ?? true,
         }).returning();
@@ -56,6 +57,7 @@ export const Route = createFileRoute("/api/admin/products")({
           mrp: body.mrp ? String(Number(body.mrp)) : null,
           stock: Number(body.stock) || 0,
           imageUrl: body.image_url?.trim() || null,
+          galleryImages: Array.isArray(body.gallery_images) ? body.gallery_images : [],
           category: body.category?.trim() || null,
           active: body.active,
           updatedAt: new Date(),
