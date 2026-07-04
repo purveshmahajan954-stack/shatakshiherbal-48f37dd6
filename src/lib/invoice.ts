@@ -59,9 +59,11 @@ export function getInvoiceHtml(order: InvoiceData): string {
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#222;background:#fff;padding:40px;max-width:800px;margin:0 auto}
-  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;border-bottom:3px solid #2D5016;padding-bottom:24px}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;border-bottom:3px solid #2D5016;padding-bottom:20px}
   .brand h1{font-size:22px;font-weight:800;color:#2D5016;letter-spacing:-0.5px}
-  .brand p{font-size:11px;color:#666;margin-top:4px}
+  .brand p{font-size:11px;color:#666;margin-top:3px;line-height:1.5}
+  .brand .gst-block{margin-top:8px;padding:6px 10px;background:#f0f5eb;border-radius:6px;display:inline-block}
+  .brand .gst-block p{font-size:10.5px;color:#2D5016;font-weight:600;margin-top:0}
   .invoice-meta{text-align:right}
   .invoice-meta h2{font-size:24px;color:#2D5016;font-weight:700;letter-spacing:2px}
   .invoice-meta p{font-size:12px;color:#666;margin-top:4px}
@@ -87,8 +89,13 @@ export function getInvoiceHtml(order: InvoiceData): string {
     <div class="brand">
       <h1>🌿 SHATAKSHI HERBAL</h1>
       <p>Pure Ayurvedic · AYUSH Certified · 100% Natural</p>
-      <p style="margin-top:2px">www.shatakshiherbal.com</p>
-      <p style="margin-top:2px;color:#2D5016;font-size:10px">GST: 27AABCS1234A1Z5</p>
+      <p>Bypass Road, Near Chitragupt School, Shivaji Ward</p>
+      <p>Gadarwara, Narsinghpur, Madhya Pradesh – 487551</p>
+      <p>📞 9754468444 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com</p>
+      <div class="gst-block">
+        <p>GSTIN: 23CNYPK2804B1Z6</p>
+        <p>State: 23 – Madhya Pradesh</p>
+      </div>
     </div>
     <div class="invoice-meta">
       <h2>INVOICE</h2>
@@ -141,7 +148,8 @@ export function getInvoiceHtml(order: InvoiceData): string {
 
   <div class="footer">
     Thank you for shopping with Shatakshi Herbal!<br>
-    For queries, contact us at support@shatakshiherbal.com · +91-XXXXXXXXXX<br>
+    For queries: 📞 9754468444 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com<br>
+    Bypass Road, Near Chitragupt School, Shivaji Ward, Gadarwara, Narsinghpur, M.P – 487551<br>
     This is a computer-generated invoice and does not require a physical signature.
   </div>
 
