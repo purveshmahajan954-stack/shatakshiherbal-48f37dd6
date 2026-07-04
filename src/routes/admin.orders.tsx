@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { adminGet, adminPatch } from "@/lib/api-client";
-import { Loader2, Search, RotateCcw, ChevronDown, FileDown, Truck } from "lucide-react";
+import { Loader2, Search, RotateCcw, ChevronDown, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { downloadInvoice } from "@/lib/invoice";
+import CreateShipment from "@/components/CreateShipment";
 
 export const Route = createFileRoute("/admin/orders")({
   component: OrdersPage,
@@ -33,6 +34,7 @@ type Order = {
   awbNumber: string | null;
   courierName: string | null;
   shipmentStatus: string;
+  labelUrl: string | null;
   createdAt: string;
 };
 
@@ -141,6 +143,12 @@ function OrdersPage() {
 
 function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boolean; onUpdate: (p: { status?: string; payment_status?: string }) => void }) {
   const [open, setOpen] = useState(false);
+  const [shipment, setShipment] = useState<{ awbNumber: string; courierName: string | null; labelUrl: string | null } | null>(null);
+
+  const effectiveAwb = shipment?.awbNumber ?? order.awbNumber;
+  const effectiveCourier = shipment?.courierName ?? order.courierName;
+  const effectiveLabelUrl = shipment?.labelUrl ?? order.labelUrl;
+
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden">
       <button onClick={() => setOpen((v) => !v)} className="w-full flex flex-wrap items-center gap-3 p-4 text-left hover:bg-muted/30 transition">
@@ -190,31 +198,24 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
                 </li>
               ))}
             </ul>
-            {/* Shipment info */}
-            {order.awbNumber && (
-              <>
-                <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Shipment</h4>
-                <div className="text-sm space-y-1 border border-border rounded-lg bg-card p-2.5">
-                  <div className="flex items-center gap-2">
-                    <Truck className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="text-muted-foreground">AWB:</span>
-                    <span className="font-mono font-medium">{order.awbNumber}</span>
-                  </div>
-                  {order.courierName && <div><span className="text-muted-foreground">Courier:</span> {order.courierName}</div>}
-                  <div><span className="text-muted-foreground">Status:</span> {order.trackingStatus}</div>
-                  {order.trackingId && (
-                    <Link
-                      to="/track/$trackingId"
-                      params={{ trackingId: order.trackingId }}
-                      target="_blank"
-                      className="text-xs text-primary hover:underline"
-                    >
-                      View tracking page ↗
-                    </Link>
-                  )}
-                </div>
-              </>
-            )}
+            {/* Shipment */}
+            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-1">Shipment</h4>
+            <CreateShipment
+              orderId={order.id}
+              awbNumber={effectiveAwb}
+              courierName={effectiveCourier}
+              shipmentStatus={order.shipmentStatus}
+              trackingStatus={order.trackingStatus}
+              trackingId={order.trackingId}
+              labelUrl={effectiveLabelUrl}
+              onCreated={(result) =>
+                setShipment({
+                  awbNumber: result.awbNumber,
+                  courierName: result.courierName,
+                  labelUrl: result.labelUrl,
+                })
+              }
+            />
 
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mt-4 mb-2">Manage</h4>
             <div className="flex flex-wrap gap-2 items-center">
