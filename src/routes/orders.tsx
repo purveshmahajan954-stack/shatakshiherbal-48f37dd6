@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/lib/auth";
 import { LoginScreen } from "@/components/LoginScreen";
 import { getMyOrders } from "@/lib/payments.functions";
 import { useCart } from "@/lib/cart";
+import { fetchProductsFromDb } from "@/lib/use-products";
 import {
   Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle,
   Copy, Truck, FileDown, MapPin, RefreshCcw,
@@ -72,6 +74,16 @@ function OrdersPage() {
     enabled: !!user,
     staleTime: 60_000,
   });
+
+  // Fetch live product images from DB (admin panel) keyed by slug
+  const [dbImages, setDbImages] = useState<Record<string, string>>({});
+  useEffect(() => {
+    fetchProductsFromDb().then((list) => {
+      const map: Record<string, string> = {};
+      list.forEach((p) => { if (p.slug && p.image) map[p.slug] = p.image; });
+      setDbImages(map);
+    }).catch(() => {});
+  }, []);
 
   const handleReorder = (order: any) => {
     const items = Array.isArray(order.items) ? order.items : [];
@@ -173,7 +185,7 @@ function OrdersPage() {
                   <ul className="mt-4 space-y-2">
                     {items.map((i: any, idx: number) => (
                       <li key={idx} className="flex items-center gap-3 text-sm">
-                        {i.image && <img src={i.image} alt={i.name} className="w-10 h-10 rounded-md object-cover bg-accent/30" />}
+                        {(dbImages[i.slug] || i.image) && <img src={dbImages[i.slug] || i.image} alt={i.name} className="w-10 h-10 rounded-md object-cover bg-accent/30" />}
                         <span className="flex-1 truncate">{i.name}</span>
                         <span className="text-muted-foreground">× {i.qty}</span>
                         <span className="w-20 text-right font-medium">₹{i.price * i.qty}</span>
