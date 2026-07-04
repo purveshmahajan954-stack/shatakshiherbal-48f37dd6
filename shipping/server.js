@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 const CKSHIP_BASE = "https://www.ckship.in";
 const CKSHIP_TOKEN = process.env.CKSHIP_AUTH_TOKEN;
@@ -48,10 +48,10 @@ app.post("/place-order", async (req, res) => {
     if (!state?.trim()) missing.push("State");
     if (!pincode?.trim()) missing.push("Pincode");
     if (!product_name?.trim()) missing.push("Product name");
-    if (!quantity) missing.push("Quantity");
-    if (!weight) missing.push("Weight");
+    if (!quantity || isNaN(Number(quantity))) missing.push("Quantity (must be a number)");
+    if (!weight || isNaN(Number(weight))) missing.push("Weight (must be a number)");
     if (!payment_mode) missing.push("Payment mode");
-    if (!order_amount) missing.push("Order amount");
+    if (!order_amount || isNaN(Number(order_amount))) missing.push("Order amount (must be a number)");
 
     if (missing.length > 0) {
       return res.status(400).json({ error: `Missing fields: ${missing.join(", ")}` });
@@ -80,7 +80,7 @@ app.post("/place-order", async (req, res) => {
       product_weight: Number(weight),
     };
 
-    console.log("[CKShip] Sending shipment payload:", JSON.stringify(shipmentPayload, null, 2));
+    console.log("[CKShip] Placing shipment:", shipmentPayload.order_number, "| product:", shipmentPayload.product_desc, "| qty:", shipmentPayload.product_quantity, "| amount:", shipmentPayload.order_amount);
 
     const ckRes = await fetch(`${CKSHIP_BASE}/api/shipment/create`, {
       method: "POST",
@@ -94,7 +94,6 @@ app.post("/place-order", async (req, res) => {
 
     const ckBody = await ckRes.text();
     console.log("[CKShip] Response status:", ckRes.status);
-    console.log("[CKShip] Response body:", ckBody);
 
     let ckData;
     try {
