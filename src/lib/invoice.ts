@@ -8,6 +8,7 @@ type InvoiceData = {
   shipping_address?: string | null;
   items: InvoiceItem[];
   subtotal: number;
+  gst?: number | null;
   delivery_charge: number;
   total: number;
   payment_status: string;
@@ -38,6 +39,15 @@ export function getInvoiceHtml(order: InvoiceData): string {
   const subtotal = Number(order.subtotal) || 0;
   const delivery = Number(order.delivery_charge) || 0;
   const grandTotal = subtotal + delivery;
+
+  // GST back-calculation @ 12% inclusive (Ayurvedic HSN 3004)
+  // If gst stored in DB, use it; otherwise back-calculate
+  const gstTotal = Number(order.gst) > 0
+    ? Number(order.gst)
+    : Math.round(subtotal * 12 / 112);
+  const cgst = Math.round(gstTotal / 2);
+  const sgst = gstTotal - cgst;
+  const taxableValue = subtotal - gstTotal;
 
   const rows = items
     .map(
@@ -77,9 +87,13 @@ export function getInvoiceHtml(order: InvoiceData): string {
   thead th{padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;text-align:left;font-weight:600}
   thead th:nth-child(2){text-align:center}
   thead th:nth-child(3),thead th:nth-child(4){text-align:right}
-  .totals{margin-left:auto;width:280px;border:1px solid #eee;border-radius:8px;overflow:hidden}
+  .totals{margin-left:auto;width:320px;border:1px solid #eee;border-radius:8px;overflow:hidden}
   .totals .row{display:flex;justify-content:space-between;padding:9px 14px;font-size:13px;border-bottom:1px solid #eee}
+  .totals .row.sub{background:#f7f7f2}
+  .totals .row.gst-row{font-size:12px;color:#555;padding:7px 14px 7px 24px;background:#fafaf7}
+  .totals .row.divider{border-top:2px solid #e0e0e0;border-bottom:none;padding-top:10px}
   .totals .row:last-child{background:#2D5016;color:#fff;font-weight:700;font-size:15px;border-bottom:none;padding:12px 14px}
+  .gst-note{font-size:10.5px;color:#888;margin-top:10px;text-align:right;font-style:italic}
   .footer{margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;line-height:1.6}
   @media print{body{padding:20px}@page{margin:1cm}}
 </style>
@@ -98,7 +112,7 @@ export function getInvoiceHtml(order: InvoiceData): string {
       </div>
     </div>
     <div class="invoice-meta">
-      <h2>INVOICE</h2>
+      <h2>TAX INVOICE</h2>
       <p><strong>Invoice No:</strong> ${invoiceNumber}</p>
       <p><strong>Order:</strong> ${orderId}</p>
       <p><strong>Date:</strong> ${date}</p>
@@ -126,13 +140,13 @@ export function getInvoiceHtml(order: InvoiceData): string {
   </div>
 
   <div>
-    <div class="section-title">Order Items</div>
+    <div class="section-title">Order Items (Prices inclusive of GST)</div>
     <table>
       <thead>
         <tr>
           <th>Product</th>
           <th style="text-align:center">Qty</th>
-          <th style="text-align:right">Unit Price</th>
+          <th style="text-align:right">Unit Price (MRP)</th>
           <th style="text-align:right">Amount</th>
         </tr>
       </thead>
@@ -141,16 +155,20 @@ export function getInvoiceHtml(order: InvoiceData): string {
   </div>
 
   <div class="totals">
-    <div class="row"><span>Subtotal</span><span>₹${subtotal.toLocaleString("en-IN")}</span></div>
-    <div class="row"><span>Delivery Charges</span><span>₹${delivery.toLocaleString("en-IN")}</span></div>
-    <div class="row"><span>Total Amount</span><span>₹${grandTotal.toLocaleString("en-IN")}</span></div>
+    <div class="row sub"><span>MRP Subtotal</span><span>₹${subtotal.toLocaleString("en-IN")}</span></div>
+    <div class="row gst-row"><span>Taxable Value (excl. GST)</span><span>₹${taxableValue.toLocaleString("en-IN")}</span></div>
+    <div class="row gst-row"><span>CGST @ 6% (HSN 3004)</span><span>₹${cgst.toLocaleString("en-IN")}</span></div>
+    <div class="row gst-row"><span>SGST @ 6% (HSN 3004)</span><span>₹${sgst.toLocaleString("en-IN")}</span></div>
+    <div class="row divider"><span>Delivery Charges</span><span>₹${delivery.toLocaleString("en-IN")}</span></div>
+    <div class="row"><span>Grand Total</span><span>₹${grandTotal.toLocaleString("en-IN")}</span></div>
   </div>
+  <p class="gst-note">* GST @ 12% is included in the MRP. CGST + SGST = ₹${gstTotal.toLocaleString("en-IN")} (back-calculated)</p>
 
   <div class="footer">
     Thank you for shopping with Shatakshi Herbal!<br>
     For queries: 📞 9754468444 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com<br>
     Bypass Road, Near Chitragupt School, Shivaji Ward, Gadarwara, Narsinghpur, M.P – 487551<br>
-    This is a computer-generated invoice and does not require a physical signature.
+    This is a computer-generated Tax Invoice and does not require a physical signature.
   </div>
 
   <script>window.onload=function(){setTimeout(function(){window.print()},500)}</script>

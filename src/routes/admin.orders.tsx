@@ -240,6 +240,7 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
                   shipping_address: order.shippingAddress,
                   items: order.items,
                   subtotal: order.subtotal,
+                  gst: order.gst,
                   delivery_charge: order.deliveryCharge,
                   total: order.total,
                   payment_status: order.paymentStatus,

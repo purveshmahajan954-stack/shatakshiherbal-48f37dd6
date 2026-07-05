@@ -15,10 +15,13 @@ function rzpAuthHeader() {
   return "Basic " + btoa(`${id}:${secret}`);
 }
 
+// GST @ 12% inclusive in MRP (Ayurvedic products HSN 3004)
+// Back-calculate: gst = MRP × 12/112
 function computeTotals(subtotal: number) {
   const sub = Math.max(0, Math.round(subtotal));
+  const gst = Math.round(sub * 12 / 112);
   const delivery = sub === 0 ? 0 : COURIER_CHARGE;
-  return { subtotal: sub, gst: 0, delivery, total: sub + delivery };
+  return { subtotal: sub, gst, delivery, total: sub + delivery };
 }
 
 const cartItemSchema = z.object({
@@ -121,7 +124,7 @@ export const Route = createFileRoute("/api/payments/create-order")({
           discount: "0",
           couponCode: null,
           deliveryCharge: String(totals.delivery),
-          gst: "0",
+          gst: String(totals.gst),
           total: String(totals.total),
           razorpayOrderId: rzpOrder.id,
           paymentStatus: "created",
