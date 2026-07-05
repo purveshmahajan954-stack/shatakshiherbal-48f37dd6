@@ -8,11 +8,11 @@ import { createCKShipShipment } from "@server/ckship";
 
 const COURIER_CHARGE = 220; // COD handling charge
 
-// GST @ 12% inclusive in MRP (Ayurvedic products HSN 3004)
-// Back-calculate: gst = MRP × 12/112
+// GST @ 5% inclusive in MRP (Ayurvedic products)
+// Back-calculate: gst = MRP × 5/105
 function computeTotals(subtotal: number) {
   const sub = Math.max(0, Math.round(subtotal));
-  const gst = Math.round(sub * 12 / 112);
+  const gst = Math.round(sub * 5 / 105);
   const delivery = sub === 0 ? 0 : COURIER_CHARGE;
   return { subtotal: sub, gst, delivery, total: sub + delivery };
 }

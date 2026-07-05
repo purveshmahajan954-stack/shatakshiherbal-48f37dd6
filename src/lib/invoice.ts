@@ -40,11 +40,11 @@ export function getInvoiceHtml(order: InvoiceData): string {
   const delivery = Number(order.delivery_charge) || 0;
   const grandTotal = subtotal + delivery;
 
-  // GST back-calculation @ 12% inclusive (Ayurvedic HSN 3004)
+  // GST back-calculation @ 5% inclusive (Ayurvedic products)
   // If gst stored in DB, use it; otherwise back-calculate
   const gstTotal = Number(order.gst) > 0
     ? Number(order.gst)
-    : Math.round(subtotal * 12 / 112);
+    : Math.round(subtotal * 5 / 105);
   const cgst = Math.round(gstTotal / 2);
   const sgst = gstTotal - cgst;
   const taxableValue = subtotal - gstTotal;
@@ -157,12 +157,12 @@ export function getInvoiceHtml(order: InvoiceData): string {
   <div class="totals">
     <div class="row sub"><span>MRP Subtotal</span><span>₹${subtotal.toLocaleString("en-IN")}</span></div>
     <div class="row gst-row"><span>Taxable Value (excl. GST)</span><span>₹${taxableValue.toLocaleString("en-IN")}</span></div>
-    <div class="row gst-row"><span>CGST @ 6% (HSN 3004)</span><span>₹${cgst.toLocaleString("en-IN")}</span></div>
-    <div class="row gst-row"><span>SGST @ 6% (HSN 3004)</span><span>₹${sgst.toLocaleString("en-IN")}</span></div>
+    <div class="row gst-row"><span>CGST @ 2.5%</span><span>₹${cgst.toLocaleString("en-IN")}</span></div>
+    <div class="row gst-row"><span>SGST @ 2.5%</span><span>₹${sgst.toLocaleString("en-IN")}</span></div>
     <div class="row divider"><span>Delivery Charges</span><span>₹${delivery.toLocaleString("en-IN")}</span></div>
     <div class="row"><span>Grand Total</span><span>₹${grandTotal.toLocaleString("en-IN")}</span></div>
   </div>
-  <p class="gst-note">* GST @ 12% is included in the MRP. CGST + SGST = ₹${gstTotal.toLocaleString("en-IN")} (back-calculated)</p>
+  <p class="gst-note">* GST @ 5% is included in the MRP. CGST 2.5% + SGST 2.5% = ₹${gstTotal.toLocaleString("en-IN")} (back-calculated)</p>
 
   <div class="footer">
     Thank you for shopping with Shatakshi Herbal!<br>
