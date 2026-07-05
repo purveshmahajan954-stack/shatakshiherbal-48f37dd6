@@ -59,7 +59,7 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
   };
 }
 
-const CACHE_TTL = 5 * 1000;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes — images don't change that often
 let _cache: { data: Product[]; at: number } | null = null;
 let _inflight: Promise<Product[]> | null = null;
 
@@ -111,8 +111,11 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
 }
 
 export function useProducts() {
-  const [items, setItems] = useState<Product[]>(staticProducts);
-  const [loading, setLoading] = useState(false);
+  // Start with cached data if fresh, else empty (no static fallback — avoids image flicker)
+  const [items, setItems] = useState<Product[]>(() =>
+    isCacheFresh() ? _cache!.data : []
+  );
+  const [loading, setLoading] = useState(() => !isCacheFresh());
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
 
@@ -122,10 +125,10 @@ export function useProducts() {
     try {
       const list = await fetchProductsFromDb();
       if (!mounted.current) return;
-      setItems(list.length > 0 ? list : staticProducts);
+      setItems(list);
     } catch {
       if (!mounted.current) return;
-      setItems(staticProducts);
+      setError("Failed to load products. Please try again.");
     } finally {
       if (mounted.current) setLoading(false);
     }
@@ -134,7 +137,8 @@ export function useProducts() {
   useEffect(() => {
     mounted.current = true;
     if (isCacheFresh()) {
-      setItems(_cache!.data.length > 0 ? _cache!.data : staticProducts);
+      setItems(_cache!.data);
+      setLoading(false);
     } else {
       load(false);
     }
