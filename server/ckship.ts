@@ -134,8 +134,9 @@ export async function createCKShipShipment(order: {
       qty: totalQty,
       invoice_amount: orderTotal,
       order_id: orderNumber,
-      // collectable_amount: COD only — prepaid omits this field entirely
-      ...(isCod ? { collectable_amount: String(orderTotal) } : {}),
+      // CKShip API requires collectable_amount for all orders (confirmed via 422 errors).
+      // Prepaid = "0", COD = actual order total
+      collectable_amount: isCod ? String(orderTotal) : "0",
     };
 
     console.log(

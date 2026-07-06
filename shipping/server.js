@@ -90,8 +90,9 @@ app.post("/place-order", async (req, res) => {
       qty,
       invoice_amount: orderAmt,
       order_id: orderNumber,
-      // collectable_amount: COD only — prepaid omits this field entirely
-      ...(isCod ? { collectable_amount: String(orderAmt) } : {}),
+      // CKShip API requires collectable_amount for all orders (confirmed via 422 errors).
+      // Prepaid = "0", COD = actual order total
+      collectable_amount: isCod ? String(orderAmt) : "0",
     };
 
     console.log("[CKShip] Placing shipment:", orderNumber, "| product:", product_name.trim(), "| qty:", qty, "| amount:", orderAmt, "| type:", isCod ? "COD" : "Prepaid");
