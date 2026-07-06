@@ -146,50 +146,55 @@ export async function createCKShipShipment(order: {
     const orderTotal = Number(order.total);
     const orderNumber = generateOrderNumber(order.id);
 
-    // Use /api/shipment/create — same endpoint as the shipping panel (known working).
-    // Field names: payment_method + cod_amount + consignee_* (NOT payment_mode / collectable_amount / receiver_*)
-    // parcel_type: 0 = COD, 1 = Prepaid (per CKShip API docs — previous code had this INVERTED)
+    // Use /api/shipment/add-update — the only confirmed-working CKShip endpoint.
+    // (/api/shipment/create returns 404 — that Laravel route does not exist)
+    //
+    // CRITICAL: parcel_type 0 = COD, 1 = Prepaid (previous code had this INVERTED)
     const payload: Record<string, unknown> = {
-      order_number: orderNumber,
-      order_date: todayDate(),
-      // "COD" or "prepaid" — must be exact case as CKShip expects
-      payment_method: isCod ? "COD" : "prepaid",
-      // parcel_type: 0 = COD, 1 = Prepaid (integer, not string)
+      address_id: 195,
+      receiver_name: order.shippingName ?? "Customer",
+      receiver_number: order.shippingPhone ?? "",
+      receiver_address: streetAddress,
+      receiver_pin: pincode,
+      receiver_city: city,
+      receiver_state_id: resolveStateId(stateName),
+      shipment_weight: weightGrams,
+      shipment_weight_unit: "gm",
+      shipment_length: 5,
+      shipment_length_unit: "cm",
+      shipment_breadth: 5,
+      shipment_breadth_unit: "cm",
+      shipment_height: 5,
+      shipment_height_unit: "cm",
+      parcel_content_description: productDesc,
+      // 0 = COD, 1 = Prepaid — was INVERTED in old code (COD was sending 1)
       parcel_type: isCod ? 0 : 1,
-      order_amount: orderTotal,
-      consignee_name: order.shippingName ?? "Customer",
-      consignee_phone: order.shippingPhone ?? "",
-      consignee_address: streetAddress,
-      consignee_city: city,
-      consignee_state: stateName,
-      consignee_pincode: pincode,
-      product_desc: productDesc,
-      product_quantity: totalQty,
-      product_weight: weightGrams,
+      qty: totalQty,
+      invoice_amount: orderTotal,
+      order_id: orderNumber,
+      payment_mode: isCod ? "COD" : "Prepaid",
+      // collectable_amount sent as number (not string) only for COD
+      ...(isCod ? { collectable_amount: orderTotal } : {}),
     };
-
-    // cod_amount only sent for COD orders — this is what triggers COD mode in CKShip
-    if (isCod) {
-      payload.cod_amount = orderTotal;
-    }
 
     console.log(
       `[CKShip] createShipment (${isCod ? "COD" : "Prepaid"}) for order ${order.id}:`,
       JSON.stringify({
-        order_number: orderNumber,
+        order_id: orderNumber,
         isCod,
-        payment_method: payload.payment_method,
         parcel_type: payload.parcel_type,
-        order_amount: payload.order_amount,
-        cod_amount: isCod ? orderTotal : "(not sent)",
-        consignee_city: payload.consignee_city,
-        consignee_state: payload.consignee_state,
-        consignee_pincode: payload.consignee_pincode,
-        product_weight: payload.product_weight,
+        payment_mode: payload.payment_mode,
+        invoice_amount: payload.invoice_amount,
+        collectable_amount: isCod ? orderTotal : "(not sent)",
+        receiver_city: payload.receiver_city,
+        receiver_state_id: payload.receiver_state_id,
+        state_name: stateName,
+        shipment_weight: payload.shipment_weight,
+        shipment_weight_unit: payload.shipment_weight_unit,
       }, null, 2)
     );
 
-    const res = await fetch(`${CKSHIP_BASE}/api/shipment/create`, {
+    const res = await fetch(`${CKSHIP_BASE}/api/shipment/add-update`, {
       method: "POST",
       headers: ckHeaders(),
       body: JSON.stringify(payload),
@@ -205,10 +210,13 @@ export async function createCKShipShipment(order: {
       throw new Error(data?.message || data?.error || data?.msg || `CKShip error ${res.status}`);
     }
 
-    // /api/shipment/create response: { data: { awb_number, ... }, message, status }
+    // /api/shipment/add-update response: { status: true/false, message, awb, shipment, ... }
+    if (data?.status === false) {
+      throw new Error(data?.message || `CKShip error ${res.status}`);
+    }
     const d = data?.data ?? data;
-    const awbNumber = d?.awb_number ?? d?.awb ?? d?.tracking_number ?? null;
-    const shipmentId = String(d?.shipment_id ?? d?.id ?? orderNumber);
+    const awbNumber = d?.awb ?? d?.awb_number ?? d?.tracking_number ?? null;
+    const shipmentId = String(d?.shipment ?? d?.shipment_id ?? d?.id ?? orderNumber);
     const courierName = d?.courier_name ?? d?.courier ?? null;
     const shippingCost = d?.shipping_cost ?? d?.rate ?? null;
     const labelUrl = d?.label_url ?? d?.label ?? null;
