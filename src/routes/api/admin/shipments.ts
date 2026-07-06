@@ -64,8 +64,14 @@ export const Route = createFileRoute("/api/admin/shipments")({
         if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
 
         try {
+          // If order already has a shipment in CKShip (awbNumber exists), append a
+          // suffix so CKShip doesn't reject with "order_id already taken"
+          const ckshipOrderId = order.awbNumber
+            ? `${order.id}-r${Date.now().toString(36)}`
+            : order.id;
+
           const result = await createCKShipShipment({
-            id: order.id,
+            id: ckshipOrderId,
             shippingName: order.shippingName,
             shippingPhone: order.shippingPhone,
             shippingAddress: order.shippingAddress,
@@ -207,7 +213,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
         if (action === "recreate") {
           try {
             const result = await createCKShipShipment({
-              id: order.id,
+              id: `${order.id}-r${Date.now().toString(36)}`,
               shippingName: order.shippingName,
               shippingPhone: order.shippingPhone,
               shippingAddress: order.shippingAddress,
@@ -259,7 +265,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
 
             // Re-create with payment_method: "COD" explicitly
             const result = await createCKShipShipment({
-              id: order.id,
+              id: `${order.id}-r${Date.now().toString(36)}`,
               shippingName: order.shippingName,
               shippingPhone: order.shippingPhone,
               shippingAddress: order.shippingAddress,
