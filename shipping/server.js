@@ -62,27 +62,41 @@ app.post("/place-order", async (req, res) => {
     }
 
     const isCod = payment_mode.toLowerCase() === "cod";
+    const weightGrams = Number(weight);
+    const orderAmt = Number(order_amount);
+    const qty = Number(quantity);
+    const orderNumber = generateOrderNumber();
 
+    // Confirmed working payload format from CKShip API
     const shipmentPayload = {
-      order_number: generateOrderNumber(),
-      order_date: todayDate(),
-      payment_method: isCod ? "COD" : "prepaid",
-      ...(isCod ? { cod_amount: Number(order_amount) } : {}),
-      order_amount: Number(order_amount),
-      consignee_name: customer_name.trim(),
-      consignee_phone: customer_phone.trim(),
-      consignee_address: address.trim(),
-      consignee_city: city.trim(),
-      consignee_state: state.trim(),
-      consignee_pincode: pincode.trim(),
-      product_desc: product_name.trim(),
-      product_quantity: Number(quantity),
-      product_weight: Number(weight),
+      address_id: 335,
+      receiver_name: customer_name.trim(),
+      receiver_number: customer_phone.trim(),
+      receiver_address: address.trim(),
+      receiver_pin: pincode.trim(),
+      receiver_city: city.trim(),
+      receiver_state_id: state.trim(),
+      shipment_weight: weightGrams,
+      shipment_weight_unit: String(weightGrams),
+      shipment_length: 5,
+      shipment_length_unit: "cm",
+      shipment_breadth: 5,
+      shipment_breadth_unit: "cm",
+      shipment_height: 5,
+      shipment_height_unit: "cm",
+      parcel_content_description: product_name.trim(),
+      // parcel_type: 1 = Prepaid, 0 = COD
+      parcel_type: isCod ? 0 : 1,
+      qty,
+      invoice_amount: orderAmt,
+      order_id: orderNumber,
+      // collectable_amount only for COD
+      ...(isCod ? { collectable_amount: String(orderAmt) } : {}),
     };
 
-    console.log("[CKShip] Placing shipment:", shipmentPayload.order_number, "| product:", shipmentPayload.product_desc, "| qty:", shipmentPayload.product_quantity, "| amount:", shipmentPayload.order_amount);
+    console.log("[CKShip] Placing shipment:", orderNumber, "| product:", product_name.trim(), "| qty:", qty, "| amount:", orderAmt, "| type:", isCod ? "COD" : "Prepaid");
 
-    const ckRes = await fetch(`${CKSHIP_BASE}/api/shipment/create`, {
+    const ckRes = await fetch(`${CKSHIP_BASE}/api/shipment/add-update`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${CKSHIP_TOKEN}`,
@@ -108,18 +122,19 @@ app.post("/place-order", async (req, res) => {
       return res.status(502).json({ error: msg, details: ckData });
     }
 
+    const d = ckData?.data ?? ckData;
     const awb =
-      ckData?.data?.awb_number ||
-      ckData?.awb_number ||
-      ckData?.data?.awb ||
-      ckData?.awb ||
-      ckData?.data?.tracking_number ||
+      d?.awb ??
+      d?.awb_number ??
+      d?.tracking_number ??
       null;
 
     return res.json({
       success: true,
       awb,
-      order_number: shipmentPayload.order_number,
+      order_number: orderNumber,
+      shipment_id: d?.shipment ?? d?.shipment_id ?? d?.id ?? null,
+      courier: d?.courier_name ?? d?.courier ?? null,
       raw: ckData,
     });
   } catch (err) {

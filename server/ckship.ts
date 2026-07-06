@@ -112,16 +112,14 @@ export async function createCKShipShipment(order: {
     //
     // CRITICAL: parcel_type 0 = COD, 1 = Prepaid (previous code had this INVERTED)
     const payload: Record<string, unknown> = {
-      address_id: 195,
+      address_id: 335,
       receiver_name: order.shippingName ?? "Customer",
       receiver_number: order.shippingPhone ?? "",
       receiver_address: streetAddress,
       receiver_pin: pincode,
       receiver_city: city,
-      // CKShip expects state name as string (e.g. "Rajasthan"), NOT a numeric ID
       receiver_state_id: stateName,
       shipment_weight: weightGrams,
-      // CKShip expects weight value as string (e.g. "200"), not a unit word like "gm"
       shipment_weight_unit: String(weightGrams),
       shipment_length: 5,
       shipment_length_unit: "cm",
@@ -130,13 +128,12 @@ export async function createCKShipShipment(order: {
       shipment_height: 5,
       shipment_height_unit: "cm",
       parcel_content_description: productDesc,
-      // parcel_type: 0 = COD, 1 = Prepaid (confirmed from working payload)
+      // parcel_type: 1 = Prepaid, 0 = COD (confirmed from working payload)
       parcel_type: isCod ? 0 : 1,
       qty: totalQty,
       invoice_amount: orderTotal,
       order_id: orderNumber,
-      payment_mode: isCod ? "COD" : "Prepaid",
-      // collectable_amount must be a STRING per CKShip API (confirmed from working payload)
+      // collectable_amount only sent for COD; prepaid payload omits it entirely
       ...(isCod ? { collectable_amount: String(orderTotal) } : {}),
     };
 
