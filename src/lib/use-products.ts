@@ -40,6 +40,7 @@ export function mergeProduct(db: DbProduct, stat?: Product): Product {
     slug: db.slug,
     name: db.name,
     image: db.imageUrl || base?.image || productPlaceholder,
+    publicImage: db.imageUrl || base?.publicImage || productPlaceholder,
     desc: db.description || base?.desc || "",
     longDesc: base?.longDesc || (db.description || ""),
     price: Number(db.price) || 0,
