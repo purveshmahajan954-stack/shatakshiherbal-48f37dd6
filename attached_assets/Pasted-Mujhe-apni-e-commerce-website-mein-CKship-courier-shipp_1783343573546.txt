@@ -1,0 +1,48 @@
+Mujhe apni e-commerce website mein CKship (courier/shipping aggregator) 
+integration ke saath COD (Cash on Delivery) order ka issue debug karna hai. 
+Problem ye hai ki COD orders CKship par jaate waqt "collectable amount" 
+sahi tarike se pass nahi ho raha / COD order create hi nahi ho raha.
+
+Mujhe puri codebase deeply check karke ye batao:
+
+1. CKSHIP API INTEGRATION FILE DHOONDO
+   - Wo file/module dhoondo jahan CKship ka order creation API call ho raha hai
+   - Search karo keywords: "ckship", "cod", "collectable", "payment_mode", 
+     "COD", "cash_on_delivery"
+
+2. REQUEST PAYLOAD CHECK KARO
+   - CKship ko jo request bheji ja rahi hai usme ye fields verify karo:
+     - payment_mode / payment_type (COD ya Prepaid sahi set ho raha hai kya)
+     - cod_amount / collectable_amount / total_amount field ka naam sahi hai kya
+       (CKship ki official API docs ke field name se match kar rahe ho na)
+     - Amount ka data type check karo — string bhej rahe ho ya number 
+       (kai API integer/float expect karti hain, string bhejne se fail ho jata hai)
+     - Amount 0 ya null to nahi ja raha (order total calculate hone se pehle 
+       hi API call to nahi ho raha)
+
+3. ORDER TOTAL CALCULATION LOGIC CHECK KARO
+   - Cart/order total kaise calculate ho raha hai us function ko dhoondo
+   - Discount, shipping charge, tax add hone ke baad hi collectable amount 
+     bana rahe ho ya galat sequence mein calculate ho raha hai
+   - COD select hone par extra COD charges add ho rahe hain to wo bhi 
+     final collectable amount mein include ho rahe hain kya
+
+4. API RESPONSE / ERROR LOGGING ADD KARO
+   - CKship API call ke response ko console.log / print karke dikhao
+   - Agar error aa raha hai to poora error message aur status code print karo
+   - Request payload (jo bheja gaya) bhi console mein print karo taaki 
+     compare kar saken
+
+5. ENVIRONMENT VARIABLES / CONFIG CHECK KARO
+   - CKship API key, secret, account ID sahi environment mein set hain kya
+   - Sandbox/test mode aur production mode ka URL/key mismatch to nahi hai
+
+6. MUJHE FINAL REPORT DO:
+   - Konsi file mein exact problem hai (file name + line number)
+   - Kya galat ho raha hai (missing field / wrong field name / wrong data 
+     type / calculation error / auth issue)
+   - Fix kya karna hoga, code snippet ke saath
+
+Poora code trace karo step by step — cart se leke checkout tak, phir 
+checkout se CKship API call tak — aur mujhe exact root cause batao, 
+sirf guess mat karo.

@@ -6,15 +6,13 @@ import { z } from "zod";
 import { randomHex } from "@server/password";
 import { createCKShipShipment } from "@server/ckship";
 
-const COURIER_CHARGE = 220; // COD handling charge
-
-// GST @ 5% inclusive in MRP (Ayurvedic products)
-// Back-calculate: gst = MRP × 5/105
+// Matches the shared computeTotals in src/lib/payments.functions.ts
+// COD_CHARGE = 220, PREPAID_CHARGE = 150, GST = 0 (inclusive in MRP)
+const COD_CHARGE = 220;
 function computeTotals(subtotal: number) {
   const sub = Math.max(0, Math.round(subtotal));
-  const gst = Math.round(sub * 5 / 105);
-  const delivery = sub === 0 ? 0 : COURIER_CHARGE;
-  return { subtotal: sub, gst, delivery, total: sub + delivery };
+  const delivery = sub === 0 ? 0 : COD_CHARGE;
+  return { subtotal: sub, gst: 0, delivery, total: sub + delivery };
 }
 
 const cartItemSchema = z.object({
@@ -84,7 +82,7 @@ export const Route = createFileRoute("/api/payments/cod-order")({
         }
 
         const subtotal = trustedItems.reduce((s, i) => s + i.price * i.qty, 0);
-        const totals = computeTotals(subtotal);
+        const totals = computeTotals(subtotal, "cod");
         const trackingId = `SHIP-${randomHex(4).toUpperCase().slice(0, 6)}`;
 
         const [orderRow] = await db.insert(orders).values({

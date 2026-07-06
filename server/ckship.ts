@@ -59,6 +59,55 @@ export type CKShipTrackResult = {
   raw: unknown;
 };
 
+// CKShip numeric state IDs (alphabetical order, matching CKShip's state list)
+const CKSHIP_STATE_IDS: Record<string, number> = {
+  "andhra pradesh": 1,
+  "arunachal pradesh": 2,
+  "assam": 3,
+  "bihar": 4,
+  "chhattisgarh": 5,
+  "goa": 6,
+  "gujarat": 7,
+  "haryana": 8,
+  "himachal pradesh": 9,
+  "jharkhand": 10,
+  "karnataka": 11,
+  "kerala": 12,
+  "madhya pradesh": 13,
+  "maharashtra": 14,
+  "manipur": 15,
+  "meghalaya": 16,
+  "mizoram": 17,
+  "nagaland": 18,
+  "odisha": 19,
+  "punjab": 20,
+  "rajasthan": 21,
+  "sikkim": 22,
+  "tamil nadu": 23,
+  "telangana": 24,
+  "tripura": 25,
+  "uttar pradesh": 26,
+  "uttarakhand": 27,
+  "west bengal": 28,
+  "andaman and nicobar islands": 29,
+  "chandigarh": 30,
+  "dadra and nagar haveli and daman and diu": 31,
+  "delhi": 32,
+  "jammu and kashmir": 33,
+  "ladakh": 34,
+  "lakshadweep": 35,
+  "puducherry": 36,
+};
+
+function resolveStateId(stateName: string): number {
+  const id = CKSHIP_STATE_IDS[stateName.trim().toLowerCase()];
+  if (!id) {
+    console.warn(`[CKShip] Unknown state "${stateName}" — defaulting to Maharashtra (14). Add it to CKSHIP_STATE_IDS.`);
+    return 14;
+  }
+  return id;
+}
+
 export async function createCKShipShipment(order: {
   id: string;
   shippingName: string | null;
@@ -85,7 +134,7 @@ export async function createCKShipShipment(order: {
       .trim();
     const parts = cleanAddress.split(",").map((p) => p.trim()).filter(Boolean);
 
-    const state = parts.length >= 1 ? parts[parts.length - 1] : "Maharashtra";
+    const stateName = parts.length >= 1 ? parts[parts.length - 1] : "Maharashtra";
     const city = parts.length >= 2 ? parts[parts.length - 2] : "Mumbai";
     const streetAddress = parts.slice(0, Math.max(1, parts.length - 2)).join(", ") || address;
 
@@ -94,6 +143,7 @@ export async function createCKShipShipment(order: {
 
     const isCod = order.paymentMethod?.toLowerCase() === "cod";
     const orderTotal = Number(order.total);
+    const stateId = resolveStateId(stateName);
 
     const payload = {
       address_id: 195,
@@ -102,9 +152,11 @@ export async function createCKShipShipment(order: {
       receiver_address: streetAddress,
       receiver_pin: pincode,
       receiver_city: city,
-      receiver_state_id: state,
+      // FIX: receiver_state_id expects a numeric ID, not a state name string
+      receiver_state_id: stateId,
+      // FIX: shipment_weight_unit must be the unit string "gm", not the weight value
       shipment_weight: weightGrams,
-      shipment_weight_unit: String(weightGrams),
+      shipment_weight_unit: "gm",
       shipment_length: 5,
       shipment_length_unit: "cm",
       shipment_breadth: 5,
@@ -119,8 +171,8 @@ export async function createCKShipShipment(order: {
       order_id: order.id,
       // CKShip uses payment_mode (NOT payment_method) — wrong field name was causing COD→Prepaid
       payment_mode: isCod ? "COD" : "Prepaid",
-      // collectable_amount must be a string per CKShip API
-      ...(isCod ? { collectable_amount: String(orderTotal) } : {}),
+      // FIX: collectable_amount must be a number (not a string) — CKShip rejects string type
+      ...(isCod ? { collectable_amount: orderTotal } : {}),
     };
 
     console.log(
@@ -132,10 +184,15 @@ export async function createCKShipShipment(order: {
         parcel_type: payload.parcel_type,
         payment_mode: payload.payment_mode,
         invoice_amount: payload.invoice_amount,
+        // FIX: log the actual type being sent so it matches payload
         collectable_amount: isCod ? orderTotal : "(not sent — prepaid)",
+        collectable_amount_type: isCod ? typeof orderTotal : "n/a",
         receiver_pin: payload.receiver_pin,
         receiver_city: payload.receiver_city,
         receiver_state_id: payload.receiver_state_id,
+        state_name_parsed: stateName,
+        shipment_weight: payload.shipment_weight,
+        shipment_weight_unit: payload.shipment_weight_unit,
       }, null, 2)
     );
 
