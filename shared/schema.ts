@@ -107,6 +107,7 @@ export const products = pgTable(
     mrp: numeric("mrp"),
     stock: integer("stock").notNull().default(0),
     imageUrl: text("image_url"),
+    images: jsonb("images").$type<string[]>().default([]),
     galleryImages: jsonb("gallery_images").$type<string[]>(),
     category: text("category"),
     active: boolean("active").notNull().default(true),
