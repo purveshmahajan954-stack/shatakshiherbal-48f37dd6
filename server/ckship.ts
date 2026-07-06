@@ -89,8 +89,8 @@ export async function createCKShipShipment(order: {
     const city = parts.length >= 2 ? parts[parts.length - 2] : "Mumbai";
     const streetAddress = parts.slice(0, Math.max(1, parts.length - 2)).join(", ") || address;
 
-    // Weight: ~0.3 kg per item, min 0.1 kg
-    const weight = Math.max(0.1, totalQty * 0.3);
+    // Weight in grams: ~200g per item for herbal products, min 100g
+    const weightGrams = Math.max(100, totalQty * 200);
 
     const isCod = order.paymentMethod?.toLowerCase() === "cod";
     const orderTotal = Number(order.total);
@@ -103,10 +103,14 @@ export async function createCKShipShipment(order: {
       receiver_pin: pincode,
       receiver_city: city,
       receiver_state_id: state,
-      shipment_weight: weight,
-      shipment_length: 15,
-      shipment_breadth: 10,
-      shipment_height: 10,
+      shipment_weight: weightGrams,
+      shipment_weight_unit: String(weightGrams),
+      shipment_length: 5,
+      shipment_length_unit: "cm",
+      shipment_breadth: 5,
+      shipment_breadth_unit: "cm",
+      shipment_height: 5,
+      shipment_height_unit: "cm",
       parcel_content_description: productDesc,
       // parcel_type: 1 = COD, 0 = Prepaid
       parcel_type: isCod ? 1 : 0,
@@ -115,8 +119,8 @@ export async function createCKShipShipment(order: {
       order_id: order.id,
       // CKShip uses payment_mode (NOT payment_method) — wrong field name was causing COD→Prepaid
       payment_mode: isCod ? "COD" : "Prepaid",
-      // CKShip uses collectable_amount (NOT cod_amount) — missing field caused COD to be treated as Prepaid
-      ...(isCod ? { collectable_amount: orderTotal } : {}),
+      // collectable_amount must be a string per CKShip API
+      ...(isCod ? { collectable_amount: String(orderTotal) } : {}),
     };
 
     console.log(
