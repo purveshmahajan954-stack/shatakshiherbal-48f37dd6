@@ -5,26 +5,27 @@ description: Confirmed working payload rules for CKShip /api/shipment/add-update
 
 # CKShip Payload Quirks
 
-**Why:** CKShip API behavior differs from its own docs. These rules are confirmed from actual working payloads.
+**Why:** CKShip API behavior differs from its own docs. These rules are confirmed from live API responses.
 
 ## Endpoint
 Always use `/api/shipment/add-update` — `/api/shipment/create` returns 404.
 
 ## address_id
-Different values depending on payment type:
-- Prepaid → `335`
-- COD → `195`
+Always use `335` for ALL shipment types (prepaid and COD both).
+- `195` was tried for COD but returns `404 {"message":"Pickup address not found."}`.
 
 ## parcel_type
 - `1` = Prepaid
 - `0` = COD
 
 ## collectable_amount
-- **Prepaid**: Omit entirely (do NOT send `"0"` — causes validation errors)
-- **COD**: Send as string, e.g. `"499"`
+CKShip always requires this field — even for prepaid (parcel_type=1).
+- **Prepaid**: Send `"0"` (string)
+- **COD**: Send the order total as string, e.g. `"499"`
+- Omitting it for prepaid causes `422 {"errors":{"collectable_amount":["The collectable amount field is required."]}}`
 
 ## shipment_weight_unit
-Must be the weight value repeated as a string, e.g. if `shipment_weight: 50` then `shipment_weight_unit: "50"`.
+Must be the weight value repeated as a string, e.g. if `shipment_weight: 200` then `shipment_weight_unit: "200"`.
 
 ## dimension units
 Always `"cm"` as string.
