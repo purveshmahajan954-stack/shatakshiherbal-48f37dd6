@@ -67,9 +67,9 @@ app.post("/place-order", async (req, res) => {
     const qty = Number(quantity);
     const orderNumber = generateOrderNumber();
 
-    // address_id: 335 for all shipment types (195 returns "Pickup address not found")
+    // address_id: prepaid=335, COD=195 (separate pickup addresses per type)
     const shipmentPayload = {
-      address_id: 335,
+      address_id: isCod ? 195 : 335,
       receiver_name: customer_name.trim(),
       receiver_number: customer_phone.trim(),
       receiver_address: address.trim(),
@@ -90,8 +90,8 @@ app.post("/place-order", async (req, res) => {
       qty,
       invoice_amount: orderAmt,
       order_id: orderNumber,
-      // CKShip always requires collectable_amount; "0" for prepaid
-      collectable_amount: isCod ? String(orderAmt) : "0",
+      // collectable_amount: COD only — prepaid omits this field entirely
+      ...(isCod ? { collectable_amount: String(orderAmt) } : {}),
     };
 
     console.log("[CKShip] Placing shipment:", orderNumber, "| product:", product_name.trim(), "| qty:", qty, "| amount:", orderAmt, "| type:", isCod ? "COD" : "Prepaid");

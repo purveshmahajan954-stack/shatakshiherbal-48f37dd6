@@ -111,9 +111,9 @@ export async function createCKShipShipment(order: {
     // (/api/shipment/create returns 404 — that Laravel route does not exist)
     //
     // CRITICAL: parcel_type 0 = COD, 1 = Prepaid (previous code had this INVERTED)
-    // address_id: 335 for all shipment types (195 returns "Pickup address not found")
+    // address_id: prepaid=335, COD=195 (separate pickup addresses per type)
     const payload: Record<string, unknown> = {
-      address_id: 335,
+      address_id: isCod ? 195 : 335,
       receiver_name: order.shippingName ?? "Customer",
       receiver_number: order.shippingPhone ?? "",
       receiver_address: streetAddress,
@@ -134,8 +134,8 @@ export async function createCKShipShipment(order: {
       qty: totalQty,
       invoice_amount: orderTotal,
       order_id: orderNumber,
-      // CKShip always requires collectable_amount; "0" for prepaid
-      collectable_amount: isCod ? String(orderTotal) : "0",
+      // collectable_amount: COD only — prepaid omits this field entirely
+      ...(isCod ? { collectable_amount: String(orderTotal) } : {}),
     };
 
     console.log(
