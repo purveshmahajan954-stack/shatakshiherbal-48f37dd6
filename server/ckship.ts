@@ -59,45 +59,6 @@ export type CKShipTrackResult = {
   raw: unknown;
 };
 
-// CKShip numeric state IDs (alphabetical order, matching CKShip's state list)
-const CKSHIP_STATE_IDS: Record<string, number> = {
-  "andhra pradesh": 1,
-  "arunachal pradesh": 2,
-  "assam": 3,
-  "bihar": 4,
-  "chhattisgarh": 5,
-  "goa": 6,
-  "gujarat": 7,
-  "haryana": 8,
-  "himachal pradesh": 9,
-  "jharkhand": 10,
-  "karnataka": 11,
-  "kerala": 12,
-  "madhya pradesh": 13,
-  "maharashtra": 14,
-  "manipur": 15,
-  "meghalaya": 16,
-  "mizoram": 17,
-  "nagaland": 18,
-  "odisha": 19,
-  "punjab": 20,
-  "rajasthan": 21,
-  "sikkim": 22,
-  "tamil nadu": 23,
-  "telangana": 24,
-  "tripura": 25,
-  "uttar pradesh": 26,
-  "uttarakhand": 27,
-  "west bengal": 28,
-  "andaman and nicobar islands": 29,
-  "chandigarh": 30,
-  "dadra and nagar haveli and daman and diu": 31,
-  "delhi": 32,
-  "jammu and kashmir": 33,
-  "ladakh": 34,
-  "lakshadweep": 35,
-  "puducherry": 36,
-};
 
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10);
