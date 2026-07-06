@@ -63,6 +63,15 @@ npm run deploy:cloudflare   # builds for CF Workers + deploys via Wrangler
 
 Cloudflare secrets must be set via `wrangler secret put <KEY>` — they are not read from `process.env` in the CF Workers build.
 
+## Replit setup status
+
+- ✅ `npm install` — root dependencies installed (640 packages)
+- ✅ `cd shipping && npm install` — shipping panel dependencies installed (67 packages)
+- ✅ `npm run db:push` — schema pushed to Replit's built-in PostgreSQL (`DATABASE_URL`); all tables created
+- ✅ Both workflows running: **Start application** (port 5000) and **Shipping Panel** (port 3001)
+- ⚠️ No product/admin data seeded yet — storefront is live but empty
+- ⚠️ Optional secrets (Razorpay, Google OAuth, Telegram, etc.) not yet configured
+
 ## User preferences
 
 - Keep existing project structure and stack — do not restructure without asking
