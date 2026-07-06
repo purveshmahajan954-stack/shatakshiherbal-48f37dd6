@@ -148,11 +148,14 @@ export async function createCKShipShipment(order: {
 
     // Use /api/shipment/create — same endpoint as the shipping panel (known working).
     // Field names: payment_method + cod_amount + consignee_* (NOT payment_mode / collectable_amount / receiver_*)
+    // parcel_type: 0 = COD, 1 = Prepaid (per CKShip API docs — previous code had this INVERTED)
     const payload: Record<string, unknown> = {
       order_number: orderNumber,
       order_date: todayDate(),
       // "COD" or "prepaid" — must be exact case as CKShip expects
       payment_method: isCod ? "COD" : "prepaid",
+      // parcel_type: 0 = COD, 1 = Prepaid (integer, not string)
+      parcel_type: isCod ? 0 : 1,
       order_amount: orderTotal,
       consignee_name: order.shippingName ?? "Customer",
       consignee_phone: order.shippingPhone ?? "",
@@ -176,6 +179,7 @@ export async function createCKShipShipment(order: {
         order_number: orderNumber,
         isCod,
         payment_method: payload.payment_method,
+        parcel_type: payload.parcel_type,
         order_amount: payload.order_amount,
         cod_amount: isCod ? orderTotal : "(not sent)",
         consignee_city: payload.consignee_city,
