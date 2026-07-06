@@ -99,13 +99,15 @@ const CKSHIP_STATE_IDS: Record<string, number> = {
   "puducherry": 36,
 };
 
-function resolveStateId(stateName: string): number {
-  const id = CKSHIP_STATE_IDS[stateName.trim().toLowerCase()];
-  if (!id) {
-    console.warn(`[CKShip] Unknown state "${stateName}" — defaulting to Maharashtra (14). Add it to CKSHIP_STATE_IDS.`);
-    return 14;
-  }
-  return id;
+function todayDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+let _orderCounter = 1;
+function generateOrderNumber(orderId: string): string {
+  // Short readable order number: last 8 chars of UUID + counter
+  const suffix = orderId.replace(/-/g, "").slice(-8).toUpperCase();
+  return `SH-${suffix}-${String(_orderCounter++).padStart(3, "0")}`;
 }
 
 export async function createCKShipShipment(order: {
@@ -121,12 +123,11 @@ export async function createCKShipShipment(order: {
     const productDesc = (order.items ?? []).map((i) => `${i.name} x${i.qty}`).join(", ").slice(0, 200) || "Herbal Products";
     const totalQty = (order.items ?? []).reduce((s, i) => s + i.qty, 0) || 1;
 
-    // Parse address parts — remove pincode first so last part = state, second-last = city
+    // Parse address — extract pincode, city, state from comma-separated address string
     const address = order.shippingAddress ?? "";
     const pinMatch = address.match(/\b(\d{6})\b/);
     const pincode = pinMatch?.[1] ?? "400001";
 
-    // Strip the 6-digit pincode (and any surrounding commas/spaces) to get clean parts
     const cleanAddress = address
       .replace(/,?\s*\b\d{6}\b\s*,?/g, ",")
       .replace(/,\s*,/g, ",")
@@ -143,89 +144,74 @@ export async function createCKShipShipment(order: {
 
     const isCod = order.paymentMethod?.toLowerCase() === "cod";
     const orderTotal = Number(order.total);
-    const stateId = resolveStateId(stateName);
+    const orderNumber = generateOrderNumber(order.id);
 
-    const payload = {
-      address_id: 195,
-      receiver_name: order.shippingName ?? "Customer",
-      receiver_number: order.shippingPhone ?? "",
-      receiver_address: streetAddress,
-      receiver_pin: pincode,
-      receiver_city: city,
-      // FIX: receiver_state_id expects a numeric ID, not a state name string
-      receiver_state_id: stateId,
-      // FIX: shipment_weight_unit must be the unit string "gm", not the weight value
-      shipment_weight: weightGrams,
-      shipment_weight_unit: "gm",
-      shipment_length: 5,
-      shipment_length_unit: "cm",
-      shipment_breadth: 5,
-      shipment_breadth_unit: "cm",
-      shipment_height: 5,
-      shipment_height_unit: "cm",
-      parcel_content_description: productDesc,
-      // parcel_type: 1 = COD, 0 = Prepaid
-      parcel_type: isCod ? 1 : 0,
-      qty: totalQty,
-      invoice_amount: orderTotal,
-      order_id: order.id,
-      // CKShip uses payment_mode (NOT payment_method) — wrong field name was causing COD→Prepaid
-      payment_mode: isCod ? "COD" : "Prepaid",
-      // FIX: collectable_amount must be a number (not a string) — CKShip rejects string type
-      ...(isCod ? { collectable_amount: orderTotal } : {}),
+    // Use /api/shipment/create — same endpoint as the shipping panel (known working).
+    // Field names: payment_method + cod_amount + consignee_* (NOT payment_mode / collectable_amount / receiver_*)
+    const payload: Record<string, unknown> = {
+      order_number: orderNumber,
+      order_date: todayDate(),
+      // "COD" or "prepaid" — must be exact case as CKShip expects
+      payment_method: isCod ? "COD" : "prepaid",
+      order_amount: orderTotal,
+      consignee_name: order.shippingName ?? "Customer",
+      consignee_phone: order.shippingPhone ?? "",
+      consignee_address: streetAddress,
+      consignee_city: city,
+      consignee_state: stateName,
+      consignee_pincode: pincode,
+      product_desc: productDesc,
+      product_quantity: totalQty,
+      product_weight: weightGrams,
     };
 
+    // cod_amount only sent for COD orders — this is what triggers COD mode in CKShip
+    if (isCod) {
+      payload.cod_amount = orderTotal;
+    }
+
     console.log(
-      `[CKShip] createShipment payload for order ${order.id}:`,
+      `[CKShip] createShipment (${isCod ? "COD" : "Prepaid"}) for order ${order.id}:`,
       JSON.stringify({
-        order_id: order.id,
+        order_number: orderNumber,
         isCod,
-        paymentMethod: order.paymentMethod,
-        parcel_type: payload.parcel_type,
-        payment_mode: payload.payment_mode,
-        invoice_amount: payload.invoice_amount,
-        // FIX: log the actual type being sent so it matches payload
-        collectable_amount: isCod ? orderTotal : "(not sent — prepaid)",
-        collectable_amount_type: isCod ? typeof orderTotal : "n/a",
-        receiver_pin: payload.receiver_pin,
-        receiver_city: payload.receiver_city,
-        receiver_state_id: payload.receiver_state_id,
-        state_name_parsed: stateName,
-        shipment_weight: payload.shipment_weight,
-        shipment_weight_unit: payload.shipment_weight_unit,
+        payment_method: payload.payment_method,
+        order_amount: payload.order_amount,
+        cod_amount: isCod ? orderTotal : "(not sent)",
+        consignee_city: payload.consignee_city,
+        consignee_state: payload.consignee_state,
+        consignee_pincode: payload.consignee_pincode,
+        product_weight: payload.product_weight,
       }, null, 2)
     );
 
-    const res = await fetch(`${CKSHIP_BASE}/api/shipment/add-update`, {
+    const res = await fetch(`${CKSHIP_BASE}/api/shipment/create`, {
       method: "POST",
       headers: ckHeaders(),
       body: JSON.stringify(payload),
     });
 
     const bodyText = await res.text();
-    console.log("[CKShip] createShipment response:", res.status, bodyText.slice(0, 500));
+    console.log("[CKShip] createShipment response:", res.status, bodyText.slice(0, 600));
 
     let data: any;
     try { data = JSON.parse(bodyText); } catch { throw new Error(`CKShip: Invalid response (${res.status}): ${bodyText.slice(0, 200)}`); }
 
-    // API returns { "status": true/false, "message": "...", "shipment": "...", "awb": "..." }
-    if (data?.status === false) {
-      throw new Error(data?.message || `CKShip error ${res.status}`);
-    }
-
-    if (!res.ok && data?.status !== true) {
+    if (!res.ok) {
       throw new Error(data?.message || data?.error || data?.msg || `CKShip error ${res.status}`);
     }
 
-    const awbNumber = data?.awb ?? data?.awb_number ?? data?.data?.awb ?? null;
-    const shipmentId = String(data?.shipment ?? data?.shipment_id ?? data?.data?.shipment_id ?? "");
-    const courierName = data?.courier_name ?? data?.courier ?? data?.data?.courier_name ?? null;
-    const shippingCost = data?.shipping_cost ?? data?.rate ?? data?.data?.shipping_cost ?? null;
-    const labelUrl = data?.label_url ?? data?.label ?? data?.data?.label_url ?? null;
+    // /api/shipment/create response: { data: { awb_number, ... }, message, status }
+    const d = data?.data ?? data;
+    const awbNumber = d?.awb_number ?? d?.awb ?? d?.tracking_number ?? null;
+    const shipmentId = String(d?.shipment_id ?? d?.id ?? orderNumber);
+    const courierName = d?.courier_name ?? d?.courier ?? null;
+    const shippingCost = d?.shipping_cost ?? d?.rate ?? null;
+    const labelUrl = d?.label_url ?? d?.label ?? null;
 
     return {
       shipmentId: shipmentId || null,
-      orderNumber: order.id,
+      orderNumber,
       awbNumber,
       courierName,
       shippingCost: shippingCost ? Number(shippingCost) : null,
