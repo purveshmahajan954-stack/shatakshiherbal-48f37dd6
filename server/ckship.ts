@@ -111,9 +111,9 @@ export async function createCKShipShipment(order: {
     // (/api/shipment/create returns 404 — that Laravel route does not exist)
     //
     // CRITICAL: parcel_type 0 = COD, 1 = Prepaid (previous code had this INVERTED)
-    // address_id: prepaid=335, COD=195 (separate pickup addresses per type)
+    // address_id: 195 for all shipment types (confirmed pickup address for this account)
     const payload: Record<string, unknown> = {
-      address_id: isCod ? 195 : 335,
+      address_id: 195,
       receiver_name: order.shippingName ?? "Customer",
       receiver_number: order.shippingPhone ?? "",
       receiver_address: streetAddress,

@@ -67,9 +67,9 @@ app.post("/place-order", async (req, res) => {
     const qty = Number(quantity);
     const orderNumber = generateOrderNumber();
 
-    // address_id: prepaid=335, COD=195 (separate pickup addresses per type)
+    // address_id: 195 for all shipment types (confirmed pickup address for this account)
     const shipmentPayload = {
-      address_id: isCod ? 195 : 335,
+      address_id: 195,
       receiver_name: customer_name.trim(),
       receiver_number: customer_phone.trim(),
       receiver_address: address.trim(),
