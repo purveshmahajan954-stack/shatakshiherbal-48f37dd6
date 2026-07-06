@@ -68,8 +68,9 @@ app.post("/place-order", async (req, res) => {
     const orderNumber = generateOrderNumber();
 
     // Confirmed working payload format from CKShip API
+    // address_id: prepaid → 335, COD → 195
     const shipmentPayload = {
-      address_id: 335,
+      address_id: isCod ? 195 : 335,
       receiver_name: customer_name.trim(),
       receiver_number: customer_phone.trim(),
       receiver_address: address.trim(),
@@ -90,8 +91,8 @@ app.post("/place-order", async (req, res) => {
       qty,
       invoice_amount: orderAmt,
       order_id: orderNumber,
-      // CKShip requires collectable_amount for ALL shipments; use "0" for prepaid
-      collectable_amount: isCod ? String(orderAmt) : "0",
+      // collectable_amount: only for COD, prepaid omits it entirely
+      ...(isCod ? { collectable_amount: String(orderAmt) } : {}),
     };
 
     console.log("[CKShip] Placing shipment:", orderNumber, "| product:", product_name.trim(), "| qty:", qty, "| amount:", orderAmt, "| type:", isCod ? "COD" : "Prepaid");
