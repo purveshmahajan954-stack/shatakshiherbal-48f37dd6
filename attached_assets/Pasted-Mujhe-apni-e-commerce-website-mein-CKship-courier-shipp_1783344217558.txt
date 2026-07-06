@@ -1,0 +1,62 @@
+Mujhe apni e-commerce website mein CKship (courier/shipping aggregator) 
+integration ke saath COD (Cash on Delivery) order ka issue debug karna hai. 
+Problem ye hai ki COD orders CKship par jaate waqt "collectable amount" 
+sahi tarike se pass nahi ho raha / COD order create hi nahi ho raha.
+
+IMPORTANT: CKship API mein "parcel_type" naam ka field hota hai jiski value:
+- 0 = COD (Cash on Delivery)
+- 1 = Prepaid
+
+Mujhe puri codebase deeply check karke ye batao:
+
+1. CKSHIP API INTEGRATION FILE DHOONDO
+   - Wo file/module dhoondo jahan CKship ka order creation API call ho raha hai
+   - Search karo keywords: "ckship", "parcel_type", "cod", "collectable", 
+     "payment_mode", "COD", "cash_on_delivery"
+
+2. PARCEL_TYPE FIELD SPECIFICALLY CHECK KARO
+   - "parcel_type" field request payload mein bhej rahe hain ya nahi
+   - Jab order COD hai to parcel_type = 0 set ho raha hai kya (na ki 1 
+     ya koi default value)
+   - Jab order Prepaid hai to parcel_type = 1 set ho raha hai kya
+   - Ye value hardcoded to nahi hai (jaise hamesha 1 fix ho, chahe order 
+     COD ho) — ye dynamically order ke payment method ke hisaab se set 
+     hona chahiye
+   - Data type check karo — parcel_type integer (0/1) jaana chahiye, 
+     string ("0"/"1") nahi (jab tak API docs string na maange)
+
+3. COLLECTABLE AMOUNT FIELD CHECK KARO
+   - jab parcel_type = 0 (COD) hai, tabhi collectable_amount / cod_amount 
+     field required hoga — check karo ye field bhej rahe ho ya nahi
+   - agar parcel_type = 1 (Prepaid) galti se set ho raha hai, to CKship 
+     collectable_amount ko ignore ya reject kar dega — ye common bug hai
+   - Amount ka field name CKship docs se match kar rahe ho kya 
+     (collectable_amount / cod_amount / collectable_value)
+   - Amount number format mein hai (string nahi), aur 0/null nahi hai
+
+4. ORDER PAYMENT METHOD SE PARCEL_TYPE MAPPING CHECK KARO
+   - Website ke checkout mein jab user "COD" select karta hai, us value 
+     (jaise "cod" string ya boolean) ko CKship ke parcel_type = 0 mein 
+     map karne wala code dhoondo
+   - Ye mapping logic galat condition (if/else) ke wajah se ulta to 
+     nahi ho raha (COD par 1 aur Prepaid par 0 ja raha ho)
+
+5. API RESPONSE / ERROR LOGGING ADD KARO
+   - CKship ko bheja gaya poora request payload console.log karo 
+     (parcel_type aur collectable_amount dono values ke saath)
+   - CKship se aaya response/error poora print karo (status code + message)
+
+6. ENVIRONMENT VARIABLES / CONFIG CHECK KARO
+   - CKship API key, secret, account ID sahi environment mein set hain kya
+   - Sandbox/test aur production URL/key mismatch to nahi hai
+
+7. MUJHE FINAL REPORT DO:
+   - Konsi file mein exact problem hai (file name + line number)
+   - parcel_type aur collectable_amount ki actual bheji ja rahi value kya hai
+   - Kya galat ho raha hai (wrong parcel_type / missing collectable_amount / 
+     wrong mapping / wrong data type)
+   - Fix kya karna hoga, code snippet ke saath (before/after)
+
+Poora code trace karo step by step — checkout page se leke CKship API 
+call tak — aur exact root cause batao, sirf guess mat karo. Especially 
+parcel_type aur collectable_amount ke beech ka relation zaroor check karo.

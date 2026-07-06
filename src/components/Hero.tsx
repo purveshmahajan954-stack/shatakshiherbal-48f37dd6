@@ -13,7 +13,11 @@ const heroSlides = [heroImg, heroImg2, heroImg3, heroImg4];
 export function Hero() {
   const [slide, setSlide] = useState(0);
   const [loaded, setLoaded] = useState<boolean[]>(() => heroSlides.map(() => false));
+  // Prevent hydration mismatch: animate only after client has mounted.
+  // On SSR the content is fully visible (opacity 1); animation runs only client-side.
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     // Warm subsequent slides in the background so transitions feel instant
     heroSlides.slice(1).forEach((src) => { const img = new Image(); img.src = src; });
     const id = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 3500);
@@ -24,7 +28,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-cream via-cream to-accent/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-        <motion.div suppressHydrationWarning initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <motion.div initial={mounted ? { opacity: 0, y: 20 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <div className="inline-flex items-center gap-2 bg-accent/60 px-3 sm:px-4 py-2 rounded-full text-[11px] sm:text-xs font-semibold text-primary mb-6 sm:mb-8">
             <span className="w-2 h-2 rounded-full bg-primary-light" />
             AYUSH CERTIFIED · 100% NATURAL
@@ -93,7 +97,7 @@ export function Hero() {
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="relative">
+        <motion.div initial={mounted ? { opacity: 0, scale: 0.95 } : false} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="relative">
           <div className="relative rounded-3xl overflow-hidden shadow-soft bg-white aspect-square">
             {!loaded[slide] && (
               <Skeleton className="absolute inset-0 w-full h-full rounded-3xl bg-accent/40" />
