@@ -292,7 +292,6 @@ function CheckoutPage() {
         prefill: { name, email, contact: effectivePhone },
         notes: { address: fullAddress },
         theme: { color: "#2D5016" },
-        method: { upi: true, card: true, netbanking: true, wallet: true },
         handler: async (resp: any) => {
           try {
             await apiPost("/api/payments/verify", {
