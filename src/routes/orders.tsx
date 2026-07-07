@@ -219,11 +219,11 @@ function OrdersPage() {
 
       // Check refund status
       if (data.refund?.ok) {
-        toast.success("Order cancel hua! Refund 5–7 business days mein aa jayega.");
+        toast.success("Order cancelled! Your refund will arrive in 5–7 business days.");
       } else if (data.refund && !data.refund.ok) {
-        toast.success("Order cancel hua! Refund ke liye support se contact karo.");
+        toast.success("Order cancelled! Please contact support for your refund.");
       } else {
-        toast.success("Order cancel ho gaya!");
+        toast.success("Order cancelled successfully!");
       }
 
       // Refresh orders list
