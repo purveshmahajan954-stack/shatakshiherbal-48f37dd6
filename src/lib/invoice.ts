@@ -94,7 +94,11 @@ export function getInvoiceHtml(order: InvoiceData): string {
   .totals .row.divider{border-top:2px solid #e0e0e0;border-bottom:none;padding-top:10px}
   .totals .row:last-child{background:#2D5016;color:#fff;font-weight:700;font-size:15px;border-bottom:none;padding:12px 14px}
   .gst-note{font-size:10.5px;color:#888;margin-top:10px;text-align:right;font-style:italic}
-  .footer{margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;line-height:1.6}
+  .tnc{margin-top:32px;padding:16px 18px;background:#f7f7f2;border:1px solid #e5e8df;border-radius:8px}
+  .tnc h4{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#2D5016;font-weight:700;margin-bottom:8px}
+  .tnc ol{padding-left:16px;color:#555;font-size:10.5px;line-height:1.8}
+  .tnc ol li{margin-bottom:2px}
+  .footer{margin-top:24px;padding-top:20px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;line-height:1.6}
   @media print{body{padding:20px}@page{margin:1cm}}
 </style>
 </head>
@@ -163,6 +167,20 @@ export function getInvoiceHtml(order: InvoiceData): string {
     <div class="row"><span>Grand Total</span><span>₹${grandTotal.toLocaleString("en-IN")}</span></div>
   </div>
   <p class="gst-note">* GST @ 5% is included in the MRP. CGST 2.5% + SGST 2.5% = ₹${gstTotal.toLocaleString("en-IN")} (back-calculated)</p>
+
+  <div class="tnc">
+    <h4>Terms &amp; Conditions</h4>
+    <ol>
+      <li>All products sold are subject to availability. Prices are inclusive of applicable GST.</li>
+      <li>Returns &amp; replacements are accepted within <strong>7 days of delivery</strong> only for damaged, defective, or incorrectly shipped items. Please contact us with photographic evidence.</li>
+      <li>No cash refunds for change of mind. Store credit / replacement will be offered at our discretion.</li>
+      <li>Our products are 100% natural and Ayurvedic. Consult a qualified physician before use if you are pregnant, nursing, or have any pre-existing medical condition.</li>
+      <li>Keep all products out of reach of children. Store in a cool, dry place away from direct sunlight and moisture.</li>
+      <li>Shatakshi Herbal shall not be liable for any adverse reactions arising from improper use or failure to read label instructions.</li>
+      <li>Disputes, if any, are subject to the jurisdiction of courts at Gadarwara, Narsinghpur, Madhya Pradesh.</li>
+      <li>This is a computer-generated Tax Invoice and is valid without a physical signature.</li>
+    </ol>
+  </div>
 
   <div class="footer">
     Thank you for shopping with Shatakshi Herbal!<br>
