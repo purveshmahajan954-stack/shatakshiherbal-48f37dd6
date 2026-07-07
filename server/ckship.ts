@@ -254,10 +254,12 @@ export async function getCKShipLabel(awbNumber: string): Promise<string | null> 
 
 export async function cancelCKShipShipment(awbNumber: string): Promise<{ success: boolean; message: string }> {
   return withRetry(async () => {
-    const res = await fetch(`${CKSHIP_BASE}/api/shipment/cancel`, {
+    const form = new FormData();
+    form.append("tracking_id", awbNumber);
+    const res = await fetch(`${CKSHIP_BASE}/api/cancel-shipment`, {
       method: "POST",
-      headers: ckHeaders(),
-      body: JSON.stringify({ awb: awbNumber }),
+      headers: { Authorization: `Bearer ${token()}`, Accept: "application/json" },
+      body: form,
     });
 
     const bodyText = await res.text();
