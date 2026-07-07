@@ -19,6 +19,7 @@ import {
   CreditCard,
   BarChart3,
   Truck,
+  Receipt,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -37,6 +38,7 @@ const NAV = [
   { to: "/admin/customers", label: "Customers", icon: UserCircle },
   { to: "/admin/payments", label: "Payments", icon: CreditCard },
   { to: "/admin/reports", label: "Reports", icon: BarChart3 },
+  { to: "/admin/gstr1", label: "GST Reports", icon: Receipt },
   { to: "/admin/leads", label: "Leads", icon: MessageSquare },
   { to: "/admin/shipping", label: "Shipping", icon: Truck },
   { to: "/admin/products", label: "Products", icon: Package },

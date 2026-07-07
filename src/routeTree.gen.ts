@@ -49,6 +49,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminGstr1RouteImport } from './routes/admin.gstr1'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as ApiUserProfileRouteImport } from './routes/api/user/profile'
@@ -83,6 +84,7 @@ import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
 import { Route as ApiAdminMigrateRouteImport } from './routes/api/admin/migrate'
 import { Route as ApiAdminMeRouteImport } from './routes/api/admin/me'
 import { Route as ApiAdminLeadsRouteImport } from './routes/api/admin/leads'
+import { Route as ApiAdminGstr1RouteImport } from './routes/api/admin/gstr1'
 import { Route as ApiAdminFirebasePhoneVerifyRouteImport } from './routes/api/admin/firebase-phone-verify'
 import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
 import { Route as ApiAdminCustomersRouteImport } from './routes/api/admin/customers'
@@ -288,6 +290,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGstr1Route = AdminGstr1RouteImport.update({
+  id: '/gstr1',
+  path: '/gstr1',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -460,6 +467,11 @@ const ApiAdminLeadsRoute = ApiAdminLeadsRouteImport.update({
   path: '/api/admin/leads',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminGstr1Route = ApiAdminGstr1RouteImport.update({
+  id: '/api/admin/gstr1',
+  path: '/api/admin/gstr1',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminFirebasePhoneVerifyRoute =
   ApiAdminFirebasePhoneVerifyRouteImport.update({
     id: '/api/admin/firebase-phone-verify',
@@ -511,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/gstr1': typeof AdminGstr1Route
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -529,6 +542,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/customers': typeof ApiAdminCustomersRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/firebase-phone-verify': typeof ApiAdminFirebasePhoneVerifyRoute
+  '/api/admin/gstr1': typeof ApiAdminGstr1Route
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
@@ -590,6 +604,7 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/gstr1': typeof AdminGstr1Route
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -608,6 +623,7 @@ export interface FileRoutesByTo {
   '/api/admin/customers': typeof ApiAdminCustomersRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/firebase-phone-verify': typeof ApiAdminFirebasePhoneVerifyRoute
+  '/api/admin/gstr1': typeof ApiAdminGstr1Route
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
@@ -671,6 +687,7 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/gstr1': typeof AdminGstr1Route
   '/admin/leads': typeof AdminLeadsRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -689,6 +706,7 @@ export interface FileRoutesById {
   '/api/admin/customers': typeof ApiAdminCustomersRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/firebase-phone-verify': typeof ApiAdminFirebasePhoneVerifyRoute
+  '/api/admin/gstr1': typeof ApiAdminGstr1Route
   '/api/admin/leads': typeof ApiAdminLeadsRoute
   '/api/admin/me': typeof ApiAdminMeRoute
   '/api/admin/migrate': typeof ApiAdminMigrateRoute
@@ -753,6 +771,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/admin/customers'
     | '/admin/dashboard'
+    | '/admin/gstr1'
     | '/admin/leads'
     | '/admin/orders'
     | '/admin/payments'
@@ -771,6 +790,7 @@ export interface FileRouteTypes {
     | '/api/admin/customers'
     | '/api/admin/dashboard'
     | '/api/admin/firebase-phone-verify'
+    | '/api/admin/gstr1'
     | '/api/admin/leads'
     | '/api/admin/me'
     | '/api/admin/migrate'
@@ -832,6 +852,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/admin/customers'
     | '/admin/dashboard'
+    | '/admin/gstr1'
     | '/admin/leads'
     | '/admin/orders'
     | '/admin/payments'
@@ -850,6 +871,7 @@ export interface FileRouteTypes {
     | '/api/admin/customers'
     | '/api/admin/dashboard'
     | '/api/admin/firebase-phone-verify'
+    | '/api/admin/gstr1'
     | '/api/admin/leads'
     | '/api/admin/me'
     | '/api/admin/migrate'
@@ -912,6 +934,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/admin/customers'
     | '/admin/dashboard'
+    | '/admin/gstr1'
     | '/admin/leads'
     | '/admin/orders'
     | '/admin/payments'
@@ -930,6 +953,7 @@ export interface FileRouteTypes {
     | '/api/admin/customers'
     | '/api/admin/dashboard'
     | '/api/admin/firebase-phone-verify'
+    | '/api/admin/gstr1'
     | '/api/admin/leads'
     | '/api/admin/me'
     | '/api/admin/migrate'
@@ -1000,6 +1024,7 @@ export interface RootRouteChildren {
   ApiAdminCustomersRoute: typeof ApiAdminCustomersRoute
   ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
   ApiAdminFirebasePhoneVerifyRoute: typeof ApiAdminFirebasePhoneVerifyRoute
+  ApiAdminGstr1Route: typeof ApiAdminGstr1Route
   ApiAdminLeadsRoute: typeof ApiAdminLeadsRoute
   ApiAdminMeRoute: typeof ApiAdminMeRoute
   ApiAdminMigrateRoute: typeof ApiAdminMigrateRoute
@@ -1317,6 +1342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLeadsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/gstr1': {
+      id: '/admin/gstr1'
+      path: '/gstr1'
+      fullPath: '/admin/gstr1'
+      preLoaderRoute: typeof AdminGstr1RouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/dashboard'
@@ -1555,6 +1587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminLeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/gstr1': {
+      id: '/api/admin/gstr1'
+      path: '/api/admin/gstr1'
+      fullPath: '/api/admin/gstr1'
+      preLoaderRoute: typeof ApiAdminGstr1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/firebase-phone-verify': {
       id: '/api/admin/firebase-phone-verify'
       path: '/api/admin/firebase-phone-verify'
@@ -1589,6 +1628,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminCustomersRoute: typeof AdminCustomersRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminGstr1Route: typeof AdminGstr1Route
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
@@ -1602,6 +1642,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCustomersRoute: AdminCustomersRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminGstr1Route: AdminGstr1Route,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
@@ -1659,6 +1700,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminCustomersRoute: ApiAdminCustomersRoute,
   ApiAdminDashboardRoute: ApiAdminDashboardRoute,
   ApiAdminFirebasePhoneVerifyRoute: ApiAdminFirebasePhoneVerifyRoute,
+  ApiAdminGstr1Route: ApiAdminGstr1Route,
   ApiAdminLeadsRoute: ApiAdminLeadsRoute,
   ApiAdminMeRoute: ApiAdminMeRoute,
   ApiAdminMigrateRoute: ApiAdminMigrateRoute,
