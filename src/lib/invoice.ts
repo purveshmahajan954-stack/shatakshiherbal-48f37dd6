@@ -27,7 +27,7 @@ function generateInvoiceNumber(orderId: string, createdAt: string): string {
   return `INV-${ymd}-${suffix}`;
 }
 
-export function getInvoiceHtml(order: InvoiceData): string {
+export function getInvoiceHtml(order: InvoiceData, baseUrl = ""): string {
   const items = Array.isArray(order.items) ? order.items : [];
   const date = new Date(order.created_at).toLocaleString("en-IN", {
     dateStyle: "long",
@@ -70,6 +70,7 @@ export function getInvoiceHtml(order: InvoiceData): string {
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#222;background:#fff;padding:40px;max-width:800px;margin:0 auto}
   .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;border-bottom:3px solid #2D5016;padding-bottom:20px}
+  .brand-logo{height:64px;width:auto;object-fit:contain;display:block;margin-bottom:6px}
   .brand h1{font-size:22px;font-weight:800;color:#2D5016;letter-spacing:-0.5px}
   .brand p{font-size:11px;color:#666;margin-top:3px;line-height:1.5}
   .brand .gst-block{margin-top:8px;padding:6px 10px;background:#f0f5eb;border-radius:6px;display:inline-block}
@@ -105,7 +106,8 @@ export function getInvoiceHtml(order: InvoiceData): string {
 <body>
   <div class="header">
     <div class="brand">
-      <h1>🌿 SHATAKSHI HERBAL</h1>
+      <img src="${baseUrl}/logo.png" alt="Shatakshi Herbal" class="brand-logo" />
+      <h1>SHATAKSHI HERBAL</h1>
       <p>Pure Ayurvedic · AYUSH Certified · 100% Natural</p>
       <p>Bypass Road, Near Chitragupt School, Shivaji Ward</p>
       <p>Gadarwara, Narsinghpur, Madhya Pradesh – 487551</p>
@@ -195,7 +197,8 @@ export function getInvoiceHtml(order: InvoiceData): string {
 }
 
 export function downloadInvoice(order: InvoiceData) {
-  const html = getInvoiceHtml(order);
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const html = getInvoiceHtml(order, baseUrl);
   const invoiceNumber = generateInvoiceNumber(order.id, order.created_at);
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
