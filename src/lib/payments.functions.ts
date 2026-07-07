@@ -236,6 +236,7 @@ export const getMyOrders = createServerFn({ method: "GET" })
         email: orders.email,
         razorpayOrderId: orders.razorpayOrderId,
         razorpayPaymentId: orders.razorpayPaymentId,
+        paymentMethod: orders.paymentMethod,
         trackingId: orders.trackingId,
         trackingStatus: orders.trackingStatus,
         trackingLocation: orders.trackingLocation,
