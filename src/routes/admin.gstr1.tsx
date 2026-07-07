@@ -338,37 +338,72 @@ function Gstr1Page() {
       filterMode === "month" ? month :
       `${from || "—"} to ${to || "—"}`;
 
+    const origin = window.location.origin;
     const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
   <title>GSTR-1 Report — Shatakshi Herbal</title>
   <style>
+    * { box-sizing: border-box; }
     body { font-family: Arial, sans-serif; font-size: 9px; margin: 16px; color: #000; }
-    h2 { font-size: 14px; margin: 0 0 2px; }
-    .meta { font-size: 10px; color: #555; margin-bottom: 14px; }
-    table { border-collapse: collapse; width: 100%; }
-    th { background: #d4e8d4; border: 1px solid #999; padding: 4px 5px; text-align: left; font-weight: bold; white-space: nowrap; }
+    /* ── Branded header ── */
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #2d5a27;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .brand-left { display: flex; align-items: center; gap: 10px; }
+    .brand-left img { height: 52px; width: auto; object-fit: contain; }
+    .brand-text { display: flex; flex-direction: column; gap: 1px; }
+    .brand-name { font-size: 15px; font-weight: 900; color: #2d5a27; letter-spacing: 0.5px; }
+    .brand-tagline { font-size: 8px; color: #555; }
+    .brand-web { font-size: 8px; color: #2d5a27; }
+    .brand-right { text-align: right; }
+    .report-title { font-size: 18px; font-weight: 900; color: #2d5a27; letter-spacing: 1px; }
+    .report-sub { font-size: 8px; color: #555; margin-top: 3px; line-height: 1.6; }
+    /* ── Table ── */
+    table { border-collapse: collapse; width: 100%; margin-top: 4px; }
+    th { background: #d4e8d4; border: 1px solid #999; padding: 4px 5px; text-align: left; font-weight: bold; white-space: nowrap; font-size: 8.5px; }
     td { border: 1px solid #ccc; padding: 3px 5px; white-space: nowrap; }
     tr:nth-child(even) td { background: #f7f7f7; }
     .r { text-align: right; }
-    .tot td { background: #e0ede0 !important; font-weight: bold; border-top: 2px solid #888; }
+    .tot td { background: #d4e8d4 !important; font-weight: bold; border-top: 2px solid #2d5a27; }
+    .footer { margin-top: 10px; font-size: 8px; color: #777; border-top: 1px solid #ddd; padding-top: 6px; }
     @media print { body { margin: 8px; } }
   </style>
 </head>
 <body>
-  <h2>GSTR-1 Report — Shatakshi Herbal</h2>
-  <p class="meta">
-    Generated: ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
-    &nbsp;|&nbsp; Period: ${filterLabel}
-    &nbsp;|&nbsp; ${sorted.length} invoices
-    &nbsp;|&nbsp; Seller State: Rajasthan (Intra: CGST+SGST, Inter: IGST)
-  </p>
+  <div class="brand-header">
+    <div class="brand-left">
+      <img src="${origin}/logo.png" alt="Shatakshi Herbal" />
+      <div class="brand-text">
+        <div class="brand-name">SHATAKSHI HERBAL</div>
+        <div class="brand-tagline">Pure Ayurvedic &nbsp;·&nbsp; AYUSH Certified &nbsp;·&nbsp; 100% Natural</div>
+        <div class="brand-web">www.shatakshiherbal.com</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <div class="report-title">GSTR-1 REPORT</div>
+      <div class="report-sub">
+        Period: ${filterLabel}<br/>
+        Generated: ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}<br/>
+        Total Invoices: ${sorted.length}<br/>
+        Seller State: Rajasthan &nbsp;|&nbsp; GST Rate: 5%
+      </div>
+    </div>
+  </div>
   <table>
     <thead><tr>${headerRow}</tr></thead>
     <tbody>${bodyRows}</tbody>
     <tfoot>${totalsRow}</tfoot>
   </table>
+  <div class="footer">
+    * Intra-state (Rajasthan): CGST 2.5% + SGST 2.5% &nbsp;|&nbsp; Inter-state: IGST 5% &nbsp;|&nbsp; Taxable Value = Order Subtotal (excl. GST &amp; delivery)
+  </div>
 </body>
 </html>`;
 
