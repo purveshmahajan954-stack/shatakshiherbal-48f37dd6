@@ -33,6 +33,7 @@ type Shipment = {
   shippingCost: string | null;
   labelUrl: string | null;
   shipmentStatus: string;
+  shipmentFailedReason: string | null;
   items: Array<{ name: string; qty: number; price: number }>;
   createdAt: string;
 };
@@ -44,6 +45,7 @@ const STATUS_BADGE: Record<string, string> = {
   "Recreated (COD)": "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
   Cancelled: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
   "Tracking Updated": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  "Shipment Failed - Retry Needed": "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 font-semibold",
 };
 
 const TRACK_BADGE: Record<string, string> = {
@@ -92,11 +94,12 @@ function ShippingPage() {
   const stats = useMemo(() => {
     const total = shipments.length;
     const notCreated = shipments.filter((s) => s.shipmentStatus === "Not Created" && (s.paymentStatus === "paid" || s.paymentMethod === "cod")).length;
+    const failed = shipments.filter((s) => s.shipmentStatus === "Shipment Failed - Retry Needed").length;
     const shipped = shipments.filter((s) => ["Shipped", "In Transit", "Out for Delivery"].includes(s.trackingStatus)).length;
     const delivered = shipments.filter((s) => s.trackingStatus === "Delivered").length;
     const returned = shipments.filter((s) => s.trackingStatus === "Returned").length;
     const totalCost = shipments.reduce((s, o) => s + (o.shippingCost ? Number(o.shippingCost) : 0), 0);
-    return { total, notCreated, shipped, delivered, returned, totalCost };
+    return { total, notCreated, failed, shipped, delivered, returned, totalCost };
   }, [shipments]);
 
   const filtered = useMemo(() => {
@@ -172,7 +175,7 @@ function ShippingPage() {
 
   const isBusy = (id: string, act: string) => busyId === id + act;
 
-  const STATUSES = ["all", "Not Created", "Created", "Recreated", "Cancelled", "Tracking Updated"];
+  const STATUSES = ["all", "Shipment Failed - Retry Needed", "Not Created", "Created", "Recreated", "Cancelled", "Tracking Updated"];
 
   return (
     <div className="space-y-6">
@@ -196,9 +199,9 @@ function ShippingPage() {
         {[
           { label: "Total Orders", value: stats.total, icon: Package, color: "text-foreground" },
           { label: "Pending Shipment", value: stats.notCreated, icon: AlertTriangle, color: "text-yellow-600" },
+          { label: "Shipment Failed", value: stats.failed, icon: XCircle, color: stats.failed > 0 ? "text-red-600" : "text-muted-foreground" },
           { label: "In Transit", value: stats.shipped, icon: Truck, color: "text-blue-600" },
           { label: "Delivered", value: stats.delivered, icon: CheckCircle2, color: "text-emerald-600" },
-          { label: "Returned", value: stats.returned, icon: XCircle, color: "text-red-600" },
           { label: "Shipping Cost", value: `₹${stats.totalCost.toFixed(0)}`, icon: TrendingUp, color: "text-primary" },
         ].map((s) => (
           <div key={s.label} className="bg-card border border-border rounded-xl p-4">
@@ -388,6 +391,9 @@ function ShipmentRow({
             {s.shipmentStatus === "Not Created" && (s.paymentStatus === "paid" || s.paymentMethod === "cod") && (
               <ActionBtn label="Create" icon={<Package className="w-3.5 h-3.5" />} busy={isBusy(s.id, "create")} onClick={() => createShipment(s.id)} cls="bg-primary text-primary-foreground" />
             )}
+            {s.shipmentStatus === "Shipment Failed - Retry Needed" && (
+              <ActionBtn label="Retry" icon={<RotateCcw className="w-3.5 h-3.5" />} busy={isBusy(s.id, "create")} onClick={() => createShipment(s.id)} cls="bg-red-600 text-white border-red-600 hover:bg-red-700" />
+            )}
             {s.awbNumber && (
               <>
                 <ActionBtn label="Track" icon={<Truck className="w-3.5 h-3.5" />} busy={isBusy(s.id, "refresh")} onClick={() => action(s.id, "refresh", "Tracking refreshed")} />
@@ -456,6 +462,12 @@ function ShipmentRow({
                   )}
                 </div>
               </div>
+              {s.shipmentFailedReason && (
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <div className="font-medium mb-1 text-xs uppercase tracking-wider text-red-600">Shipment Failure Reason</div>
+                  <p className="text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2 font-mono break-all">{s.shipmentFailedReason}</p>
+                </div>
+              )}
             </div>
           </td>
         </tr>

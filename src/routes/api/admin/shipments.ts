@@ -39,6 +39,7 @@ export const Route = createFileRoute("/api/admin/shipments")({
             shippingCost: orders.shippingCost,
             labelUrl: orders.labelUrl,
             shipmentStatus: orders.shipmentStatus,
+            shipmentFailedReason: orders.shipmentFailedReason,
             paymentMethod: orders.paymentMethod,
             items: orders.items,
             createdAt: orders.createdAt,
