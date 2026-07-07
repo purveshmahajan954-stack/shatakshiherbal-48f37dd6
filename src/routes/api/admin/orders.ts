@@ -4,6 +4,7 @@ import { orders } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 import { requireAdmin } from "@server/admin-auth";
 import { triggerRazorpayRefund } from "@/routes/api/orders/cancel";
+import { cancelCKShipShipment } from "@server/ckship";
 
 export const Route = createFileRoute("/api/admin/orders")({
   server: {
@@ -50,17 +51,32 @@ export const Route = createFileRoute("/api/admin/orders")({
         if (Object.keys(patch).length === 0)
           return Response.json({ error: "Nothing to update" }, { status: 400 });
 
+        // Fetch order when we need it for side-effects (refund or CKShip cancel)
+        let fetchedOrder: (typeof orders.$inferSelect) | null = null;
+        const needsOrder = body.payment_status === "refunded" || body.status === "cancelled";
+        if (needsOrder) {
+          const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+          fetchedOrder = rows[0] ?? null;
+        }
+
         // Auto-trigger Razorpay refund when admin sets payment_status → refunded
         let refundResult: { ok: boolean; refundId?: string; error?: string } | null = null;
-        if (body.payment_status === "refunded") {
-          const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-          const order = rows[0];
-          if (order?.razorpayPaymentId) {
-            const alreadyRefunded =
-              order.paymentStatus === "refunded";
-            if (!alreadyRefunded) {
-              refundResult = await triggerRazorpayRefund(order.razorpayPaymentId);
+        if (body.payment_status === "refunded" && fetchedOrder?.razorpayPaymentId) {
+          if (fetchedOrder.paymentStatus !== "refunded") {
+            refundResult = await triggerRazorpayRefund(fetchedOrder.razorpayPaymentId);
+          }
+        }
+
+        // Auto-cancel CKShip shipment when admin sets status → cancelled and AWB exists
+        let ckshipResult: { success: boolean; message: string } | null = null;
+        if (body.status === "cancelled" && fetchedOrder?.awbNumber && fetchedOrder.shipmentStatus !== "Cancelled") {
+          try {
+            ckshipResult = await cancelCKShipShipment(fetchedOrder.awbNumber);
+            if (ckshipResult.success) {
+              patch.shipmentStatus = "Cancelled";
             }
+          } catch (e) {
+            console.warn("[admin cancel] CKShip cancel failed (non-fatal):", e);
           }
         }
 
@@ -69,7 +85,7 @@ export const Route = createFileRoute("/api/admin/orders")({
           .set({ ...patch, trackingUpdatedAt: new Date() })
           .where(eq(orders.id, id));
 
-        return Response.json({ ok: true, refund: refundResult });
+        return Response.json({ ok: true, refund: refundResult, ckship: ckshipResult });
       },
     },
   },
