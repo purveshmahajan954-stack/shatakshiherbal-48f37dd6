@@ -57,6 +57,7 @@ export const Route = createFileRoute("/api/admin/orders")({
         if (needsOrder) {
           const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
           fetchedOrder = rows[0] ?? null;
+          if (!fetchedOrder) return Response.json({ error: "Order not found" }, { status: 404 });
         }
 
         // Auto-trigger Razorpay refund when admin sets payment_status → refunded
@@ -65,6 +66,15 @@ export const Route = createFileRoute("/api/admin/orders")({
           if (fetchedOrder.paymentStatus !== "refunded") {
             refundResult = await triggerRazorpayRefund(fetchedOrder.razorpayPaymentId);
           }
+        }
+
+        // Block cancellation if order is already packed/processing or beyond
+        const PACKED_OR_BEYOND = new Set(["processing", "shipped", "delivered"]);
+        if (body.status === "cancelled" && fetchedOrder && PACKED_OR_BEYOND.has(fetchedOrder.status)) {
+          return Response.json(
+            { error: `Order is '${fetchedOrder.status}' — pack ho chuka hai, cancel nahi ho sakta` },
+            { status: 400 },
+          );
         }
 
         // Auto-cancel CKShip shipment when admin sets status → cancelled and AWB exists

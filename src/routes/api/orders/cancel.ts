@@ -7,7 +7,7 @@ import { cancelCKShipShipment } from "@server/ckship";
 import { CANCEL_WINDOW_HOURS } from "@/lib/order-constants";
 export { CANCEL_WINDOW_HOURS };
 
-const NON_CANCELLABLE = new Set(["shipped", "delivered", "cancelled", "failed"]);
+const NON_CANCELLABLE = new Set(["processing", "shipped", "delivered", "cancelled", "failed"]);
 const NON_CANCELLABLE_TRACKING = new Set([
   "Shipped", "In Transit", "Out for Delivery", "Delivered", "RTO", "Returned",
 ]);

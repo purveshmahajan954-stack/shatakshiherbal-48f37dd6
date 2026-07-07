@@ -243,7 +243,11 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
             <div className="flex flex-wrap gap-2 items-center">
               <label className="text-xs text-muted-foreground">Order:</label>
               <select disabled={updating} value={order.status} onChange={(e) => onUpdate({ status: e.target.value })} className="text-sm border border-border rounded-lg px-2 py-1.5 bg-background">
-                {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                {ORDER_STATUSES.map((s) => {
+                  const packedOrBeyond = ["processing", "shipped", "delivered"].includes(order.status);
+                  const disableCancel = s === "cancelled" && packedOrBeyond;
+                  return <option key={s} value={s} disabled={disableCancel}>{s}{disableCancel ? " (not allowed)" : ""}</option>;
+                })}
               </select>
               <label className="text-xs text-muted-foreground ml-2">Payment:</label>
               <select disabled={updating} value={order.paymentStatus} onChange={(e) => onUpdate({ payment_status: e.target.value })} className="text-sm border border-border rounded-lg px-2 py-1.5 bg-background">
