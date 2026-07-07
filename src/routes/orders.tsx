@@ -471,7 +471,7 @@ function OrdersPage() {
                         <MapPin className="w-4 h-4" /> Track Package
                       </Link>
                     )}
-                    {(o.payment_status !== "paid" && o.payment_status !== "confirmed" && o.paymentStatus !== "paid" && o.paymentStatus !== "confirmed") && o.status !== "cancelled" && (
+                    {(o.payment_status !== "paid" && o.payment_status !== "confirmed" && o.paymentStatus !== "paid" && o.paymentStatus !== "confirmed") && o.status !== "cancelled" && o.payment_method !== "cod" && o.paymentMethod !== "cod" && (
                       <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline self-center">
                         Retry payment →
                       </Link>
