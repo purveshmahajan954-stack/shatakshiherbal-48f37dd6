@@ -98,6 +98,16 @@ const TRACK_BADGE: Record<string, string> = {
   Cancelled: "bg-red-100 text-red-700",
 };
 
+const CANCEL_REASONS = [
+  "Changed my mind",
+  "Ordered by mistake",
+  "Found a better price elsewhere",
+  "Delivery time too long",
+  "Want to change delivery address",
+  "Want to change product or quantity",
+  "Other",
+];
+
 function CancelConfirmDialog({
   order,
   onConfirm,
@@ -105,68 +115,132 @@ function CancelConfirmDialog({
   loading,
 }: {
   order: any;
-  onConfirm: () => void;
+  onConfirm: (reason: string) => void;
   onClose: () => void;
   loading: boolean;
 }) {
+  const [step, setStep] = useState<"reason" | "confirm">("reason");
+  const [selectedReason, setSelectedReason] = useState("");
+  const [otherText, setOtherText] = useState("");
+
   const isPaid =
     order.payment_status === "paid" ||
     order.paymentStatus === "paid" ||
     order.payment_status === "confirmed" ||
     order.paymentStatus === "confirmed";
-  const isCod =
-    order.payment_method === "cod" || order.paymentMethod === "cod";
+  const isCod = order.payment_method === "cod" || order.paymentMethod === "cod";
+
+  const finalReason = selectedReason === "Other" ? otherText.trim() : selectedReason;
+  const canProceed = selectedReason && (selectedReason !== "Other" || otherText.trim().length > 0);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-        <div className="flex items-start gap-3 mb-4">
+        {/* Header */}
+        <div className="flex items-start gap-3 mb-5">
           <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
             <AlertTriangle className="w-5 h-5 text-red-500" />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">Cancel this order?</h3>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h3 className="font-semibold text-lg">
+              {step === "reason" ? "Why are you cancelling?" : "Cancel this order?"}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-0.5">
               Order #{(order.id ?? "").slice(0, 8).toUpperCase()} — ₹{order.total}
             </p>
           </div>
         </div>
 
-        {isPaid && !isCod ? (
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-800 mb-5">
-            ✅ Your <strong>refund will be processed automatically</strong> to your original payment method. Usually takes 5–7 business days.
-          </div>
-        ) : isCod ? (
-          <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-sm text-amber-800 mb-5">
-            This is a Cash on Delivery order — no payment was collected, so no refund is needed.
-          </div>
+        {step === "reason" ? (
+          <>
+            {/* Step 1 — Reason selection */}
+            <ul className="space-y-2 mb-5">
+              {CANCEL_REASONS.map((r) => (
+                <li key={r}>
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${selectedReason === r ? "border-destructive/60 bg-destructive/5" : "border-border hover:bg-accent/50"}`}>
+                    <input
+                      type="radio"
+                      name="cancel-reason"
+                      value={r}
+                      checked={selectedReason === r}
+                      onChange={() => setSelectedReason(r)}
+                      className="accent-destructive w-4 h-4 shrink-0"
+                    />
+                    <span className="text-sm font-medium">{r}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+
+            {selectedReason === "Other" && (
+              <textarea
+                value={otherText}
+                onChange={(e) => setOtherText(e.target.value)}
+                placeholder="Please describe your reason…"
+                maxLength={300}
+                rows={3}
+                className="w-full border border-border rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-destructive/30 mb-4"
+              />
+            )}
+
+            <div className="flex gap-3 justify-end">
+              <button onClick={onClose} className="px-4 py-2 rounded-full text-sm font-semibold border border-border hover:bg-accent transition">
+                Go Back
+              </button>
+              <button
+                disabled={!canProceed}
+                onClick={() => setStep("confirm")}
+                className="px-4 py-2 rounded-full text-sm font-semibold bg-destructive text-destructive-foreground hover:opacity-90 transition disabled:opacity-40"
+              >
+                Continue →
+              </button>
+            </div>
+          </>
         ) : (
-          <div className="bg-muted/50 rounded-xl p-3 text-sm text-muted-foreground mb-5">
-            No payment was made for this order, so no refund will be issued.
-          </div>
+          <>
+            {/* Step 2 — Confirm */}
+            <div className="bg-muted/40 border border-border rounded-xl px-4 py-3 text-sm mb-4">
+              <span className="text-muted-foreground">Reason: </span>
+              <span className="font-medium">{finalReason}</span>
+            </div>
+
+            {isPaid && !isCod ? (
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-800 mb-4">
+                ✅ Your <strong>refund will be processed automatically</strong> to your original payment method. Usually takes 5–7 business days.
+              </div>
+            ) : isCod ? (
+              <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-sm text-amber-800 mb-4">
+                This is a Cash on Delivery order — no payment was collected, so no refund is needed.
+              </div>
+            ) : (
+              <div className="bg-muted/50 rounded-xl p-3 text-sm text-muted-foreground mb-4">
+                No payment was made for this order, so no refund will be issued.
+              </div>
+            )}
+
+            <p className="text-sm text-muted-foreground mb-5">
+              This action cannot be undone once confirmed.
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setStep("reason")}
+                disabled={loading}
+                className="px-4 py-2 rounded-full text-sm font-semibold border border-border hover:bg-accent transition"
+              >
+                ← Back
+              </button>
+              <button
+                onClick={() => onConfirm(finalReason)}
+                disabled={loading}
+                className="px-4 py-2 rounded-full text-sm font-semibold bg-destructive text-destructive-foreground hover:opacity-90 transition flex items-center gap-2"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                Yes, Cancel Order
+              </button>
+            </div>
+          </>
         )}
-
-        <p className="text-sm text-muted-foreground mb-5">
-          This action cannot be undone once confirmed.
-        </p>
-
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="px-4 py-2 rounded-full text-sm font-semibold border border-border hover:bg-accent transition"
-          >
-            Go Back
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="px-4 py-2 rounded-full text-sm font-semibold bg-destructive text-destructive-foreground hover:opacity-90 transition flex items-center gap-2"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
-            Yes, Cancel Order
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -198,7 +272,7 @@ function OrdersPage() {
   const [cancellingOrder, setCancellingOrder] = useState<any | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
-  const handleCancelConfirm = async () => {
+  const handleCancelConfirm = async (reason: string) => {
     if (!cancellingOrder) return;
     setCancelLoading(true);
     try {
@@ -209,7 +283,7 @@ function OrdersPage() {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ orderId: cancellingOrder.id }),
+        body: JSON.stringify({ orderId: cancellingOrder.id, reason }),
       });
       const data = await res.json();
       if (!res.ok) {

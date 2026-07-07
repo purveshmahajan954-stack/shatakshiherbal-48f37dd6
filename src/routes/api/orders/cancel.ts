@@ -72,7 +72,7 @@ export const Route = createFileRoute("/api/orders/cancel")({
           return Response.json({ error: "Invalid JSON" }, { status: 400 });
         }
 
-        const { orderId } = body ?? {};
+        const { orderId, reason } = body ?? {};
         if (!orderId) return Response.json({ error: "Missing orderId" }, { status: 400 });
 
         // Fetch the order
@@ -124,6 +124,7 @@ export const Route = createFileRoute("/api/orders/cancel")({
         const patch: Record<string, any> = {
           status: "cancelled",
           trackingUpdatedAt: new Date(),
+          cancelReason: reason ? String(reason).slice(0, 500) : null,
         };
 
         // COD with existing shipment → cancel CKShip shipment (best-effort)
