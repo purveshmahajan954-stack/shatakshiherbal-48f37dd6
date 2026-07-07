@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { adminGet } from "@/lib/api-client";
 import {
   ChevronDown,
@@ -234,7 +234,6 @@ function Gstr1Page() {
   const [sortKey, setSortKey] = useState<SortKey>("invoiceDate");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
-  const printRef = useRef<HTMLDivElement>(null);
 
   const fetchData = async () => {
     setBusy(true);
@@ -292,7 +291,94 @@ function Gstr1Page() {
     setPage(1);
   };
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const esc = (v: string | number | null) =>
+      String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    const headerRow = COLS.map((c) => `<th>${esc(c.label)}</th>`).join("");
+
+    const bodyRows = sorted
+      .map(
+        (r) =>
+          `<tr>
+            <td>${esc(r.invoiceNo)}</td>
+            <td>${esc(fmtDate(r.invoiceDate))}</td>
+            <td>${esc(r.orderId.slice(0, 8).toUpperCase())}</td>
+            <td>${esc(r.customerName)}</td>
+            <td>${esc(r.gstin || "")}</td>
+            <td>${esc(r.state)}</td>
+            <td>${esc(r.placeOfSupply)}</td>
+            <td class="r">${r.taxableValue.toFixed(2)}</td>
+            <td class="r">5%</td>
+            <td class="r">${r.cgst > 0 ? r.cgst.toFixed(2) : "—"}</td>
+            <td class="r">${r.sgst > 0 ? r.sgst.toFixed(2) : "—"}</td>
+            <td class="r">${r.igst > 0 ? r.igst.toFixed(2) : "—"}</td>
+            <td class="r">${r.totalGst.toFixed(2)}</td>
+            <td class="r">${r.invoiceTotal.toFixed(2)}</td>
+            <td>${esc(r.paymentMode === "cod" ? "COD" : "Online")}</td>
+            <td>${esc(r.orderStatus)}</td>
+          </tr>`,
+      )
+      .join("");
+
+    const totalsRow = `<tr class="tot">
+      <td colspan="7">Totals (${sorted.length} invoices)</td>
+      <td class="r">${totals.taxableValue.toFixed(2)}</td>
+      <td></td>
+      <td class="r">${totals.cgst.toFixed(2)}</td>
+      <td class="r">${totals.sgst.toFixed(2)}</td>
+      <td class="r">${totals.igst.toFixed(2)}</td>
+      <td class="r">${totals.totalGst.toFixed(2)}</td>
+      <td class="r">${totals.invoiceTotal.toFixed(2)}</td>
+      <td colspan="2"></td>
+    </tr>`;
+
+    const filterLabel =
+      filterMode === "fy" ? `FY ${fy}` :
+      filterMode === "month" ? month :
+      `${from || "—"} to ${to || "—"}`;
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>GSTR-1 Report — Shatakshi Herbal</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 9px; margin: 16px; color: #000; }
+    h2 { font-size: 14px; margin: 0 0 2px; }
+    .meta { font-size: 10px; color: #555; margin-bottom: 14px; }
+    table { border-collapse: collapse; width: 100%; }
+    th { background: #d4e8d4; border: 1px solid #999; padding: 4px 5px; text-align: left; font-weight: bold; white-space: nowrap; }
+    td { border: 1px solid #ccc; padding: 3px 5px; white-space: nowrap; }
+    tr:nth-child(even) td { background: #f7f7f7; }
+    .r { text-align: right; }
+    .tot td { background: #e0ede0 !important; font-weight: bold; border-top: 2px solid #888; }
+    @media print { body { margin: 8px; } }
+  </style>
+</head>
+<body>
+  <h2>GSTR-1 Report — Shatakshi Herbal</h2>
+  <p class="meta">
+    Generated: ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
+    &nbsp;|&nbsp; Period: ${filterLabel}
+    &nbsp;|&nbsp; ${sorted.length} invoices
+    &nbsp;|&nbsp; Seller State: Rajasthan (Intra: CGST+SGST, Inter: IGST)
+  </p>
+  <table>
+    <thead><tr>${headerRow}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+    <tfoot>${totalsRow}</tfoot>
+  </table>
+</body>
+</html>`;
+
+    const w = window.open("", "_blank", "width=1400,height=800");
+    if (!w) { alert("Please allow popups to print the report."); return; }
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(() => { w.print(); }, 400);
+  };
 
   const statusBadge = (s: string) => {
     const color =
@@ -316,17 +402,6 @@ function Gstr1Page() {
 
   return (
     <div className="space-y-4 gstr1-print-root">
-      <style>{`
-        @media print {
-          body > * { display: none !important; }
-          .gstr1-print-root { display: block !important; }
-          .no-print { display: none !important; }
-          .print-table-wrap { overflow: visible !important; }
-          * { font-size: 10px !important; }
-          table { border-collapse: collapse; width: 100%; }
-          th, td { border: 1px solid #999; padding: 3px 5px; }
-        }
-      `}</style>
 
       <div className="no-print flex items-center justify-between gap-3 flex-wrap">
         <div>
@@ -468,14 +543,7 @@ function Gstr1Page() {
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden" ref={printRef}>
-        <div className="hidden print:block p-4 border-b border-border">
-          <h2 className="font-bold text-lg">GSTR-1 Report — Shatakshi Herbal</h2>
-          <p className="text-sm text-muted-foreground">
-            Generated: {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
-          </p>
-        </div>
-
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
         {busy ? (
           <div className="py-16 flex justify-center">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
