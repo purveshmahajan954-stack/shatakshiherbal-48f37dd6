@@ -134,20 +134,20 @@ function CancelConfirmDialog({
 
         {isPaid && !isCod ? (
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-800 mb-5">
-            ✅ Aapka <strong>refund automatically</strong> process ho jayega aapke original payment method par. Usually 5–7 business days lagते hain.
+            ✅ Your <strong>refund will be processed automatically</strong> to your original payment method. Usually takes 5–7 business days.
           </div>
         ) : isCod ? (
           <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-sm text-amber-800 mb-5">
-            COD order — koi payment nahi hua tha, to refund ki zarurat nahi.
+            This is a Cash on Delivery order — no payment was collected, so no refund is needed.
           </div>
         ) : (
           <div className="bg-muted/50 rounded-xl p-3 text-sm text-muted-foreground mb-5">
-            Payment nahi hua tha, to refund nahi hoga.
+            No payment was made for this order, so no refund will be issued.
           </div>
         )}
 
         <p className="text-sm text-muted-foreground mb-5">
-          Cancel karne ke baad order wapas nahi ho sakta.
+          This action cannot be undone once confirmed.
         </p>
 
         <div className="flex gap-3 justify-end">
@@ -156,7 +156,7 @@ function CancelConfirmDialog({
             disabled={loading}
             className="px-4 py-2 rounded-full text-sm font-semibold border border-border hover:bg-accent transition"
           >
-            Ruko
+            Go Back
           </button>
           <button
             onClick={onConfirm}
@@ -164,7 +164,7 @@ function CancelConfirmDialog({
             className="px-4 py-2 rounded-full text-sm font-semibold bg-destructive text-destructive-foreground hover:opacity-90 transition flex items-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
-            Haan, Cancel Karo
+            Yes, Cancel Order
           </button>
         </div>
       </div>
