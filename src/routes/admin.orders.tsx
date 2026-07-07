@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { adminGet, adminPatch } from "@/lib/api-client";
-import { Loader2, Search, RotateCcw, ChevronDown, FileDown } from "lucide-react";
+import { Loader2, Search, RotateCcw, ChevronDown, FileDown, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { downloadInvoice } from "@/lib/invoice";
 import CreateShipment from "@/components/CreateShipment";
@@ -36,6 +36,7 @@ type Order = {
   shipmentStatus: string;
   labelUrl: string | null;
   createdAt: string;
+  cancelReason: string | null;
 };
 
 const PAYMENT_STATUSES = ["created", "paid", "failed", "signature_failed", "refunded", "cod_pending", "cod_collected"];
@@ -46,7 +47,7 @@ function OrdersPage() {
   const [busy, setBusy] = useState(true);
   const [search, setSearch] = useState("");
   const [paymentFilter, setPaymentFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("cancelled");
   const [updating, setUpdating] = useState<string | null>(null);
 
   const load = async () => {
@@ -149,22 +150,43 @@ function OrderRow({ order, updating, onUpdate }: { order: Order; updating: boole
   const effectiveCourier = shipment?.courierName ?? order.courierName;
   const effectiveLabelUrl = shipment?.labelUrl ?? order.labelUrl;
 
+  const isCancelled = order.status === "cancelled";
+
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
-      <button onClick={() => setOpen((v) => !v)} className="w-full flex flex-wrap items-center gap-3 p-4 text-left hover:bg-muted/30 transition">
+    <div className={`bg-card border rounded-xl overflow-hidden ${isCancelled ? "border-red-300 dark:border-red-700" : "border-border"}`}>
+      <button onClick={() => setOpen((v) => !v)} className={`w-full flex flex-wrap items-center gap-3 p-4 text-left transition ${isCancelled ? "bg-red-50/60 dark:bg-red-950/20 hover:bg-red-100/60 dark:hover:bg-red-950/30" : "hover:bg-muted/30"}`}>
         <div className="flex-1 min-w-[180px]">
-          <div className="font-semibold">{order.shippingName || "—"}</div>
+          <div className="font-semibold flex items-center gap-1.5">
+            {isCancelled && <XCircle className="w-4 h-4 text-red-500 shrink-0" />}
+            {order.shippingName || "—"}
+          </div>
           <div className="text-xs text-muted-foreground">
             {new Date(order.createdAt).toLocaleString("en-IN")} • #{order.id.slice(0, 8)} • {order.shippingPhone || "—"}
           </div>
+          {isCancelled && order.cancelReason && (
+            <div className="text-xs text-red-600 dark:text-red-400 mt-0.5">
+              Reason: {order.cancelReason}
+            </div>
+          )}
         </div>
         <div className="font-semibold whitespace-nowrap">₹{Number(order.total).toLocaleString("en-IN")}</div>
         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${payBadge(order.paymentStatus)}`}>{order.paymentStatus}</span>
-        <span className="px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">{order.status}</span>
+        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge(order.status)}`}>{order.status}</span>
         <ChevronDown className={`w-4 h-4 text-muted-foreground transition ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
         <div className="border-t border-border p-4 grid md:grid-cols-2 gap-6 bg-muted/20">
+          {isCancelled && (
+            <div className="md:col-span-2 flex items-start gap-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3">
+              <XCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+              <div>
+                <span className="text-sm font-semibold text-red-700 dark:text-red-400">Order cancelled by customer</span>
+                {order.cancelReason && (
+                  <p className="text-sm text-red-600 dark:text-red-300 mt-0.5">Reason: {order.cancelReason}</p>
+                )}
+              </div>
+            </div>
+          )}
           <div>
             <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Customer (admin only)</h4>
             <div className="text-sm space-y-1">
@@ -276,6 +298,21 @@ function payBadge(s: string) {
     failed: "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
     signature_failed: "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
     refunded: "bg-slate-200 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300",
+    cod_pending: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
+    cod_collected: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300",
+  };
+  return map[s] || "bg-muted text-muted-foreground";
+}
+
+function statusBadge(s: string) {
+  const map: Record<string, string> = {
+    pending: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
+    confirmed: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
+    processing: "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300",
+    shipped: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300",
+    delivered: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300",
+    cancelled: "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
+    failed: "bg-slate-200 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300",
   };
   return map[s] || "bg-muted text-muted-foreground";
 }
