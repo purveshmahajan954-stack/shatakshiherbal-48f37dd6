@@ -2,11 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
 import { orders, userSessions, profiles } from "@shared/schema";
 import { eq, and, gt } from "drizzle-orm";
+import { cancelCKShipShipment } from "@server/ckship";
 
 import { CANCEL_WINDOW_HOURS } from "@/lib/order-constants";
 export { CANCEL_WINDOW_HOURS };
 
 const NON_CANCELLABLE = new Set(["shipped", "delivered", "cancelled", "failed"]);
+const NON_CANCELLABLE_TRACKING = new Set([
+  "Shipped", "In Transit", "Out for Delivery", "Delivered", "RTO", "Returned",
+]);
 
 async function requireUser(request: Request) {
   const auth = request.headers.get("authorization");
@@ -84,15 +88,24 @@ export const Route = createFileRoute("/api/orders/cancel")({
         if (order.status === "cancelled")
           return Response.json({ error: "Order already cancelled" }, { status: 400 });
 
-        // Non-cancellable status?
+        // Non-cancellable order status?
         if (NON_CANCELLABLE.has(order.status))
           return Response.json(
             { error: `Cannot cancel an order that is '${order.status}'` },
             { status: 400 },
           );
 
-        // Shipment already dispatched?
-        if (order.shipmentStatus === "Created")
+        // Non-cancellable tracking status (courier already in motion)?
+        if (order.trackingStatus && NON_CANCELLABLE_TRACKING.has(order.trackingStatus))
+          return Response.json(
+            { error: `Order is already ${order.trackingStatus} — cancel nahi ho sakta` },
+            { status: 400 },
+          );
+
+        const isCod = order.paymentMethod === "cod";
+
+        // Prepaid: block if shipment dispatched (COD gets more leniency — tracked via trackingStatus above)
+        if (!isCod && order.shipmentStatus === "Created")
           return Response.json(
             { error: "Shipment already dispatched. Please contact support to cancel." },
             { status: 400 },
@@ -113,13 +126,24 @@ export const Route = createFileRoute("/api/orders/cancel")({
           trackingUpdatedAt: new Date(),
         };
 
-        // Auto-refund if prepaid and paid
-        let refundResult: { ok: boolean; refundId?: string; error?: string } | null = null;
-        const isPaid =
-          order.paymentStatus === "paid" || order.paymentStatus === "confirmed";
-        const isPrePaid = order.paymentMethod !== "cod";
+        // COD with existing shipment → cancel CKShip shipment (best-effort)
+        let ckshipCancelResult: { success: boolean; message: string } | null = null;
+        if (isCod && order.awbNumber) {
+          try {
+            ckshipCancelResult = await cancelCKShipShipment(order.awbNumber);
+            if (ckshipCancelResult.success) {
+              patch.shipmentStatus = "Cancelled";
+            }
+          } catch (e) {
+            console.warn("[cancel] CKShip cancel failed (proceeding anyway):", e);
+          }
+        }
 
-        if (isPaid && isPrePaid && order.razorpayPaymentId) {
+        // Prepaid + paid → auto Razorpay refund
+        let refundResult: { ok: boolean; refundId?: string; error?: string } | null = null;
+        const isPaid = order.paymentStatus === "paid" || order.paymentStatus === "confirmed";
+
+        if (!isCod && isPaid && order.razorpayPaymentId) {
           refundResult = await triggerRazorpayRefund(order.razorpayPaymentId);
           if (refundResult.ok) {
             patch.paymentStatus = "refunded";
@@ -128,7 +152,7 @@ export const Route = createFileRoute("/api/orders/cancel")({
 
         await db.update(orders).set(patch).where(eq(orders.id, orderId));
 
-        return Response.json({ ok: true, refund: refundResult });
+        return Response.json({ ok: true, refund: refundResult, ckship: ckshipCancelResult });
       },
     },
   },

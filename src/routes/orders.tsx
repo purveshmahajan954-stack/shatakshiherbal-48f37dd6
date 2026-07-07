@@ -40,16 +40,29 @@ function cancelWindowHoursLeft(createdAt: string): number | null {
   return remaining > 0 ? remaining : null;
 }
 
-const NON_CANCELLABLE = new Set(["shipped", "delivered", "cancelled", "failed"]);
+const NON_CANCELLABLE_STATUS = new Set(["shipped", "delivered", "cancelled", "failed"]);
+// Tracking statuses that mean the courier already has the parcel — no cancellation possible
+const NON_CANCELLABLE_TRACKING = new Set([
+  "Shipped", "In Transit", "Out for Delivery", "Delivered", "RTO", "Returned",
+]);
 
 function isCancellable(order: any): boolean {
   const status = order.status ?? "";
   const shipmentStatus = order.shipment_status ?? order.shipmentStatus ?? "Not Created";
+  const trackingStatus = order.tracking_status ?? order.trackingStatus ?? "";
+  const paymentMethod = order.payment_method ?? order.paymentMethod ?? "";
   const createdAt = order.created_at ?? order.createdAt ?? "";
-  if (NON_CANCELLABLE.has(status)) return false;
-  if (shipmentStatus === "Created") return false;
+
+  if (NON_CANCELLABLE_STATUS.has(status)) return false;
+  if (NON_CANCELLABLE_TRACKING.has(trackingStatus)) return false;
   if (!createdAt) return false;
-  return cancelWindowHoursLeft(createdAt) !== null;
+  if (cancelWindowHoursLeft(createdAt) === null) return false;
+
+  // Prepaid: block if shipment already dispatched to courier
+  if (paymentMethod !== "cod" && shipmentStatus === "Created") return false;
+
+  // COD: allow cancel as long as tracking is not in transit (checked above)
+  return true;
 }
 
 export const Route = createFileRoute("/orders")({
