@@ -61,6 +61,7 @@ import { Route as ApiPaymentsRazorpayKeyRouteImport } from './routes/api/payment
 import { Route as ApiPaymentsMarkFailedRouteImport } from './routes/api/payments/mark-failed'
 import { Route as ApiPaymentsCreateOrderRouteImport } from './routes/api/payments/create-order'
 import { Route as ApiPaymentsCodOrderRouteImport } from './routes/api/payments/cod-order'
+import { Route as ApiOrdersCancelRouteImport } from './routes/api/orders/cancel'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAuthSignoutRouteImport } from './routes/api/auth/signout'
 import { Route as ApiAuthSigninRouteImport } from './routes/api/auth/signin'
@@ -350,6 +351,11 @@ const ApiPaymentsCodOrderRoute = ApiPaymentsCodOrderRouteImport.update({
   path: '/api/payments/cod-order',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiOrdersCancelRoute = ApiOrdersCancelRouteImport.update({
+  id: '/api/orders/cancel',
+  path: '/api/orders/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
   id: '/api/auth/signup',
   path: '/api/auth/signup',
@@ -566,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/orders/cancel': typeof ApiOrdersCancelRoute
   '/api/payments/cod-order': typeof ApiPaymentsCodOrderRoute
   '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
   '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
@@ -647,6 +654,7 @@ export interface FileRoutesByTo {
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/orders/cancel': typeof ApiOrdersCancelRoute
   '/api/payments/cod-order': typeof ApiPaymentsCodOrderRoute
   '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
   '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
@@ -730,6 +738,7 @@ export interface FileRoutesById {
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/orders/cancel': typeof ApiOrdersCancelRoute
   '/api/payments/cod-order': typeof ApiPaymentsCodOrderRoute
   '/api/payments/create-order': typeof ApiPaymentsCreateOrderRoute
   '/api/payments/mark-failed': typeof ApiPaymentsMarkFailedRoute
@@ -814,6 +823,7 @@ export interface FileRouteTypes {
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
+    | '/api/orders/cancel'
     | '/api/payments/cod-order'
     | '/api/payments/create-order'
     | '/api/payments/mark-failed'
@@ -895,6 +905,7 @@ export interface FileRouteTypes {
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
+    | '/api/orders/cancel'
     | '/api/payments/cod-order'
     | '/api/payments/create-order'
     | '/api/payments/mark-failed'
@@ -977,6 +988,7 @@ export interface FileRouteTypes {
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
+    | '/api/orders/cancel'
     | '/api/payments/cod-order'
     | '/api/payments/create-order'
     | '/api/payments/mark-failed'
@@ -1048,6 +1060,7 @@ export interface RootRouteChildren {
   ApiAuthSigninRoute: typeof ApiAuthSigninRoute
   ApiAuthSignoutRoute: typeof ApiAuthSignoutRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+  ApiOrdersCancelRoute: typeof ApiOrdersCancelRoute
   ApiPaymentsCodOrderRoute: typeof ApiPaymentsCodOrderRoute
   ApiPaymentsCreateOrderRoute: typeof ApiPaymentsCreateOrderRoute
   ApiPaymentsMarkFailedRoute: typeof ApiPaymentsMarkFailedRoute
@@ -1426,6 +1439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPaymentsCodOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/orders/cancel': {
+      id: '/api/orders/cancel'
+      path: '/api/orders/cancel'
+      fullPath: '/api/orders/cancel'
+      preLoaderRoute: typeof ApiOrdersCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/signup': {
       id: '/api/auth/signup'
       path: '/api/auth/signup'
@@ -1724,6 +1744,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSigninRoute: ApiAuthSigninRoute,
   ApiAuthSignoutRoute: ApiAuthSignoutRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
+  ApiOrdersCancelRoute: ApiOrdersCancelRoute,
   ApiPaymentsCodOrderRoute: ApiPaymentsCodOrderRoute,
   ApiPaymentsCreateOrderRoute: ApiPaymentsCreateOrderRoute,
   ApiPaymentsMarkFailedRoute: ApiPaymentsMarkFailedRoute,

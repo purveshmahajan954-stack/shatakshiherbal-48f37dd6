@@ -3,6 +3,7 @@ import { db } from "@server/db";
 import { orders } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 import { requireAdmin } from "@server/admin-auth";
+import { triggerRazorpayRefund } from "@/routes/api/orders/cancel";
 
 export const Route = createFileRoute("/api/admin/orders")({
   server: {
@@ -23,9 +24,19 @@ export const Route = createFileRoute("/api/admin/orders")({
         if (!id) return Response.json({ error: "Missing id" }, { status: 400 });
 
         let body: any;
-        try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON" }, { status: 400 }); }
+        try {
+          body = await request.json();
+        } catch {
+          return Response.json({ error: "Invalid JSON" }, { status: 400 });
+        }
 
-        const allowed = ["status", "payment_status", "tracking_status", "tracking_location", "tracking_eta"];
+        const allowed = [
+          "status",
+          "payment_status",
+          "tracking_status",
+          "tracking_location",
+          "tracking_eta",
+        ];
         const patch: Record<string, any> = {};
         for (const k of allowed) {
           if (k in body) {
@@ -36,10 +47,29 @@ export const Route = createFileRoute("/api/admin/orders")({
             else if (k === "tracking_eta") patch.trackingEta = body[k];
           }
         }
-        if (Object.keys(patch).length === 0) return Response.json({ error: "Nothing to update" }, { status: 400 });
+        if (Object.keys(patch).length === 0)
+          return Response.json({ error: "Nothing to update" }, { status: 400 });
 
-        await db.update(orders).set({ ...patch, trackingUpdatedAt: new Date() }).where(eq(orders.id, id));
-        return Response.json({ ok: true });
+        // Auto-trigger Razorpay refund when admin sets payment_status → refunded
+        let refundResult: { ok: boolean; refundId?: string; error?: string } | null = null;
+        if (body.payment_status === "refunded") {
+          const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+          const order = rows[0];
+          if (order?.razorpayPaymentId) {
+            const alreadyRefunded =
+              order.paymentStatus === "refunded";
+            if (!alreadyRefunded) {
+              refundResult = await triggerRazorpayRefund(order.razorpayPaymentId);
+            }
+          }
+        }
+
+        await db
+          .update(orders)
+          .set({ ...patch, trackingUpdatedAt: new Date() })
+          .where(eq(orders.id, id));
+
+        return Response.json({ ok: true, refund: refundResult });
       },
     },
   },

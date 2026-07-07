@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -11,10 +11,11 @@ import { useCart } from "@/lib/cart";
 import { fetchProductsFromDb } from "@/lib/use-products";
 import {
   Loader2, Package, ShoppingBag, Check, CircleDashed, XCircle,
-  Copy, Truck, FileDown, MapPin, RefreshCcw,
+  Copy, Truck, FileDown, MapPin, RefreshCcw, X, AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { downloadInvoice } from "@/lib/invoice";
+import { CANCEL_WINDOW_HOURS } from "@/lib/order-constants";
 
 type TimelineStep = { key: string; label: string; state: "done" | "current" | "todo" | "failed" };
 
@@ -30,6 +31,25 @@ function buildTimeline(paymentStatus: string): TimelineStep[] {
 
 function copy(text: string, label: string) {
   navigator.clipboard?.writeText(text).then(() => toast.success(`${label} copied`));
+}
+
+/** Returns hours remaining in the cancel window, or null if outside window */
+function cancelWindowHoursLeft(createdAt: string): number | null {
+  const elapsed = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60);
+  const remaining = CANCEL_WINDOW_HOURS - elapsed;
+  return remaining > 0 ? remaining : null;
+}
+
+const NON_CANCELLABLE = new Set(["shipped", "delivered", "cancelled", "failed"]);
+
+function isCancellable(order: any): boolean {
+  const status = order.status ?? "";
+  const shipmentStatus = order.shipment_status ?? order.shipmentStatus ?? "Not Created";
+  const createdAt = order.created_at ?? order.createdAt ?? "";
+  if (NON_CANCELLABLE.has(status)) return false;
+  if (shipmentStatus === "Created") return false;
+  if (!createdAt) return false;
+  return cancelWindowHoursLeft(createdAt) !== null;
 }
 
 export const Route = createFileRoute("/orders")({
@@ -49,6 +69,8 @@ const STATUS_STYLES: Record<string, string> = {
   created: "bg-muted text-muted-foreground",
   failed: "bg-destructive/10 text-destructive",
   signature_failed: "bg-destructive/10 text-destructive",
+  refunded: "bg-blue-100 text-blue-700",
+  cancelled: "bg-red-100 text-red-700",
 };
 
 const TRACK_BADGE: Record<string, string> = {
@@ -63,10 +85,85 @@ const TRACK_BADGE: Record<string, string> = {
   Cancelled: "bg-red-100 text-red-700",
 };
 
+function CancelConfirmDialog({
+  order,
+  onConfirm,
+  onClose,
+  loading,
+}: {
+  order: any;
+  onConfirm: () => void;
+  onClose: () => void;
+  loading: boolean;
+}) {
+  const isPaid =
+    order.payment_status === "paid" ||
+    order.paymentStatus === "paid" ||
+    order.payment_status === "confirmed" ||
+    order.paymentStatus === "confirmed";
+  const isCod =
+    order.payment_method === "cod" || order.paymentMethod === "cod";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5 text-red-500" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">Cancel this order?</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Order #{(order.id ?? "").slice(0, 8).toUpperCase()} — ₹{order.total}
+            </p>
+          </div>
+        </div>
+
+        {isPaid && !isCod ? (
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-800 mb-5">
+            ✅ Aapka <strong>refund automatically</strong> process ho jayega aapke original payment method par. Usually 5–7 business days lagते hain.
+          </div>
+        ) : isCod ? (
+          <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-sm text-amber-800 mb-5">
+            COD order — koi payment nahi hua tha, to refund ki zarurat nahi.
+          </div>
+        ) : (
+          <div className="bg-muted/50 rounded-xl p-3 text-sm text-muted-foreground mb-5">
+            Payment nahi hua tha, to refund nahi hoga.
+          </div>
+        )}
+
+        <p className="text-sm text-muted-foreground mb-5">
+          Cancel karne ke baad order wapas nahi ho sakta.
+        </p>
+
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="px-4 py-2 rounded-full text-sm font-semibold border border-border hover:bg-accent transition"
+          >
+            Ruko
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="px-4 py-2 rounded-full text-sm font-semibold bg-destructive text-destructive-foreground hover:opacity-90 transition flex items-center gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+            Haan, Cancel Karo
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OrdersPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { clear, add } = useCart();
+  const queryClient = useQueryClient();
   const fetchOrders = useServerFn(getMyOrders);
   const { data, isLoading } = useQuery({
     queryKey: ["my-orders"],
@@ -75,7 +172,6 @@ function OrdersPage() {
     staleTime: 60_000,
   });
 
-  // Fetch live product images from DB (admin panel) keyed by slug
   const [dbImages, setDbImages] = useState<Record<string, string>>({});
   useEffect(() => {
     fetchProductsFromDb().then((list) => {
@@ -84,6 +180,48 @@ function OrdersPage() {
       setDbImages(map);
     }).catch(() => {});
   }, []);
+
+  // Cancel dialog state
+  const [cancellingOrder, setCancellingOrder] = useState<any | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+
+  const handleCancelConfirm = async () => {
+    if (!cancellingOrder) return;
+    setCancelLoading(true);
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      const res = await fetch("/api/orders/cancel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ orderId: cancellingOrder.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Cancel nahi hua, dobara try karo");
+        return;
+      }
+
+      // Check refund status
+      if (data.refund?.ok) {
+        toast.success("Order cancel hua! Refund 5–7 business days mein aa jayega.");
+      } else if (data.refund && !data.refund.ok) {
+        toast.success("Order cancel hua! Refund ke liye support se contact karo.");
+      } else {
+        toast.success("Order cancel ho gaya!");
+      }
+
+      // Refresh orders list
+      queryClient.invalidateQueries({ queryKey: ["my-orders"] });
+      setCancellingOrder(null);
+    } catch {
+      toast.error("Network error — dobara try karo");
+    } finally {
+      setCancelLoading(false);
+    }
+  };
 
   const handleReorder = (order: any) => {
     const items = Array.isArray(order.items) ? order.items : [];
@@ -94,7 +232,6 @@ function OrdersPage() {
       add({ name: i.name, price: i.price, image: i.image, slug: i.slug }, i.qty ?? 1);
     });
 
-    // Parse shipping address from order to pre-fill checkout
     try {
       const shipping = order.shipping_address ?? order.shippingAddress ?? "";
       const parts = typeof shipping === "string" ? shipping.split(",").map((s: string) => s.trim()) : [];
@@ -129,6 +266,15 @@ function OrdersPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-cream/40">
+      {cancellingOrder && (
+        <CancelConfirmDialog
+          order={cancellingOrder}
+          onConfirm={handleCancelConfirm}
+          onClose={() => setCancellingOrder(null)}
+          loading={cancelLoading}
+        />
+      )}
+
       <Header />
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-10">
         <h1 className="font-display text-3xl sm:text-4xl mb-2">My Orders</h1>
@@ -152,6 +298,10 @@ function OrdersPage() {
               const awbNumber = o.awb_number ?? o.awbNumber;
               const courierName = o.courier_name ?? o.courierName;
               const trackingId = o.tracking_id ?? o.trackingId;
+              const createdAt = o.created_at ?? o.createdAt ?? "";
+              const hoursLeft = createdAt ? cancelWindowHoursLeft(createdAt) : null;
+              const canCancel = isCancellable(o);
+              const isCancelled = o.status === "cancelled" || o.payment_status === "refunded" || o.paymentStatus === "refunded";
 
               return (
                 <li key={o.id} className="bg-white rounded-2xl shadow-card p-5 sm:p-6">
@@ -163,7 +313,7 @@ function OrdersPage() {
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Placed on</div>
-                      <div className="text-sm">{new Date(o.created_at ?? o.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</div>
+                      <div className="text-sm">{new Date(createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Total</div>
@@ -173,7 +323,12 @@ function OrdersPage() {
                       <span className={`inline-block text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${STATUS_STYLES[o.payment_status ?? o.paymentStatus] ?? "bg-muted"}`}>
                         {o.payment_status ?? o.paymentStatus}
                       </span>
-                      {trackingStatus && trackingStatus !== "Order Placed" && (
+                      {isCancelled && (o.status === "cancelled") && (
+                        <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                          Cancelled
+                        </span>
+                      )}
+                      {trackingStatus && trackingStatus !== "Order Placed" && o.status !== "cancelled" && (
                         <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${TRACK_BADGE[trackingStatus] ?? "bg-muted text-muted-foreground"}`}>
                           {trackingStatus}
                         </span>
@@ -193,7 +348,7 @@ function OrdersPage() {
                     ))}
                   </ul>
 
-                  {/* Shipment info bar — shown when shipment created */}
+                  {/* Shipment info bar */}
                   {awbNumber && (
                     <div className="mt-4 flex flex-wrap items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800 text-sm">
                       <Truck className="w-4 h-4 text-blue-600 shrink-0" />
@@ -207,6 +362,14 @@ function OrdersPage() {
                           {trackingStatus}
                         </span>
                       )}
+                    </div>
+                  )}
+
+                  {/* Cancel window warning */}
+                  {canCancel && hoursLeft !== null && hoursLeft < 6 && (
+                    <div className="mt-3 flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      Cancel window closes in {Math.ceil(hoursLeft)} hour{Math.ceil(hoursLeft) !== 1 ? "s" : ""}
                     </div>
                   )}
 
@@ -273,7 +436,17 @@ function OrdersPage() {
 
                   {/* Action buttons */}
                   <div className="mt-4 flex flex-wrap justify-end gap-3">
-                    {(o.payment_status === "paid" || o.payment_status === "confirmed" || o.paymentStatus === "paid" || o.paymentStatus === "confirmed") && (
+                    {/* Cancel button */}
+                    {canCancel && (
+                      <button
+                        onClick={() => setCancellingOrder(o)}
+                        className="inline-flex items-center gap-2 border border-destructive/40 text-destructive bg-destructive/5 px-4 py-2 rounded-full text-sm font-semibold hover:bg-destructive/10 transition"
+                      >
+                        <X className="w-4 h-4" /> Cancel Order
+                      </button>
+                    )}
+
+                    {(o.payment_status === "paid" || o.payment_status === "confirmed" || o.paymentStatus === "paid" || o.paymentStatus === "confirmed") && o.status !== "cancelled" && (
                       <>
                         <button
                           onClick={() => downloadInvoice(o)}
@@ -289,7 +462,7 @@ function OrdersPage() {
                         </button>
                       </>
                     )}
-                    {trackingId && (
+                    {trackingId && o.status !== "cancelled" && (
                       <Link
                         to="/track/$trackingId"
                         params={{ trackingId }}
@@ -298,7 +471,7 @@ function OrdersPage() {
                         <MapPin className="w-4 h-4" /> Track Package
                       </Link>
                     )}
-                    {(o.payment_status !== "paid" && o.payment_status !== "confirmed" && o.paymentStatus !== "paid" && o.paymentStatus !== "confirmed") && (
+                    {(o.payment_status !== "paid" && o.payment_status !== "confirmed" && o.paymentStatus !== "paid" && o.paymentStatus !== "confirmed") && o.status !== "cancelled" && (
                       <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline self-center">
                         Retry payment →
                       </Link>
