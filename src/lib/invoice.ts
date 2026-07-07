@@ -70,11 +70,12 @@ export function getInvoiceHtml(order: InvoiceData, baseUrl = ""): string {
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#222;background:#fff;padding:40px;max-width:800px;margin:0 auto}
   .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;border-bottom:3px solid #2D5016;padding-bottom:20px}
-  .brand-logo{height:64px;width:auto;object-fit:contain;display:block;margin-bottom:6px}
-  .brand h1{font-size:22px;font-weight:800;color:#2D5016;letter-spacing:-0.5px}
-  .brand p{font-size:11px;color:#666;margin-top:3px;line-height:1.5}
-  .brand .gst-block{margin-top:8px;padding:6px 10px;background:#f0f5eb;border-radius:6px;display:inline-block}
-  .brand .gst-block p{font-size:10.5px;color:#2D5016;font-weight:600;margin-top:0}
+  .brand{display:flex;align-items:flex-start;gap:12px}
+  .brand-logo{height:56px;width:auto;object-fit:contain;flex-shrink:0;margin-top:2px}
+  .brand-text h1{font-size:19px;font-weight:800;color:#2D5016;letter-spacing:-0.5px;margin-bottom:2px}
+  .brand-text p{font-size:10.5px;color:#666;margin-top:2px;line-height:1.45}
+  .brand-text .gst-block{margin-top:6px;padding:4px 8px;background:#f0f5eb;border-radius:5px;display:inline-block}
+  .brand-text .gst-block p{font-size:10px;color:#2D5016;font-weight:600;margin-top:0}
   .invoice-meta{text-align:right}
   .invoice-meta h2{font-size:24px;color:#2D5016;font-weight:700;letter-spacing:2px}
   .invoice-meta p{font-size:12px;color:#666;margin-top:4px}
@@ -107,14 +108,16 @@ export function getInvoiceHtml(order: InvoiceData, baseUrl = ""): string {
   <div class="header">
     <div class="brand">
       <img src="${baseUrl}/logo.png" alt="Shatakshi Herbal" class="brand-logo" />
-      <h1>SHATAKSHI HERBAL</h1>
-      <p>Pure Ayurvedic · AYUSH Certified · 100% Natural</p>
-      <p>Bypass Road, Near Chitragupt School, Shivaji Ward</p>
-      <p>Gadarwara, Narsinghpur, Madhya Pradesh – 487551</p>
-      <p>📞 9754468444 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com</p>
-      <div class="gst-block">
-        <p>GSTIN: 23CNYPK2804B1Z6</p>
-        <p>State: 23 – Madhya Pradesh</p>
+      <div class="brand-text">
+        <h1>SHATAKSHI HERBAL</h1>
+        <p>Pure Ayurvedic · AYUSH Certified · 100% Natural</p>
+        <p>Bypass Road, Near Chitragupt School, Shivaji Ward</p>
+        <p>Gadarwara, Narsinghpur, Madhya Pradesh – 487551</p>
+        <p>📞 9754468444 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com</p>
+        <div class="gst-block">
+          <p>GSTIN: 23CNYPK2804B1Z6</p>
+          <p>State: 23 – Madhya Pradesh</p>
+        </div>
       </div>
     </div>
     <div class="invoice-meta">
