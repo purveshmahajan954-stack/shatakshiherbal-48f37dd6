@@ -87,7 +87,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-cream/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-cream/60">
-          <div>© {new Date().getFullYear()} Shatakshi Herbal Pvt. Ltd. All rights reserved.</div>
+          <div>© 2025 Shatakshi Herbal Pvt. Ltd. All rights reserved.</div>
           <div className="inline-flex items-center gap-1.5">Made with <Leaf className="w-3.5 h-3.5 text-primary-light" /> in India</div>
         </div>
       </div>
