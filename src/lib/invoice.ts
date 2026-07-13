@@ -113,7 +113,7 @@ export function getInvoiceHtml(order: InvoiceData, baseUrl = ""): string {
         <p>Pure Ayurvedic · AYUSH Certified · 100% Natural</p>
         <p>Bypass Road, Near Chitragupt School, Shivaji Ward</p>
         <p>Gadarwara, Narsinghpur, Madhya Pradesh – 487551</p>
-        <p>📞 9754468444 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com</p>
+        <p>📞 9244774344 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com</p>
         <div class="gst-block">
           <p>GSTIN: 23CNYPK2804B1Z6</p>
           <p>State: 23 – Madhya Pradesh</p>
@@ -189,7 +189,7 @@ export function getInvoiceHtml(order: InvoiceData, baseUrl = ""): string {
 
   <div class="footer">
     Thank you for shopping with Shatakshi Herbal!<br>
-    For queries: 📞 9754468444 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com<br>
+    For queries: 📞 9244774344 &nbsp;|&nbsp; ✉ shatakshiherbal2015@gmail.com<br>
     Bypass Road, Near Chitragupt School, Shivaji Ward, Gadarwara, Narsinghpur, M.P – 487551<br>
     This is a computer-generated Tax Invoice and does not require a physical signature.
   </div>

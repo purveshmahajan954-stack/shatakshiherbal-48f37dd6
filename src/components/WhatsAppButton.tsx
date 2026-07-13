@@ -1,7 +1,7 @@
 export function WhatsAppButton() {
   const handleClick = () => {
     window.open(
-      "https://wa.me/919754468444?text=Hello%20I%20want%20to%20know%20more%20about%20your%20products",
+      "https://wa.me/919244774344?text=Hello%20I%20want%20to%20know%20more%20about%20your%20products",
       "_blank"
     );
   };

@@ -35,7 +35,7 @@ export function MeetOurDoctor() {
 
             <div className="mt-8 flex flex-col gap-3 w-full">
               <a
-                href="tel:+919754468444"
+                href="tel:+919244774344"
                 className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white rounded-xl px-5 py-3 text-sm font-semibold transition w-full"
               >
                 <Phone className="w-4 h-4" /> +91 97544 68444

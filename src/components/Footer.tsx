@@ -32,7 +32,7 @@ const socials = [
   { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
   { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
   { icon: Youtube, href: "https://youtube.com", label: "YouTube" },
-  { icon: MessageCircle, href: "https://wa.me/910000000000", label: "WhatsApp" },
+  { icon: MessageCircle, href: "https://wa.me/919244774344", label: "WhatsApp" },
 ];
 
 export function Footer() {

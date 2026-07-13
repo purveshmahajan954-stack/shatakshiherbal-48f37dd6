@@ -21,7 +21,7 @@ const SELLER_NAME    = "Suneel Katiya Shatakshi Herbal";
 const SELLER_ADDRESS = "Gadarwara";
 const SELLER_GST     = "23CNYPK2804B1Z6";
 const RETURN_ADDRESS = "Bypass Road Near Chitragupt School Shivaji Ward, PIN: 487551";
-const CUSTOMER_CARE  = "9754468444";
+const CUSTOMER_CARE  = "9244774344";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
