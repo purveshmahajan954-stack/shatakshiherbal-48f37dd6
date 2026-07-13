@@ -58,7 +58,7 @@ function ContactPage() {
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
               { icon: Mail, label: "Email", value: "sunil.katiya06@gmail.com" },
-              { icon: Phone, label: "Phone", value: "+91 97544 68444" },
+              { icon: Phone, label: "Phone", value: "+91 92447 74344" },
               { icon: MapPin, label: "Address", value: "By-pass Road, near Chitragupt school, Shivaji Ward, Gadarwara, Madhya Pradesh 487551" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="bg-white p-6 rounded-2xl shadow-card text-center">
