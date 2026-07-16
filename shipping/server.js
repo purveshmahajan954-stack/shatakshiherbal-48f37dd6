@@ -35,6 +35,9 @@ app.post("/place-order", async (req, res) => {
       product_name,
       quantity,
       weight,
+      length: pkg_length,
+      width: pkg_width,
+      height: pkg_height,
       payment_mode,
       order_amount,
     } = req.body;
@@ -50,6 +53,9 @@ app.post("/place-order", async (req, res) => {
     if (!product_name?.trim()) missing.push("Product name");
     if (!quantity || isNaN(Number(quantity))) missing.push("Quantity (must be a number)");
     if (!weight || isNaN(Number(weight))) missing.push("Weight (must be a number)");
+    if (!pkg_length || isNaN(Number(pkg_length))) missing.push("Length (must be a number)");
+    if (!pkg_width  || isNaN(Number(pkg_width)))  missing.push("Width (must be a number)");
+    if (!pkg_height || isNaN(Number(pkg_height))) missing.push("Height (must be a number)");
     if (!payment_mode) missing.push("Payment mode");
     if (!order_amount || isNaN(Number(order_amount))) missing.push("Order amount (must be a number)");
 
@@ -63,6 +69,9 @@ app.post("/place-order", async (req, res) => {
 
     const isCod = payment_mode.toLowerCase() === "cod";
     const weightGrams = Number(weight);
+    const lengthCm = Number(pkg_length);
+    const widthCm  = Number(pkg_width);
+    const heightCm = Number(pkg_height);
     const orderAmt = Number(order_amount);
     const qty = Number(quantity);
     const orderNumber = generateOrderNumber();
@@ -77,12 +86,12 @@ app.post("/place-order", async (req, res) => {
       receiver_city: city.trim(),
       receiver_state_id: state.trim(),
       shipment_weight: weightGrams,
-      shipment_weight_unit: String(weightGrams),
-      shipment_length: 5,
+      shipment_weight_unit: "g",
+      shipment_length: lengthCm,
       shipment_length_unit: "cm",
-      shipment_breadth: 5,
+      shipment_breadth: widthCm,
       shipment_breadth_unit: "cm",
-      shipment_height: 5,
+      shipment_height: heightCm,
       shipment_height_unit: "cm",
       parcel_content_description: product_name.trim(),
       // parcel_type: 1 = Prepaid, 0 = COD
@@ -140,6 +149,54 @@ app.post("/place-order", async (req, res) => {
     });
   } catch (err) {
     console.error("[place-order] Unexpected error:", err);
+    return res.status(500).json({ error: err.message || "Server error" });
+  }
+});
+
+// ── Tracking proxy ──────────────────────────────────────────────────
+app.get("/track-shipment", async (req, res) => {
+  const awb = (req.query.awb ?? "").toString().trim();
+  if (!awb) return res.status(400).json({ error: "awb is required" });
+  if (!CKSHIP_TOKEN) return res.status(500).json({ error: "CKShip token not configured" });
+
+  try {
+    const ckRes = await fetch(`${CKSHIP_BASE}/api/shipment/track?awb=${encodeURIComponent(awb)}`, {
+      headers: {
+        Authorization: `Bearer ${CKSHIP_TOKEN}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    const body = await ckRes.text();
+    let data;
+    try { data = JSON.parse(body); } catch { data = { raw: body }; }
+
+    if (!ckRes.ok) {
+      return res.status(ckRes.status).json({ error: `CKShip ${ckRes.status}`, details: data });
+    }
+
+    // Normalise response — CKShip may nest data under .data
+    const d = data?.data ?? data ?? {};
+    const events = (d.tracking_events ?? d.events ?? d.tracking ?? []).map(e => ({
+      status: e.status ?? e.activity ?? e.remark ?? "",
+      location: e.location ?? e.city ?? "",
+      timestamp: e.timestamp ?? e.date ?? e.updated_at ?? "",
+      description: e.description ?? e.remark ?? "",
+    }));
+    const latest = events[0];
+    const rawStatus = d.current_status ?? d.status ?? d.shipment_status ?? latest?.status ?? null;
+
+    return res.json({
+      awb,
+      status: rawStatus,
+      location: d.current_location ?? d.location ?? latest?.location ?? null,
+      eta: d.expected_delivery ?? d.eta ?? null,
+      courier: d.courier_name ?? d.courier ?? null,
+      events,
+      raw: data,
+    });
+  } catch (err) {
+    console.error("[track-shipment] Error:", err);
     return res.status(500).json({ error: err.message || "Server error" });
   }
 });

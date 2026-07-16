@@ -121,7 +121,7 @@ export async function createCKShipShipment(order: {
       receiver_city: city,
       receiver_state_id: stateName,
       shipment_weight: weightGrams,
-      shipment_weight_unit: String(weightGrams),
+      shipment_weight_unit: "g",
       shipment_length: 5,
       shipment_length_unit: "cm",
       shipment_breadth: 5,
