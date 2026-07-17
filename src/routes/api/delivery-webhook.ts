@@ -14,13 +14,19 @@ function verifyWebhookSignature(body: string, signature: string | null): boolean
 
 function normalizeStatus(raw: string): string {
   const s = raw.toLowerCase();
+  // Out for Delivery must come before generic "deliver" check
   if (s.includes("out") && s.includes("deliver")) return "Out for Delivery";
+  // Undelivered / failed attempt must come before generic "deliver" check
+  if (s.includes("undeliver") || s.includes("failed") || s.includes("attempt")) return "In Transit";
   if (s.includes("deliver")) return "Delivered";
-  if (s.includes("transit") || s.includes("in-transit")) return "In Transit";
-  if (s.includes("ship") || s.includes("dispatch")) return "Shipped";
-  if (s.includes("pack")) return "Packed";
-  if (s.includes("rto") || s.includes("return")) return "Returned";
+  if (s.includes("rto")) return "RTO";
+  if (s.includes("transit") || s.includes("in-transit") || s.includes("intransit")) return "In Transit";
+  // "Picked Up" from seller = shipped; also dispatch
+  if (s.includes("pick") || s.includes("dispatch") || s.includes("ship")) return "Shipped";
+  // Manifested / booked / packed = parcel ready but not yet picked
+  if (s.includes("manifest") || s.includes("booked") || s.includes("pack") || s.includes("creat")) return "Packed";
   if (s.includes("cancel")) return "Cancelled";
+  if (s.includes("return")) return "Returned";
   return raw;
 }
 
