@@ -275,17 +275,26 @@ export async function cancelCKShipShipment(awbNumber: string): Promise<{ success
 
 export function mapCKShipStatus(raw: string): string {
   const s = raw.toLowerCase();
-  // Out for Delivery must come before generic "deliver" check
+  // Out for Delivery — must come before generic "deliver"
   if (s.includes("out") && s.includes("deliver")) return "Out for Delivery";
-  // Undelivered / failed attempt must come before generic "deliver" check
-  if (s.includes("undeliver") || s.includes("failed") || s.includes("attempt")) return "In Transit";
+  // Undelivered / failed attempt — must come before "deliver"
+  if (s.includes("undeliver") || (s.includes("failed") && s.includes("deliver")) || s.includes("delivery attempt")) return "In Transit";
   if (s.includes("deliver")) return "Delivered";
   if (s.includes("rto")) return "RTO";
-  if (s.includes("transit") || s.includes("in-transit") || s.includes("intransit")) return "In Transit";
-  // "Picked Up" from seller = shipped; also dispatch
-  if (s.includes("pick") || s.includes("dispatch") || s.includes("ship")) return "Shipped";
-  // Manifested / booked / packed = parcel ready but not yet picked
-  if (s.includes("manifest") || s.includes("booked") || s.includes("pack") || s.includes("creat")) return "Packed";
+  // Hub / facility / vehicle / bag movement events = In Transit
+  // (must come BEFORE "ship" / "pick" so "Shipment Received at Facility" → In Transit, not Shipped)
+  if (
+    s.includes("transit") || s.includes("intransit") ||
+    s.includes("vehicle") || s.includes("departed") ||
+    s.includes("bag added") || s.includes("added to bag") ||
+    s.includes("received at") || s.includes("facility") ||
+    s.includes("origin center") || s.includes("trip arrived") ||
+    s.includes("hub") || s.includes("sorting")
+  ) return "In Transit";
+  // Initial pickup from seller warehouse = Shipped
+  if (s.includes("pick") || s.includes("dispatch")) return "Shipped";
+  // Manifest uploaded / booked / shipment created = Packed (registered, not yet collected)
+  if (s.includes("manifest") || s.includes("booked") || s.includes("pack") || s.includes("creat") || s.includes("ship")) return "Packed";
   if (s.includes("cancel")) return "Cancelled";
   if (s.includes("return")) return "Returned";
   return raw;
