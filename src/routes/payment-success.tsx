@@ -223,7 +223,7 @@ function SuccessPage() {
           )}
 
           <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
-            {order?.awb_number && (
+            {order?.awb_number ? (
               <a
                 href={`https://ckship.in/tracking/${order.awb_number}`}
                 target="_blank"
@@ -232,7 +232,11 @@ function SuccessPage() {
               >
                 <Truck className="w-4 h-4" /> Track Order
               </a>
-            )}
+            ) : order?.tracking_id ? (
+              <div className="inline-flex items-center justify-center gap-2 bg-muted text-muted-foreground px-6 py-3 rounded-full font-semibold text-sm">
+                <Truck className="w-4 h-4" /> Tracking available once shipped
+              </div>
+            ) : null}
             <Link to="/orders" className="inline-flex items-center justify-center gap-2 border border-border px-6 py-3 rounded-full font-semibold hover:bg-cream">
               <Package className="w-4 h-4" /> My Orders
             </Link>
