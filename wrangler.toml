@@ -28,3 +28,4 @@ binding = "ASSETS"
 
 [vars]
 NODE_ENV = "production"
+GOOGLE_REDIRECT_URI = "https://shatakshi-herbal.purveshmahajan954.workers.dev/api/auth/google-callback"
