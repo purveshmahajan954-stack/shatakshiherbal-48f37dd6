@@ -112,7 +112,7 @@ export function Hero() {
                 loading={slide === 0 ? "eager" : "lazy"}
                 decoding="async"
                 onLoad={() => markLoaded(slide)}
-                initial={{ opacity: 0, scale: 1.02 }}
+                initial={mounted ? { opacity: 0, scale: 1.02 } : false}
                 animate={{ opacity: loaded[slide] ? 1 : 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.6 }}
@@ -130,7 +130,7 @@ export function Hero() {
               ))}
             </div>
           </div>
-          <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity }}
+          <motion.div suppressHydrationWarning initial={false} animate={{ y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity }}
             className="hidden sm:flex absolute top-8 -left-4 lg:left-8 bg-white rounded-2xl shadow-soft px-5 py-3 items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center"><Leaf className="w-5 h-5 text-primary" /></div>
             <div>
@@ -138,7 +138,7 @@ export function Hero() {
               <div className="text-xs text-muted-foreground">Farm to bottle</div>
             </div>
           </motion.div>
-          <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 5, repeat: Infinity }}
+          <motion.div suppressHydrationWarning initial={false} animate={{ y: [0, 8, 0] }} transition={{ duration: 5, repeat: Infinity }}
             className="hidden sm:flex absolute top-[68%] -right-2 lg:right-0 bg-white rounded-2xl shadow-soft px-5 py-3 items-center gap-3">
             <Sparkles className="w-5 h-5 text-gold" />
             <div>
@@ -146,7 +146,7 @@ export function Hero() {
               <div className="text-sm font-semibold">Kumkumadi Serum</div>
             </div>
           </motion.div>
-          <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 4.5, repeat: Infinity }}
+          <motion.div suppressHydrationWarning initial={false} animate={{ y: [0, -6, 0] }} transition={{ duration: 4.5, repeat: Infinity }}
             className="hidden sm:flex absolute -bottom-4 right-8 bg-white rounded-2xl shadow-soft px-5 py-3 items-center gap-2">
             <div className="flex gap-0.5">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
