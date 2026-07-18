@@ -76,7 +76,6 @@ function ShippingPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [globalRefreshing, setGlobalRefreshing] = useState(false);
-  const [bulkCreating, setBulkCreating] = useState(false);
 
   const load = async () => {
     setBusy(true);
@@ -161,27 +160,6 @@ function ShippingPage() {
     }
   };
 
-  const bulkCreate = async () => {
-    if (!confirm("Ye saare orders jinka AWB nahi hai unke liye CKShip shipment create karega. Confirm?")) return;
-    setBulkCreating(true);
-    try {
-      const data = await adminPatch<{ created: number; skipped: number; errors: string[]; total: number }>(
-        "/api/admin/shipments?action=bulk-create&order_id=_", {}
-      );
-      const msg = `✅ ${data?.created ?? 0}/${data?.total ?? 0} shipments created${data?.errors?.length ? ` • ${data.errors.length} errors` : ""}`;
-      if (data?.errors?.length) {
-        toast.warning(msg + "\n" + data.errors.slice(0, 3).join("\n"));
-      } else {
-        toast.success(msg);
-      }
-      await load();
-    } catch (err: any) {
-      toast.error(err.message || "Bulk create failed");
-    } finally {
-      setBulkCreating(false);
-    }
-  };
-
   const refreshAll = async () => {
     setGlobalRefreshing(true);
     try {
@@ -207,15 +185,6 @@ function ShippingPage() {
           <p className="text-sm text-muted-foreground mt-0.5">Manage CKShip shipments, labels, and tracking</p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={bulkCreate}
-            disabled={bulkCreating}
-            title="CKShip mein shipment create karo un sabhi orders ke liye jinka AWB nahi hai"
-            className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 hover:bg-orange-600"
-          >
-            <Package className={`w-4 h-4 ${bulkCreating ? "animate-pulse" : ""}`} />
-            {bulkCreating ? "Creating…" : "Bulk Create AWB"}
-          </button>
           <button
             onClick={refreshAll}
             disabled={globalRefreshing}
