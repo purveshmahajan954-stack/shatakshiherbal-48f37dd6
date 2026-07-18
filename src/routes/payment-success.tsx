@@ -232,7 +232,7 @@ function SuccessPage() {
               >
                 <Truck className="w-4 h-4" /> Track Order
               </a>
-            ) : order?.tracking_id ? (
+            ) : order ? (
               <div className="inline-flex items-center justify-center gap-2 bg-muted text-muted-foreground px-6 py-3 rounded-full font-semibold text-sm">
                 <Truck className="w-4 h-4" /> Tracking available once shipped
               </div>

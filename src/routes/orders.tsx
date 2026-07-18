@@ -571,15 +571,21 @@ function OrdersPage() {
                         </button>
                       </>
                     )}
-                    {awbNumber && o.status !== "cancelled" && (
-                      <a
-                        href={`https://ckship.in/tracking/${awbNumber}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition"
-                      >
-                        <MapPin className="w-4 h-4" /> Track Package
-                      </a>
+                    {o.status !== "cancelled" && (awbNumber || trackingId) && (
+                      awbNumber ? (
+                        <a
+                          href={`https://ckship.in/tracking/${awbNumber}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition"
+                        >
+                          <MapPin className="w-4 h-4" /> Track Package
+                        </a>
+                      ) : (
+                        <span className="inline-flex items-center gap-2 bg-muted text-muted-foreground px-4 py-2 rounded-full text-sm font-semibold cursor-default">
+                          <MapPin className="w-4 h-4" /> Tracking Soon
+                        </span>
+                      )
                     )}
                     {(o.payment_status !== "paid" && o.payment_status !== "confirmed" && o.paymentStatus !== "paid" && o.paymentStatus !== "confirmed") && o.status !== "cancelled" && o.payment_method !== "cod" && o.paymentMethod !== "cod" && (
                       <Link to="/checkout" className="inline-block text-sm text-primary font-semibold hover:underline self-center">
