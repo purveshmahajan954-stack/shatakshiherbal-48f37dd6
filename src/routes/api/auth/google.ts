@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/auth/google")({
         }
 
         const origin = new URL(request.url).origin;
-        const redirectUri = process.env.GOOGLE_REDIRECT_URI ?? `${origin}/api/auth/google-callback`;
+        const redirectUri = `${origin}/api/auth/google-callback`;
         const state = generateToken();
 
         const params = new URLSearchParams({

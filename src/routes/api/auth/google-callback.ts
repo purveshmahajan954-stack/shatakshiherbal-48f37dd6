@@ -60,7 +60,7 @@ export const Route = createFileRoute("/api/auth/google-callback")({
           });
         }
 
-        const redirectUri = process.env.GOOGLE_REDIRECT_URI ?? `${origin}/api/auth/google-callback`;
+        const redirectUri = `${origin}/api/auth/google-callback`;
 
         try {
           const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
