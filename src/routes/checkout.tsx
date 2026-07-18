@@ -75,6 +75,9 @@ function CheckoutPage() {
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState<string | null>(null);
+  const [pincodeStatus, setPincodeStatus] = useState<"idle" | "searching" | "found" | "error">("idle");
+  const [areas, setAreas] = useState<string[]>([]);
+  const [selectedArea, setSelectedArea] = useState("");
   const [busy, setBusy] = useState(false);
   const [payMethod, setPayMethod] = useState<"online" | "cod">("online");
   const [showPhoneModal, setShowPhoneModal] = useState(false);
@@ -144,23 +147,31 @@ function CheckoutPage() {
   const fetchPincodeData = async (pin: string) => {
     if (pin.length !== 6) return;
     setPincodeLoading(true);
+    setPincodeStatus("searching");
     setPincodeError(null);
     try {
       const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
       const data = await res.json();
-      if (!Array.isArray(data) || data[0]?.Status !== "Success") {
-        setPincodeError("Invalid pincode. Please check and try again.");
+      if (!Array.isArray(data) || data[0]?.Status !== "Success" || !data[0].PostOffice?.length) {
+        setPincodeError("Invalid Pincode, please check");
+        setPincodeStatus("error");
         setCity(""); setState(""); setDistrict("");
+        setAreas([]); setSelectedArea("");
         return;
       }
-      const po = data[0].PostOffice?.[0];
-      if (po) {
-        setCity(po.Division || po.Name || "");
-        setState(po.State || "");
-        setDistrict(po.District || "");
-      }
+      const postOffices: any[] = data[0].PostOffice;
+      const po = postOffices[0];
+      setCity(po.Division || po.Name || "");
+      setState(po.State || "");
+      setDistrict(po.District || "");
+      const areaNames = postOffices.map((p: any) => p.Name).filter(Boolean);
+      setAreas(areaNames);
+      setSelectedArea(areaNames[0] || "");
+      setPincodeStatus("found");
     } catch {
-      setPincodeError("Could not fetch pincode data. Please fill manually.");
+      setPincodeError("Network error — please fill details manually.");
+      setPincodeStatus("error");
+      setAreas([]); setSelectedArea("");
     } finally {
       setPincodeLoading(false);
     }
@@ -170,6 +181,8 @@ function CheckoutPage() {
     const digits = val.replace(/\D/g, "").slice(0, 6);
     setPincode(digits);
     setPincodeError(null);
+    setPincodeStatus("idle");
+    setAreas([]); setSelectedArea("");
     setSelectedAddrId(null);
     if (pincodeTimeout.current) clearTimeout(pincodeTimeout.current);
     if (digits.length === 6) {
@@ -424,20 +437,60 @@ function CheckoutPage() {
                         placeholder="6 digit PIN"
                         inputMode="numeric"
                         maxLength={6}
-                        className={`w-full border bg-white rounded-md px-4 py-2.5 text-sm pr-9 focus:outline-none focus:ring-2 focus:ring-primary ${pincodeError ? "border-red-400" : "border-border"}`}
+                        className={`w-full border bg-white rounded-md px-4 py-2.5 text-sm pr-9 focus:outline-none focus:ring-2 focus:ring-primary ${pincodeStatus === "error" ? "border-red-400" : "border-border"}`}
                       />
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {pincodeLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" /> : <Search className="w-3.5 h-3.5 text-muted-foreground" />}
+                        {pincodeLoading
+                          ? <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                          : pincodeStatus === "found"
+                            ? <Check className="w-3.5 h-3.5 text-green-600" />
+                            : <Search className="w-3.5 h-3.5 text-muted-foreground" />}
                       </div>
                     </div>
-                    {pincodeError && <p className="text-xs text-red-500">{pincodeError}</p>}
+                    {pincodeStatus === "searching" && (
+                      <p className="text-xs text-primary flex items-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" /> Searching…
+                      </p>
+                    )}
+                    {pincodeStatus === "found" && (
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Found
+                      </p>
+                    )}
+                    {pincodeStatus === "error" && (
+                      <p className="text-xs text-red-500">{pincodeError}</p>
+                    )}
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">District</label>
-                    <input value={district} onChange={(e) => { setDistrict(e.target.value); setSelectedAddrId(null); }} placeholder="e.g. Narsinghpur" className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <label className="text-xs text-muted-foreground">
+                      District
+                      {pincodeStatus === "found" && <span className="ml-1 text-green-600">(auto-filled)</span>}
+                    </label>
+                    <input
+                      value={district}
+                      onChange={(e) => { setDistrict(e.target.value); setSelectedAddrId(null); }}
+                      readOnly={pincodeStatus === "found"}
+                      placeholder="e.g. Narsinghpur"
+                      className={`w-full border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary ${pincodeStatus === "found" ? "border-border bg-muted/40 text-muted-foreground cursor-default select-none" : "border-border bg-white"}`}
+                    />
                   </div>
                 </div>
+
+                {areas.length > 0 && (
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Area / Post Office</label>
+                    <select
+                      value={selectedArea}
+                      onChange={(e) => setSelectedArea(e.target.value)}
+                      className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      {areas.map((a) => (
+                        <option key={a} value={a}>{a}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
@@ -446,18 +499,22 @@ function CheckoutPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">State</label>
-                    <select value={state} onChange={(e) => { setState(e.target.value); setSelectedAddrId(null); }} className="w-full border border-border bg-white rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    <label className="text-xs text-muted-foreground">
+                      State
+                      {pincodeStatus === "found" && <span className="ml-1 text-green-600">(auto-filled)</span>}
+                    </label>
+                    <select
+                      value={state}
+                      onChange={(e) => { setState(e.target.value); setSelectedAddrId(null); }}
+                      disabled={pincodeStatus === "found"}
+                      className={`w-full border rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary ${pincodeStatus === "found" ? "border-border bg-muted/40 text-muted-foreground cursor-default" : "border-border bg-white"}`}
+                    >
                       <option value="">Choose a state</option>
                       {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                 </div>
               </div>
-
-              {pincode.length === 6 && city && state && !pincodeLoading && (
-                <p className="text-xs text-primary mt-2 font-medium">📍 Auto-detected: {district ? `${district}, ` : ""}{city}, {state}</p>
-              )}
             </section>
 
             <section className="bg-white rounded-2xl shadow-card p-6">
