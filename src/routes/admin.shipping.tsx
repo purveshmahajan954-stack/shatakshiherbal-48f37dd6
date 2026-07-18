@@ -76,6 +76,7 @@ function ShippingPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [globalRefreshing, setGlobalRefreshing] = useState(false);
+  const [bulkCreating, setBulkCreating] = useState(false);
 
   const load = async () => {
     setBusy(true);
@@ -160,6 +161,27 @@ function ShippingPage() {
     }
   };
 
+  const bulkCreate = async () => {
+    if (!confirm("Ye saare orders jinka AWB nahi hai unke liye CKShip shipment create karega. Confirm?")) return;
+    setBulkCreating(true);
+    try {
+      const data = await adminPatch<{ created: number; skipped: number; errors: string[]; total: number }>(
+        "/api/admin/shipments?action=bulk-create&order_id=_", {}
+      );
+      const msg = `✅ ${data?.created ?? 0}/${data?.total ?? 0} shipments created${data?.errors?.length ? ` • ${data.errors.length} errors` : ""}`;
+      if (data?.errors?.length) {
+        toast.warning(msg + "\n" + data.errors.slice(0, 3).join("\n"));
+      } else {
+        toast.success(msg);
+      }
+      await load();
+    } catch (err: any) {
+      toast.error(err.message || "Bulk create failed");
+    } finally {
+      setBulkCreating(false);
+    }
+  };
+
   const refreshAll = async () => {
     setGlobalRefreshing(true);
     try {
@@ -184,14 +206,25 @@ function ShippingPage() {
           <h2 className="font-display text-2xl">Shipping Management</h2>
           <p className="text-sm text-muted-foreground mt-0.5">Manage CKShip shipments, labels, and tracking</p>
         </div>
-        <button
-          onClick={refreshAll}
-          disabled={globalRefreshing}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60"
-        >
-          <RefreshCw className={`w-4 h-4 ${globalRefreshing ? "animate-spin" : ""}`} />
-          Refresh All Tracking
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={bulkCreate}
+            disabled={bulkCreating}
+            title="CKShip mein shipment create karo un sabhi orders ke liye jinka AWB nahi hai"
+            className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60 hover:bg-orange-600"
+          >
+            <Package className={`w-4 h-4 ${bulkCreating ? "animate-pulse" : ""}`} />
+            {bulkCreating ? "Creating…" : "Bulk Create AWB"}
+          </button>
+          <button
+            onClick={refreshAll}
+            disabled={globalRefreshing}
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60"
+          >
+            <RefreshCw className={`w-4 h-4 ${globalRefreshing ? "animate-spin" : ""}`} />
+            Refresh All Tracking
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -367,11 +400,13 @@ function ShipmentRow({
           <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${TRACK_BADGE[s.trackingStatus] ?? "bg-muted text-muted-foreground"}`}>
             {s.trackingStatus}
           </span>
-          {s.trackingId && (
-            <a href={`/track/${s.trackingId}`} target="_blank" rel="noopener noreferrer" className="block text-xs text-primary mt-0.5 hover:underline font-mono">
-              {s.trackingId} ↗
+          {s.awbNumber ? (
+            <a href={`https://ckship.in/tracking/${s.awbNumber}`} target="_blank" rel="noopener noreferrer" className="block text-xs text-primary mt-0.5 hover:underline font-mono">
+              {s.awbNumber} ↗
             </a>
-          )}
+          ) : s.trackingId ? (
+            <span className="block text-xs text-muted-foreground mt-0.5 font-mono">{s.trackingId}</span>
+          ) : null}
         </td>
         <td className="px-4 py-3">
           <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_BADGE[s.shipmentStatus] ?? "bg-muted text-muted-foreground"}`}>
@@ -426,9 +461,11 @@ function ShipmentRow({
             {s.paymentMethod === "cod" && s.paymentStatus === "cod_pending" && s.awbNumber && s.shipmentStatus !== "Cancelled" && s.shipmentStatus !== "Recreated (COD)" && (
               <ActionBtn label="Re-push COD" icon={<ArrowRightLeft className="w-3.5 h-3.5" />} busy={isBusy(s.id, "repush-as-cod")} onClick={() => action(s.id, "repush-as-cod", "Shipment re-pushed as COD")} cls="text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-950/30" />
             )}
-            <a href={`/track/${s.trackingId ?? s.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium">
-              <Eye className="w-3.5 h-3.5" /> View
-            </a>
+            {s.awbNumber && (
+              <a href={`https://ckship.in/tracking/${s.awbNumber}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium">
+                <Eye className="w-3.5 h-3.5" /> View
+              </a>
+            )}
           </div>
         </td>
       </tr>

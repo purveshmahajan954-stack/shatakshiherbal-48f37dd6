@@ -118,6 +118,60 @@ export const Route = createFileRoute("/api/admin/shipments")({
         const action = url.searchParams.get("action");
         const orderId = url.searchParams.get("order_id");
 
+        /* bulk-create: create CKShip shipments for all orders without AWB */
+        if (action === "bulk-create") {
+          const pending = await db
+            .select()
+            .from(orders)
+            .where(ne(orders.shipmentStatus, "Cancelled"));
+
+          const eligible = pending.filter(
+            (o) => !o.awbNumber &&
+              (o.paymentStatus === "paid" || o.paymentStatus === "confirmed" ||
+               o.paymentStatus === "cod_pending" || o.paymentMethod === "cod") &&
+              o.status !== "cancelled"
+          );
+
+          let created = 0;
+          let skipped = 0;
+          const errors: string[] = [];
+
+          for (const o of eligible) {
+            try {
+              const result = await createCKShipShipment({
+                id: o.id,
+                shippingName: o.shippingName,
+                shippingPhone: o.shippingPhone,
+                shippingAddress: o.shippingAddress,
+                total: o.total,
+                items: o.items as any,
+                paymentMethod: o.paymentMethod,
+              });
+              if (!result.awbNumber) { skipped++; continue; }
+              await db.update(orders)
+                .set({
+                  ckshipShipmentId: result.shipmentId,
+                  ckshipOrderNumber: result.orderNumber,
+                  awbNumber: result.awbNumber,
+                  courierName: result.courierName,
+                  shippingCost: result.shippingCost !== null ? String(result.shippingCost) : null,
+                  labelUrl: result.labelUrl,
+                  shipmentStatus: "Created",
+                  trackingStatus: "Packed",
+                  trackingUpdatedAt: new Date(),
+                })
+                .where(eq(orders.id, o.id));
+              created++;
+              // Small delay to avoid rate-limiting
+              await new Promise((r) => setTimeout(r, 500));
+            } catch (err: any) {
+              errors.push(`${o.id.slice(0, 8)}: ${err?.message ?? "unknown"}`);
+            }
+          }
+
+          return Response.json({ ok: true, created, skipped, errors, total: eligible.length });
+        }
+
         if (!orderId) return Response.json({ error: "Missing order_id" }, { status: 400 });
 
         /* refresh-all: bulk update tracking for all active shipments */
