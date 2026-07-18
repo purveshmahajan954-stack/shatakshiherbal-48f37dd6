@@ -400,7 +400,9 @@ function ShipmentRow({
             )}
             {s.awbNumber && (
               <>
-                <ActionBtn label="Track" icon={<Truck className="w-3.5 h-3.5" />} busy={isBusy(s.id, "refresh")} onClick={() => action(s.id, "refresh", "Tracking refreshed")} />
+                <a href={`https://ckship.in/tracking/${s.awbNumber}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium">
+                    <Truck className="w-3.5 h-3.5" /> Track
+                  </a>
                 {s.labelUrl ? (
                   <a href={s.labelUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border border-border hover:bg-muted font-medium">
                     <Printer className="w-3.5 h-3.5" /> Label
