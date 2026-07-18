@@ -223,14 +223,15 @@ function SuccessPage() {
           )}
 
           <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
-            {order?.tracking_id && (
-              <Link
-                to="/track/$trackingId"
-                params={{ trackingId: order.tracking_id }}
+            {order?.awb_number && (
+              <a
+                href={`https://ckship.in/tracking/${order.awb_number}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:opacity-90"
               >
                 <Truck className="w-4 h-4" /> Track Order
-              </Link>
+              </a>
             )}
             <Link to="/orders" className="inline-flex items-center justify-center gap-2 border border-border px-6 py-3 rounded-full font-semibold hover:bg-cream">
               <Package className="w-4 h-4" /> My Orders

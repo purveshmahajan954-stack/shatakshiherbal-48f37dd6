@@ -181,6 +181,7 @@ function DashboardPage() {
                 const status = o.payment_status ?? o.paymentStatus ?? "created";
                 const trackingStatus = o.tracking_status ?? o.trackingStatus;
                 const trackingId = o.tracking_id ?? o.trackingId;
+                const awbNumber = o.awb_number ?? o.awbNumber;
                 const s = STATUS_STYLES[status] ?? STATUS_STYLES.created;
                 const isPaid = status === "paid" || status === "confirmed";
 
@@ -233,14 +234,15 @@ function DashboardPage() {
                           <FileDown className="w-3.5 h-3.5" /> Invoice
                         </button>
                       )}
-                      {trackingId && (
-                        <Link
-                          to="/track/$trackingId"
-                          params={{ trackingId }}
+                      {awbNumber && (
+                        <a
+                          href={`https://ckship.in/tracking/${awbNumber}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded-full font-semibold hover:opacity-90 transition"
                         >
                           <MapPin className="w-3.5 h-3.5" /> Track
-                        </Link>
+                        </a>
                       )}
                       <Link
                         to="/orders"

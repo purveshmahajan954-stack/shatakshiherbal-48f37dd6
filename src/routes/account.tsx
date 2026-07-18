@@ -599,14 +599,15 @@ function AccountPage() {
                           <FileDown className="w-3.5 h-3.5" /> Invoice
                         </button>
                       )}
-                      {o.tracking_id && (
-                        <Link
-                          to="/track/$trackingId"
-                          params={{ trackingId: o.tracking_id }}
+                      {o.awb_number && (
+                        <a
+                          href={`https://ckship.in/tracking/${o.awb_number}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-semibold hover:opacity-90 transition"
                         >
                           <Truck className="w-3.5 h-3.5" /> Track Order
-                        </Link>
+                        </a>
                       )}
                       {o.razorpay_order_id && (
                         <button
