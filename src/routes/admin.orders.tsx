@@ -47,7 +47,7 @@ function OrdersPage() {
   const [busy, setBusy] = useState(true);
   const [search, setSearch] = useState("");
   const [paymentFilter, setPaymentFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("cancelled");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [updating, setUpdating] = useState<string | null>(null);
 
   const load = async () => {
