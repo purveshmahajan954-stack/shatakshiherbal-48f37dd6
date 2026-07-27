@@ -189,15 +189,15 @@ export default function CreateShipment({
             <span className="font-mono font-bold tracking-wide">{effectiveAwb}</span>
             {effectiveCourier && <span className={cancelled ? "text-red-600" : "text-blue-600"}>· {effectiveCourier}</span>}
           </div>
-          {!cancelled && trackingId && (
-            <Link
-              to="/track/$trackingId"
-              params={{ trackingId }}
+          {!cancelled && effectiveAwb && (
+            <a
+              href={`https://www.ckship.in/tracking/${effectiveAwb}`}
               target="_blank"
+              rel="noopener noreferrer"
               className="text-blue-600 hover:underline text-[10px] block"
             >
               View tracking page ↗
-            </Link>
+            </a>
           )}
           {!cancelled && effectiveLabelUrl && (
             <a href={effectiveLabelUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-[10px] block">

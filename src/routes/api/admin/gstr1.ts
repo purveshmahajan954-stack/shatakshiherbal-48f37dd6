@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@server/db";
 import { orders } from "@shared/schema";
-import { gte, lte, and, eq } from "drizzle-orm";
+import { gte, lte, and, eq, inArray } from "drizzle-orm";
 import { requireAdmin } from "@server/admin-auth";
 
 const SELLER_STATE = "rajasthan";
@@ -34,7 +34,9 @@ export const Route = createFileRoute("/api/admin/gstr1")({
         const month = url.searchParams.get("month");
         const fy = url.searchParams.get("fy");
 
-        const conditions: ReturnType<typeof eq>[] = [eq(orders.paymentStatus, "paid")];
+        const conditions: ReturnType<typeof inArray>[] = [
+          inArray(orders.paymentStatus, ["paid", "cod_pending", "cod_collected"]) as never,
+        ];
 
         if (month) {
           const [y, m] = month.split("-").map(Number);
