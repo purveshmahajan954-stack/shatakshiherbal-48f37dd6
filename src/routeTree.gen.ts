@@ -9,201 +9,94 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WishlistRouteImport } from './routes/wishlist'
-import { Route as TrackRouteImport } from './routes/track'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ShopRouteImport } from './routes/shop'
-import { Route as ShippingRouteImport } from './routes/shipping'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as RefundRouteImport } from './routes/refund'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as ProductInfoRouteImport } from './routes/product-info'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
-import { Route as PaymentFailedRouteImport } from './routes/payment-failed'
-import { Route as OrdersRouteImport } from './routes/orders'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as CartRouteImport } from './routes/cart'
-import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
-import { Route as AdminLoginRouteImport } from './routes/admin-login'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AccountRouteImport } from './routes/account'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as PaymentFailedRouteImport } from './routes/payment-failed'
+import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProductInfoRouteImport } from './routes/product-info'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RefundRouteImport } from './routes/refund'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as ShippingRouteImport } from './routes/shipping'
+import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TrackRouteImport } from './routes/track'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as TrackTrackingIdRouteImport } from './routes/track.$trackingId'
-import { Route as ProductSlugRouteImport } from './routes/product.$slug'
-import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
-import { Route as ApiProductsRouteImport } from './routes/api/products'
-import { Route as ApiFirebaseConfigRouteImport } from './routes/api/firebase-config'
-import { Route as ApiDeliveryWebhookRouteImport } from './routes/api/delivery-webhook'
-import { Route as ApiContactRouteImport } from './routes/api/contact'
-import { Route as AdminUsersRouteImport } from './routes/admin.users'
-import { Route as AdminShippingRouteImport } from './routes/admin.shipping'
-import { Route as AdminReportsRouteImport } from './routes/admin.reports'
-import { Route as AdminProductsRouteImport } from './routes/admin.products'
-import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
-import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
-import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
-import { Route as AdminGstr1RouteImport } from './routes/admin.gstr1'
-import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
-import { Route as ApiUserProfileRouteImport } from './routes/api/user/profile'
-import { Route as ApiUserOrdersRouteImport } from './routes/api/user/orders'
-import { Route as ApiUserAddressesRouteImport } from './routes/api/user/addresses'
-import { Route as ApiPublicWebhookUpdateRouteImport } from './routes/api/public/webhook-update'
-import { Route as ApiPaymentsVerifyRouteImport } from './routes/api/payments/verify'
-import { Route as ApiPaymentsRazorpayKeyRouteImport } from './routes/api/payments/razorpay-key'
-import { Route as ApiPaymentsMarkFailedRouteImport } from './routes/api/payments/mark-failed'
-import { Route as ApiPaymentsCreateOrderRouteImport } from './routes/api/payments/create-order'
-import { Route as ApiPaymentsCodOrderRouteImport } from './routes/api/payments/cod-order'
-import { Route as ApiOrdersCancelRouteImport } from './routes/api/orders/cancel'
-import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
-import { Route as ApiAuthSignoutRouteImport } from './routes/api/auth/signout'
-import { Route as ApiAuthSigninRouteImport } from './routes/api/auth/signin'
-import { Route as ApiAuthOtpVerifyRouteImport } from './routes/api/auth/otp-verify'
-import { Route as ApiAuthOtpSendRouteImport } from './routes/api/auth/otp-send'
-import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
-import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google-callback'
-import { Route as ApiAuthGoogleRouteImport } from './routes/api/auth/google'
-import { Route as ApiAuthFirebasePhoneVerifyRouteImport } from './routes/api/auth/firebase-phone-verify'
-import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
-import { Route as ApiAdminUploadImageRouteImport } from './routes/api/admin/upload-image'
-import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
-import { Route as ApiAdminSigninRouteImport } from './routes/api/admin/signin'
-import { Route as ApiAdminShipmentsRouteImport } from './routes/api/admin/shipments'
-import { Route as ApiAdminRetryNotificationsRouteImport } from './routes/api/admin/retry-notifications'
-import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
-import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
-import { Route as ApiAdminOtpVerifyRouteImport } from './routes/api/admin/otp-verify'
-import { Route as ApiAdminOtpSendRouteImport } from './routes/api/admin/otp-send'
-import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
-import { Route as ApiAdminMigrateRouteImport } from './routes/api/admin/migrate'
-import { Route as ApiAdminMeRouteImport } from './routes/api/admin/me'
-import { Route as ApiAdminLeadsRouteImport } from './routes/api/admin/leads'
-import { Route as ApiAdminGstr1RouteImport } from './routes/api/admin/gstr1'
-import { Route as ApiAdminFirebasePhoneVerifyRouteImport } from './routes/api/admin/firebase-phone-verify'
-import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminGstr1RouteImport } from './routes/admin.gstr1'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminShippingRouteImport } from './routes/admin.shipping'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as ApiContactRouteImport } from './routes/api/contact'
+import { Route as ApiDeliveryWebhookRouteImport } from './routes/api/delivery-webhook'
+import { Route as ApiFirebaseConfigRouteImport } from './routes/api/firebase-config'
+import { Route as ApiProductsRouteImport } from './routes/api/products'
+import { Route as ApiTrackOrderRouteImport } from './routes/api/track-order'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as TrackTrackingIdRouteImport } from './routes/track.$trackingId'
 import { Route as ApiAdminCustomersRouteImport } from './routes/api/admin/customers'
+import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
+import { Route as ApiAdminFirebasePhoneVerifyRouteImport } from './routes/api/admin/firebase-phone-verify'
+import { Route as ApiAdminGstr1RouteImport } from './routes/api/admin/gstr1'
+import { Route as ApiAdminLeadsRouteImport } from './routes/api/admin/leads'
+import { Route as ApiAdminMeRouteImport } from './routes/api/admin/me'
+import { Route as ApiAdminMigrateRouteImport } from './routes/api/admin/migrate'
+import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
+import { Route as ApiAdminOtpSendRouteImport } from './routes/api/admin/otp-send'
+import { Route as ApiAdminOtpVerifyRouteImport } from './routes/api/admin/otp-verify'
+import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
+import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
+import { Route as ApiAdminRetryNotificationsRouteImport } from './routes/api/admin/retry-notifications'
+import { Route as ApiAdminShipmentsRouteImport } from './routes/api/admin/shipments'
+import { Route as ApiAdminSigninRouteImport } from './routes/api/admin/signin'
+import { Route as ApiAdminSignoutRouteImport } from './routes/api/admin/signout'
+import { Route as ApiAdminUploadImageRouteImport } from './routes/api/admin/upload-image'
+import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
+import { Route as ApiAuthFirebasePhoneVerifyRouteImport } from './routes/api/auth/firebase-phone-verify'
+import { Route as ApiAuthGoogleRouteImport } from './routes/api/auth/google'
+import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google-callback'
+import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
+import { Route as ApiAuthOtpSendRouteImport } from './routes/api/auth/otp-send'
+import { Route as ApiAuthOtpVerifyRouteImport } from './routes/api/auth/otp-verify'
+import { Route as ApiAuthPasswordResetRouteImport } from './routes/api/auth/password-reset'
+import { Route as ApiAuthPasswordResetSendRouteImport } from './routes/api/auth/password-reset-send'
+import { Route as ApiAuthSigninRouteImport } from './routes/api/auth/signin'
+import { Route as ApiAuthSignoutRouteImport } from './routes/api/auth/signout'
+import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
+import { Route as ApiOrdersCancelRouteImport } from './routes/api/orders/cancel'
+import { Route as ApiPaymentsCodOrderRouteImport } from './routes/api/payments/cod-order'
+import { Route as ApiPaymentsCreateOrderRouteImport } from './routes/api/payments/create-order'
+import { Route as ApiPaymentsMarkFailedRouteImport } from './routes/api/payments/mark-failed'
+import { Route as ApiPaymentsRazorpayKeyRouteImport } from './routes/api/payments/razorpay-key'
+import { Route as ApiPaymentsVerifyRouteImport } from './routes/api/payments/verify'
+import { Route as ApiPublicWebhookUpdateRouteImport } from './routes/api/public/webhook-update'
+import { Route as ApiUserAddressesRouteImport } from './routes/api/user/addresses'
+import { Route as ApiUserOrdersRouteImport } from './routes/api/user/orders'
+import { Route as ApiUserProfileRouteImport } from './routes/api/user/profile'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay/webhook'
 
-const WishlistRoute = WishlistRouteImport.update({
-  id: '/wishlist',
-  path: '/wishlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrackRoute = TrackRouteImport.update({
-  id: '/track',
-  path: '/track',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopRoute = ShopRouteImport.update({
-  id: '/shop',
-  path: '/shop',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShippingRoute = ShippingRouteImport.update({
-  id: '/shipping',
-  path: '/shipping',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RefundRoute = RefundRouteImport.update({
-  id: '/refund',
-  path: '/refund',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductInfoRoute = ProductInfoRouteImport.update({
-  id: '/product-info',
-  path: '/product-info',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
-  id: '/payment-success',
-  path: '/payment-success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentFailedRoute = PaymentFailedRouteImport.update({
-  id: '/payment-failed',
-  path: '/payment-failed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersRoute = OrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth-callback',
-  path: '/auth-callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin-login',
-  path: '/admin-login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -211,9 +104,124 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth-callback',
+  path: '/auth-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentFailedRoute = PaymentFailedRouteImport.update({
+  id: '/payment-failed',
+  path: '/payment-failed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment-success',
+  path: '/payment-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductInfoRoute = ProductInfoRouteImport.update({
+  id: '/product-info',
+  path: '/product-info',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundRoute = RefundRouteImport.update({
+  id: '/refund',
+  path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -221,79 +229,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const TrackTrackingIdRoute = TrackTrackingIdRouteImport.update({
-  id: '/$trackingId',
-  path: '/$trackingId',
-  getParentRoute: () => TrackRoute,
-} as any)
-const ProductSlugRoute = ProductSlugRouteImport.update({
-  id: '/product/$slug',
-  path: '/product/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
-  id: '/api/track-order',
-  path: '/api/track-order',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductsRoute = ApiProductsRouteImport.update({
-  id: '/api/products',
-  path: '/api/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiFirebaseConfigRoute = ApiFirebaseConfigRouteImport.update({
-  id: '/api/firebase-config',
-  path: '/api/firebase-config',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiDeliveryWebhookRoute = ApiDeliveryWebhookRouteImport.update({
-  id: '/api/delivery-webhook',
-  path: '/api/delivery-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiContactRoute = ApiContactRouteImport.update({
-  id: '/api/contact',
-  path: '/api/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminShippingRoute = AdminShippingRouteImport.update({
-  id: '/shipping',
-  path: '/shipping',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminReportsRoute = AdminReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProductsRoute = AdminProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminOrdersRoute = AdminOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLeadsRoute = AdminLeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminGstr1Route = AdminGstr1RouteImport.update({
-  id: '/gstr1',
-  path: '/gstr1',
+const AdminCustomersRoute = AdminCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -301,181 +239,89 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminCustomersRoute = AdminCustomersRouteImport.update({
-  id: '/customers',
-  path: '/customers',
+const AdminGstr1Route = AdminGstr1RouteImport.update({
+  id: '/gstr1',
+  path: '/gstr1',
   getParentRoute: () => AdminRoute,
 } as any)
-const ApiUserProfileRoute = ApiUserProfileRouteImport.update({
-  id: '/api/user/profile',
-  path: '/api/user/profile',
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminShippingRoute = AdminShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ApiContactRoute = ApiContactRouteImport.update({
+  id: '/api/contact',
+  path: '/api/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiUserOrdersRoute = ApiUserOrdersRouteImport.update({
-  id: '/api/user/orders',
-  path: '/api/user/orders',
+const ApiDeliveryWebhookRoute = ApiDeliveryWebhookRouteImport.update({
+  id: '/api/delivery-webhook',
+  path: '/api/delivery-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiUserAddressesRoute = ApiUserAddressesRouteImport.update({
-  id: '/api/user/addresses',
-  path: '/api/user/addresses',
+const ApiFirebaseConfigRoute = ApiFirebaseConfigRouteImport.update({
+  id: '/api/firebase-config',
+  path: '/api/firebase-config',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicWebhookUpdateRoute = ApiPublicWebhookUpdateRouteImport.update({
-  id: '/api/public/webhook-update',
-  path: '/api/public/webhook-update',
+const ApiProductsRoute = ApiProductsRouteImport.update({
+  id: '/api/products',
+  path: '/api/products',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPaymentsVerifyRoute = ApiPaymentsVerifyRouteImport.update({
-  id: '/api/payments/verify',
-  path: '/api/payments/verify',
+const ApiTrackOrderRoute = ApiTrackOrderRouteImport.update({
+  id: '/api/track-order',
+  path: '/api/track-order',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPaymentsRazorpayKeyRoute = ApiPaymentsRazorpayKeyRouteImport.update({
-  id: '/api/payments/razorpay-key',
-  path: '/api/payments/razorpay-key',
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPaymentsMarkFailedRoute = ApiPaymentsMarkFailedRouteImport.update({
-  id: '/api/payments/mark-failed',
-  path: '/api/payments/mark-failed',
+const TrackTrackingIdRoute = TrackTrackingIdRouteImport.update({
+  id: '/$trackingId',
+  path: '/$trackingId',
+  getParentRoute: () => TrackRoute,
+} as any)
+const ApiAdminCustomersRoute = ApiAdminCustomersRouteImport.update({
+  id: '/api/admin/customers',
+  path: '/api/admin/customers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPaymentsCreateOrderRoute = ApiPaymentsCreateOrderRouteImport.update({
-  id: '/api/payments/create-order',
-  path: '/api/payments/create-order',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPaymentsCodOrderRoute = ApiPaymentsCodOrderRouteImport.update({
-  id: '/api/payments/cod-order',
-  path: '/api/payments/cod-order',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersCancelRoute = ApiOrdersCancelRouteImport.update({
-  id: '/api/orders/cancel',
-  path: '/api/orders/cancel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
-  id: '/api/auth/signup',
-  path: '/api/auth/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthSignoutRoute = ApiAuthSignoutRouteImport.update({
-  id: '/api/auth/signout',
-  path: '/api/auth/signout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthSigninRoute = ApiAuthSigninRouteImport.update({
-  id: '/api/auth/signin',
-  path: '/api/auth/signin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthOtpVerifyRoute = ApiAuthOtpVerifyRouteImport.update({
-  id: '/api/auth/otp-verify',
-  path: '/api/auth/otp-verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthOtpSendRoute = ApiAuthOtpSendRouteImport.update({
-  id: '/api/auth/otp-send',
-  path: '/api/auth/otp-send',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
-  id: '/api/auth/me',
-  path: '/api/auth/me',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
-  id: '/api/auth/google-callback',
-  path: '/api/auth/google-callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthGoogleRoute = ApiAuthGoogleRouteImport.update({
-  id: '/api/auth/google',
-  path: '/api/auth/google',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthFirebasePhoneVerifyRoute =
-  ApiAuthFirebasePhoneVerifyRouteImport.update({
-    id: '/api/auth/firebase-phone-verify',
-    path: '/api/auth/firebase-phone-verify',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
-  id: '/api/admin/users',
-  path: '/api/admin/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminUploadImageRoute = ApiAdminUploadImageRouteImport.update({
-  id: '/api/admin/upload-image',
-  path: '/api/admin/upload-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminSignoutRoute = ApiAdminSignoutRouteImport.update({
-  id: '/api/admin/signout',
-  path: '/api/admin/signout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminSigninRoute = ApiAdminSigninRouteImport.update({
-  id: '/api/admin/signin',
-  path: '/api/admin/signin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminShipmentsRoute = ApiAdminShipmentsRouteImport.update({
-  id: '/api/admin/shipments',
-  path: '/api/admin/shipments',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminRetryNotificationsRoute =
-  ApiAdminRetryNotificationsRouteImport.update({
-    id: '/api/admin/retry-notifications',
-    path: '/api/admin/retry-notifications',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminReportsRoute = ApiAdminReportsRouteImport.update({
-  id: '/api/admin/reports',
-  path: '/api/admin/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminProductsRoute = ApiAdminProductsRouteImport.update({
-  id: '/api/admin/products',
-  path: '/api/admin/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminOtpVerifyRoute = ApiAdminOtpVerifyRouteImport.update({
-  id: '/api/admin/otp-verify',
-  path: '/api/admin/otp-verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminOtpSendRoute = ApiAdminOtpSendRouteImport.update({
-  id: '/api/admin/otp-send',
-  path: '/api/admin/otp-send',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
-  id: '/api/admin/orders',
-  path: '/api/admin/orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminMigrateRoute = ApiAdminMigrateRouteImport.update({
-  id: '/api/admin/migrate',
-  path: '/api/admin/migrate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminMeRoute = ApiAdminMeRouteImport.update({
-  id: '/api/admin/me',
-  path: '/api/admin/me',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminLeadsRoute = ApiAdminLeadsRouteImport.update({
-  id: '/api/admin/leads',
-  path: '/api/admin/leads',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminGstr1Route = ApiAdminGstr1RouteImport.update({
-  id: '/api/admin/gstr1',
-  path: '/api/admin/gstr1',
+const ApiAdminDashboardRoute = ApiAdminDashboardRouteImport.update({
+  id: '/api/admin/dashboard',
+  path: '/api/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminFirebasePhoneVerifyRoute =
@@ -484,14 +330,187 @@ const ApiAdminFirebasePhoneVerifyRoute =
     path: '/api/admin/firebase-phone-verify',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiAdminDashboardRoute = ApiAdminDashboardRouteImport.update({
-  id: '/api/admin/dashboard',
-  path: '/api/admin/dashboard',
+const ApiAdminGstr1Route = ApiAdminGstr1RouteImport.update({
+  id: '/api/admin/gstr1',
+  path: '/api/admin/gstr1',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAdminCustomersRoute = ApiAdminCustomersRouteImport.update({
-  id: '/api/admin/customers',
-  path: '/api/admin/customers',
+const ApiAdminLeadsRoute = ApiAdminLeadsRouteImport.update({
+  id: '/api/admin/leads',
+  path: '/api/admin/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminMeRoute = ApiAdminMeRouteImport.update({
+  id: '/api/admin/me',
+  path: '/api/admin/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminMigrateRoute = ApiAdminMigrateRouteImport.update({
+  id: '/api/admin/migrate',
+  path: '/api/admin/migrate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
+  id: '/api/admin/orders',
+  path: '/api/admin/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminOtpSendRoute = ApiAdminOtpSendRouteImport.update({
+  id: '/api/admin/otp-send',
+  path: '/api/admin/otp-send',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminOtpVerifyRoute = ApiAdminOtpVerifyRouteImport.update({
+  id: '/api/admin/otp-verify',
+  path: '/api/admin/otp-verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminProductsRoute = ApiAdminProductsRouteImport.update({
+  id: '/api/admin/products',
+  path: '/api/admin/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminReportsRoute = ApiAdminReportsRouteImport.update({
+  id: '/api/admin/reports',
+  path: '/api/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminRetryNotificationsRoute =
+  ApiAdminRetryNotificationsRouteImport.update({
+    id: '/api/admin/retry-notifications',
+    path: '/api/admin/retry-notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminShipmentsRoute = ApiAdminShipmentsRouteImport.update({
+  id: '/api/admin/shipments',
+  path: '/api/admin/shipments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSigninRoute = ApiAdminSigninRouteImport.update({
+  id: '/api/admin/signin',
+  path: '/api/admin/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSignoutRoute = ApiAdminSignoutRouteImport.update({
+  id: '/api/admin/signout',
+  path: '/api/admin/signout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminUploadImageRoute = ApiAdminUploadImageRouteImport.update({
+  id: '/api/admin/upload-image',
+  path: '/api/admin/upload-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
+  id: '/api/admin/users',
+  path: '/api/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthFirebasePhoneVerifyRoute =
+  ApiAuthFirebasePhoneVerifyRouteImport.update({
+    id: '/api/auth/firebase-phone-verify',
+    path: '/api/auth/firebase-phone-verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAuthGoogleRoute = ApiAuthGoogleRouteImport.update({
+  id: '/api/auth/google',
+  path: '/api/auth/google',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
+  id: '/api/auth/google-callback',
+  path: '/api/auth/google-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
+  id: '/api/auth/me',
+  path: '/api/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthOtpSendRoute = ApiAuthOtpSendRouteImport.update({
+  id: '/api/auth/otp-send',
+  path: '/api/auth/otp-send',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthOtpVerifyRoute = ApiAuthOtpVerifyRouteImport.update({
+  id: '/api/auth/otp-verify',
+  path: '/api/auth/otp-verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthPasswordResetRoute = ApiAuthPasswordResetRouteImport.update({
+  id: '/api/auth/password-reset',
+  path: '/api/auth/password-reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthPasswordResetSendRoute =
+  ApiAuthPasswordResetSendRouteImport.update({
+    id: '/api/auth/password-reset-send',
+    path: '/api/auth/password-reset-send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAuthSigninRoute = ApiAuthSigninRouteImport.update({
+  id: '/api/auth/signin',
+  path: '/api/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSignoutRoute = ApiAuthSignoutRouteImport.update({
+  id: '/api/auth/signout',
+  path: '/api/auth/signout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
+  id: '/api/auth/signup',
+  path: '/api/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersCancelRoute = ApiOrdersCancelRouteImport.update({
+  id: '/api/orders/cancel',
+  path: '/api/orders/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsCodOrderRoute = ApiPaymentsCodOrderRouteImport.update({
+  id: '/api/payments/cod-order',
+  path: '/api/payments/cod-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsCreateOrderRoute = ApiPaymentsCreateOrderRouteImport.update({
+  id: '/api/payments/create-order',
+  path: '/api/payments/create-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsMarkFailedRoute = ApiPaymentsMarkFailedRouteImport.update({
+  id: '/api/payments/mark-failed',
+  path: '/api/payments/mark-failed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsRazorpayKeyRoute = ApiPaymentsRazorpayKeyRouteImport.update({
+  id: '/api/payments/razorpay-key',
+  path: '/api/payments/razorpay-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsVerifyRoute = ApiPaymentsVerifyRouteImport.update({
+  id: '/api/payments/verify',
+  path: '/api/payments/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicWebhookUpdateRoute = ApiPublicWebhookUpdateRouteImport.update({
+  id: '/api/public/webhook-update',
+  path: '/api/public/webhook-update',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUserAddressesRoute = ApiUserAddressesRouteImport.update({
+  id: '/api/user/addresses',
+  path: '/api/user/addresses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUserOrdersRoute = ApiUserOrdersRouteImport.update({
+  id: '/api/user/orders',
+  path: '/api/user/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUserProfileRoute = ApiUserProfileRouteImport.update({
+  id: '/api/user/profile',
+  path: '/api/user/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRazorpayWebhookRoute =
@@ -512,6 +531,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
@@ -569,6 +589,8 @@ export interface FileRoutesByFullPath {
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/auth/otp-send': typeof ApiAuthOtpSendRoute
   '/api/auth/otp-verify': typeof ApiAuthOtpVerifyRoute
+  '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
+  '/api/auth/password-reset-send': typeof ApiAuthPasswordResetSendRoute
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -594,6 +616,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
@@ -651,6 +674,8 @@ export interface FileRoutesByTo {
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/auth/otp-send': typeof ApiAuthOtpSendRoute
   '/api/auth/otp-verify': typeof ApiAuthOtpVerifyRoute
+  '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
+  '/api/auth/password-reset-send': typeof ApiAuthPasswordResetSendRoute
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -678,6 +703,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
   '/payment-failed': typeof PaymentFailedRoute
@@ -735,6 +761,8 @@ export interface FileRoutesById {
   '/api/auth/me': typeof ApiAuthMeRoute
   '/api/auth/otp-send': typeof ApiAuthOtpSendRoute
   '/api/auth/otp-verify': typeof ApiAuthOtpVerifyRoute
+  '/api/auth/password-reset': typeof ApiAuthPasswordResetRoute
+  '/api/auth/password-reset-send': typeof ApiAuthPasswordResetSendRoute
   '/api/auth/signin': typeof ApiAuthSigninRoute
   '/api/auth/signout': typeof ApiAuthSignoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -763,6 +791,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/dashboard'
+    | '/forgot-password'
     | '/login'
     | '/orders'
     | '/payment-failed'
@@ -820,6 +849,8 @@ export interface FileRouteTypes {
     | '/api/auth/me'
     | '/api/auth/otp-send'
     | '/api/auth/otp-verify'
+    | '/api/auth/password-reset'
+    | '/api/auth/password-reset-send'
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
@@ -845,6 +876,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/dashboard'
+    | '/forgot-password'
     | '/login'
     | '/orders'
     | '/payment-failed'
@@ -902,6 +934,8 @@ export interface FileRouteTypes {
     | '/api/auth/me'
     | '/api/auth/otp-send'
     | '/api/auth/otp-verify'
+    | '/api/auth/password-reset'
+    | '/api/auth/password-reset-send'
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
@@ -928,6 +962,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/dashboard'
+    | '/forgot-password'
     | '/login'
     | '/orders'
     | '/payment-failed'
@@ -985,6 +1020,8 @@ export interface FileRouteTypes {
     | '/api/auth/me'
     | '/api/auth/otp-send'
     | '/api/auth/otp-verify'
+    | '/api/auth/password-reset'
+    | '/api/auth/password-reset-send'
     | '/api/auth/signin'
     | '/api/auth/signout'
     | '/api/auth/signup'
@@ -1012,6 +1049,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   OrdersRoute: typeof OrdersRoute
   PaymentFailedRoute: typeof PaymentFailedRoute
@@ -1057,6 +1095,8 @@ export interface RootRouteChildren {
   ApiAuthMeRoute: typeof ApiAuthMeRoute
   ApiAuthOtpSendRoute: typeof ApiAuthOtpSendRoute
   ApiAuthOtpVerifyRoute: typeof ApiAuthOtpVerifyRoute
+  ApiAuthPasswordResetRoute: typeof ApiAuthPasswordResetRoute
+  ApiAuthPasswordResetSendRoute: typeof ApiAuthPasswordResetSendRoute
   ApiAuthSigninRoute: typeof ApiAuthSigninRoute
   ApiAuthSignoutRoute: typeof ApiAuthSignoutRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
@@ -1075,165 +1115,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wishlist': {
-      id: '/wishlist'
-      path: '/wishlist'
-      fullPath: '/wishlist'
-      preLoaderRoute: typeof WishlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/track': {
-      id: '/track'
-      path: '/track'
-      fullPath: '/track'
-      preLoaderRoute: typeof TrackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop': {
-      id: '/shop'
-      path: '/shop'
-      fullPath: '/shop'
-      preLoaderRoute: typeof ShopRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shipping': {
-      id: '/shipping'
-      path: '/shipping'
-      fullPath: '/shipping'
-      preLoaderRoute: typeof ShippingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/refund': {
-      id: '/refund'
-      path: '/refund'
-      fullPath: '/refund'
-      preLoaderRoute: typeof RefundRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product-info': {
-      id: '/product-info'
-      path: '/product-info'
-      fullPath: '/product-info'
-      preLoaderRoute: typeof ProductInfoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payment-success': {
-      id: '/payment-success'
-      path: '/payment-success'
-      fullPath: '/payment-success'
-      preLoaderRoute: typeof PaymentSuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payment-failed': {
-      id: '/payment-failed'
-      path: '/payment-failed'
-      fullPath: '/payment-failed'
-      preLoaderRoute: typeof PaymentFailedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orders': {
-      id: '/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth-callback': {
-      id: '/auth-callback'
-      path: '/auth-callback'
-      fullPath: '/auth-callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin-login': {
-      id: '/admin-login'
-      path: '/admin-login'
-      fullPath: '/admin-login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -1243,11 +1129,172 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth-callback': {
+      id: '/auth-callback'
+      path: '/auth-callback'
+      fullPath: '/auth-callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-failed': {
+      id: '/payment-failed'
+      path: '/payment-failed'
+      fullPath: '/payment-failed'
+      preLoaderRoute: typeof PaymentFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-success': {
+      id: '/payment-success'
+      path: '/payment-success'
+      fullPath: '/payment-success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product-info': {
+      id: '/product-info'
+      path: '/product-info'
+      fullPath: '/product-info'
+      preLoaderRoute: typeof ProductInfoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund': {
+      id: '/refund'
+      path: '/refund'
+      fullPath: '/refund'
+      preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1257,109 +1304,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/track/$trackingId': {
-      id: '/track/$trackingId'
-      path: '/$trackingId'
-      fullPath: '/track/$trackingId'
-      preLoaderRoute: typeof TrackTrackingIdRouteImport
-      parentRoute: typeof TrackRoute
-    }
-    '/product/$slug': {
-      id: '/product/$slug'
-      path: '/product/$slug'
-      fullPath: '/product/$slug'
-      preLoaderRoute: typeof ProductSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/track-order': {
-      id: '/api/track-order'
-      path: '/api/track-order'
-      fullPath: '/api/track-order'
-      preLoaderRoute: typeof ApiTrackOrderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/products': {
-      id: '/api/products'
-      path: '/api/products'
-      fullPath: '/api/products'
-      preLoaderRoute: typeof ApiProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/firebase-config': {
-      id: '/api/firebase-config'
-      path: '/api/firebase-config'
-      fullPath: '/api/firebase-config'
-      preLoaderRoute: typeof ApiFirebaseConfigRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/delivery-webhook': {
-      id: '/api/delivery-webhook'
-      path: '/api/delivery-webhook'
-      fullPath: '/api/delivery-webhook'
-      preLoaderRoute: typeof ApiDeliveryWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/contact': {
-      id: '/api/contact'
-      path: '/api/contact'
-      fullPath: '/api/contact'
-      preLoaderRoute: typeof ApiContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/shipping': {
-      id: '/admin/shipping'
-      path: '/shipping'
-      fullPath: '/admin/shipping'
-      preLoaderRoute: typeof AdminShippingRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/reports': {
-      id: '/admin/reports'
-      path: '/reports'
-      fullPath: '/admin/reports'
-      preLoaderRoute: typeof AdminReportsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/products': {
-      id: '/admin/products'
-      path: '/products'
-      fullPath: '/admin/products'
-      preLoaderRoute: typeof AdminProductsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/payments': {
-      id: '/admin/payments'
-      path: '/payments'
-      fullPath: '/admin/payments'
-      preLoaderRoute: typeof AdminPaymentsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/orders': {
-      id: '/admin/orders'
-      path: '/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof AdminOrdersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/leads': {
-      id: '/admin/leads'
-      path: '/leads'
-      fullPath: '/admin/leads'
-      preLoaderRoute: typeof AdminLeadsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/gstr1': {
-      id: '/admin/gstr1'
-      path: '/gstr1'
-      fullPath: '/admin/gstr1'
-      preLoaderRoute: typeof AdminGstr1RouteImport
+    '/admin/customers': {
+      id: '/admin/customers'
+      path: '/customers'
+      fullPath: '/admin/customers'
+      preLoaderRoute: typeof AdminCustomersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
@@ -1369,256 +1318,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/customers': {
-      id: '/admin/customers'
-      path: '/customers'
-      fullPath: '/admin/customers'
-      preLoaderRoute: typeof AdminCustomersRouteImport
+    '/admin/gstr1': {
+      id: '/admin/gstr1'
+      path: '/gstr1'
+      fullPath: '/admin/gstr1'
+      preLoaderRoute: typeof AdminGstr1RouteImport
       parentRoute: typeof AdminRoute
     }
-    '/api/user/profile': {
-      id: '/api/user/profile'
-      path: '/api/user/profile'
-      fullPath: '/api/user/profile'
-      preLoaderRoute: typeof ApiUserProfileRouteImport
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/shipping': {
+      id: '/admin/shipping'
+      path: '/shipping'
+      fullPath: '/admin/shipping'
+      preLoaderRoute: typeof AdminShippingRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/api/contact': {
+      id: '/api/contact'
+      path: '/api/contact'
+      fullPath: '/api/contact'
+      preLoaderRoute: typeof ApiContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/user/orders': {
-      id: '/api/user/orders'
-      path: '/api/user/orders'
-      fullPath: '/api/user/orders'
-      preLoaderRoute: typeof ApiUserOrdersRouteImport
+    '/api/delivery-webhook': {
+      id: '/api/delivery-webhook'
+      path: '/api/delivery-webhook'
+      fullPath: '/api/delivery-webhook'
+      preLoaderRoute: typeof ApiDeliveryWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/user/addresses': {
-      id: '/api/user/addresses'
-      path: '/api/user/addresses'
-      fullPath: '/api/user/addresses'
-      preLoaderRoute: typeof ApiUserAddressesRouteImport
+    '/api/firebase-config': {
+      id: '/api/firebase-config'
+      path: '/api/firebase-config'
+      fullPath: '/api/firebase-config'
+      preLoaderRoute: typeof ApiFirebaseConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/webhook-update': {
-      id: '/api/public/webhook-update'
-      path: '/api/public/webhook-update'
-      fullPath: '/api/public/webhook-update'
-      preLoaderRoute: typeof ApiPublicWebhookUpdateRouteImport
+    '/api/products': {
+      id: '/api/products'
+      path: '/api/products'
+      fullPath: '/api/products'
+      preLoaderRoute: typeof ApiProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/payments/verify': {
-      id: '/api/payments/verify'
-      path: '/api/payments/verify'
-      fullPath: '/api/payments/verify'
-      preLoaderRoute: typeof ApiPaymentsVerifyRouteImport
+    '/api/track-order': {
+      id: '/api/track-order'
+      path: '/api/track-order'
+      fullPath: '/api/track-order'
+      preLoaderRoute: typeof ApiTrackOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/payments/razorpay-key': {
-      id: '/api/payments/razorpay-key'
-      path: '/api/payments/razorpay-key'
-      fullPath: '/api/payments/razorpay-key'
-      preLoaderRoute: typeof ApiPaymentsRazorpayKeyRouteImport
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/payments/mark-failed': {
-      id: '/api/payments/mark-failed'
-      path: '/api/payments/mark-failed'
-      fullPath: '/api/payments/mark-failed'
-      preLoaderRoute: typeof ApiPaymentsMarkFailedRouteImport
-      parentRoute: typeof rootRouteImport
+    '/track/$trackingId': {
+      id: '/track/$trackingId'
+      path: '/$trackingId'
+      fullPath: '/track/$trackingId'
+      preLoaderRoute: typeof TrackTrackingIdRouteImport
+      parentRoute: typeof TrackRoute
     }
-    '/api/payments/create-order': {
-      id: '/api/payments/create-order'
-      path: '/api/payments/create-order'
-      fullPath: '/api/payments/create-order'
-      preLoaderRoute: typeof ApiPaymentsCreateOrderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payments/cod-order': {
-      id: '/api/payments/cod-order'
-      path: '/api/payments/cod-order'
-      fullPath: '/api/payments/cod-order'
-      preLoaderRoute: typeof ApiPaymentsCodOrderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/cancel': {
-      id: '/api/orders/cancel'
-      path: '/api/orders/cancel'
-      fullPath: '/api/orders/cancel'
-      preLoaderRoute: typeof ApiOrdersCancelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/signup': {
-      id: '/api/auth/signup'
-      path: '/api/auth/signup'
-      fullPath: '/api/auth/signup'
-      preLoaderRoute: typeof ApiAuthSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/signout': {
-      id: '/api/auth/signout'
-      path: '/api/auth/signout'
-      fullPath: '/api/auth/signout'
-      preLoaderRoute: typeof ApiAuthSignoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/signin': {
-      id: '/api/auth/signin'
-      path: '/api/auth/signin'
-      fullPath: '/api/auth/signin'
-      preLoaderRoute: typeof ApiAuthSigninRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/otp-verify': {
-      id: '/api/auth/otp-verify'
-      path: '/api/auth/otp-verify'
-      fullPath: '/api/auth/otp-verify'
-      preLoaderRoute: typeof ApiAuthOtpVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/otp-send': {
-      id: '/api/auth/otp-send'
-      path: '/api/auth/otp-send'
-      fullPath: '/api/auth/otp-send'
-      preLoaderRoute: typeof ApiAuthOtpSendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/me': {
-      id: '/api/auth/me'
-      path: '/api/auth/me'
-      fullPath: '/api/auth/me'
-      preLoaderRoute: typeof ApiAuthMeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/google-callback': {
-      id: '/api/auth/google-callback'
-      path: '/api/auth/google-callback'
-      fullPath: '/api/auth/google-callback'
-      preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/google': {
-      id: '/api/auth/google'
-      path: '/api/auth/google'
-      fullPath: '/api/auth/google'
-      preLoaderRoute: typeof ApiAuthGoogleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/firebase-phone-verify': {
-      id: '/api/auth/firebase-phone-verify'
-      path: '/api/auth/firebase-phone-verify'
-      fullPath: '/api/auth/firebase-phone-verify'
-      preLoaderRoute: typeof ApiAuthFirebasePhoneVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/users': {
-      id: '/api/admin/users'
-      path: '/api/admin/users'
-      fullPath: '/api/admin/users'
-      preLoaderRoute: typeof ApiAdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/upload-image': {
-      id: '/api/admin/upload-image'
-      path: '/api/admin/upload-image'
-      fullPath: '/api/admin/upload-image'
-      preLoaderRoute: typeof ApiAdminUploadImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/signout': {
-      id: '/api/admin/signout'
-      path: '/api/admin/signout'
-      fullPath: '/api/admin/signout'
-      preLoaderRoute: typeof ApiAdminSignoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/signin': {
-      id: '/api/admin/signin'
-      path: '/api/admin/signin'
-      fullPath: '/api/admin/signin'
-      preLoaderRoute: typeof ApiAdminSigninRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/shipments': {
-      id: '/api/admin/shipments'
-      path: '/api/admin/shipments'
-      fullPath: '/api/admin/shipments'
-      preLoaderRoute: typeof ApiAdminShipmentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/retry-notifications': {
-      id: '/api/admin/retry-notifications'
-      path: '/api/admin/retry-notifications'
-      fullPath: '/api/admin/retry-notifications'
-      preLoaderRoute: typeof ApiAdminRetryNotificationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/reports': {
-      id: '/api/admin/reports'
-      path: '/api/admin/reports'
-      fullPath: '/api/admin/reports'
-      preLoaderRoute: typeof ApiAdminReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/products': {
-      id: '/api/admin/products'
-      path: '/api/admin/products'
-      fullPath: '/api/admin/products'
-      preLoaderRoute: typeof ApiAdminProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/otp-verify': {
-      id: '/api/admin/otp-verify'
-      path: '/api/admin/otp-verify'
-      fullPath: '/api/admin/otp-verify'
-      preLoaderRoute: typeof ApiAdminOtpVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/otp-send': {
-      id: '/api/admin/otp-send'
-      path: '/api/admin/otp-send'
-      fullPath: '/api/admin/otp-send'
-      preLoaderRoute: typeof ApiAdminOtpSendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/orders': {
-      id: '/api/admin/orders'
-      path: '/api/admin/orders'
-      fullPath: '/api/admin/orders'
-      preLoaderRoute: typeof ApiAdminOrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/migrate': {
-      id: '/api/admin/migrate'
-      path: '/api/admin/migrate'
-      fullPath: '/api/admin/migrate'
-      preLoaderRoute: typeof ApiAdminMigrateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/me': {
-      id: '/api/admin/me'
-      path: '/api/admin/me'
-      fullPath: '/api/admin/me'
-      preLoaderRoute: typeof ApiAdminMeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/leads': {
-      id: '/api/admin/leads'
-      path: '/api/admin/leads'
-      fullPath: '/api/admin/leads'
-      preLoaderRoute: typeof ApiAdminLeadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/gstr1': {
-      id: '/api/admin/gstr1'
-      path: '/api/admin/gstr1'
-      fullPath: '/api/admin/gstr1'
-      preLoaderRoute: typeof ApiAdminGstr1RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/firebase-phone-verify': {
-      id: '/api/admin/firebase-phone-verify'
-      path: '/api/admin/firebase-phone-verify'
-      fullPath: '/api/admin/firebase-phone-verify'
-      preLoaderRoute: typeof ApiAdminFirebasePhoneVerifyRouteImport
+    '/api/admin/customers': {
+      id: '/api/admin/customers'
+      path: '/api/admin/customers'
+      fullPath: '/api/admin/customers'
+      preLoaderRoute: typeof ApiAdminCustomersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/dashboard': {
@@ -1628,11 +1437,263 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/admin/customers': {
-      id: '/api/admin/customers'
-      path: '/api/admin/customers'
-      fullPath: '/api/admin/customers'
-      preLoaderRoute: typeof ApiAdminCustomersRouteImport
+    '/api/admin/firebase-phone-verify': {
+      id: '/api/admin/firebase-phone-verify'
+      path: '/api/admin/firebase-phone-verify'
+      fullPath: '/api/admin/firebase-phone-verify'
+      preLoaderRoute: typeof ApiAdminFirebasePhoneVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/gstr1': {
+      id: '/api/admin/gstr1'
+      path: '/api/admin/gstr1'
+      fullPath: '/api/admin/gstr1'
+      preLoaderRoute: typeof ApiAdminGstr1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/leads': {
+      id: '/api/admin/leads'
+      path: '/api/admin/leads'
+      fullPath: '/api/admin/leads'
+      preLoaderRoute: typeof ApiAdminLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/me': {
+      id: '/api/admin/me'
+      path: '/api/admin/me'
+      fullPath: '/api/admin/me'
+      preLoaderRoute: typeof ApiAdminMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/migrate': {
+      id: '/api/admin/migrate'
+      path: '/api/admin/migrate'
+      fullPath: '/api/admin/migrate'
+      preLoaderRoute: typeof ApiAdminMigrateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/orders': {
+      id: '/api/admin/orders'
+      path: '/api/admin/orders'
+      fullPath: '/api/admin/orders'
+      preLoaderRoute: typeof ApiAdminOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/otp-send': {
+      id: '/api/admin/otp-send'
+      path: '/api/admin/otp-send'
+      fullPath: '/api/admin/otp-send'
+      preLoaderRoute: typeof ApiAdminOtpSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/otp-verify': {
+      id: '/api/admin/otp-verify'
+      path: '/api/admin/otp-verify'
+      fullPath: '/api/admin/otp-verify'
+      preLoaderRoute: typeof ApiAdminOtpVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/products': {
+      id: '/api/admin/products'
+      path: '/api/admin/products'
+      fullPath: '/api/admin/products'
+      preLoaderRoute: typeof ApiAdminProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/reports': {
+      id: '/api/admin/reports'
+      path: '/api/admin/reports'
+      fullPath: '/api/admin/reports'
+      preLoaderRoute: typeof ApiAdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/retry-notifications': {
+      id: '/api/admin/retry-notifications'
+      path: '/api/admin/retry-notifications'
+      fullPath: '/api/admin/retry-notifications'
+      preLoaderRoute: typeof ApiAdminRetryNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/shipments': {
+      id: '/api/admin/shipments'
+      path: '/api/admin/shipments'
+      fullPath: '/api/admin/shipments'
+      preLoaderRoute: typeof ApiAdminShipmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/signin': {
+      id: '/api/admin/signin'
+      path: '/api/admin/signin'
+      fullPath: '/api/admin/signin'
+      preLoaderRoute: typeof ApiAdminSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/signout': {
+      id: '/api/admin/signout'
+      path: '/api/admin/signout'
+      fullPath: '/api/admin/signout'
+      preLoaderRoute: typeof ApiAdminSignoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/upload-image': {
+      id: '/api/admin/upload-image'
+      path: '/api/admin/upload-image'
+      fullPath: '/api/admin/upload-image'
+      preLoaderRoute: typeof ApiAdminUploadImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/users': {
+      id: '/api/admin/users'
+      path: '/api/admin/users'
+      fullPath: '/api/admin/users'
+      preLoaderRoute: typeof ApiAdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/firebase-phone-verify': {
+      id: '/api/auth/firebase-phone-verify'
+      path: '/api/auth/firebase-phone-verify'
+      fullPath: '/api/auth/firebase-phone-verify'
+      preLoaderRoute: typeof ApiAuthFirebasePhoneVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google': {
+      id: '/api/auth/google'
+      path: '/api/auth/google'
+      fullPath: '/api/auth/google'
+      preLoaderRoute: typeof ApiAuthGoogleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google-callback': {
+      id: '/api/auth/google-callback'
+      path: '/api/auth/google-callback'
+      fullPath: '/api/auth/google-callback'
+      preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/me': {
+      id: '/api/auth/me'
+      path: '/api/auth/me'
+      fullPath: '/api/auth/me'
+      preLoaderRoute: typeof ApiAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/otp-send': {
+      id: '/api/auth/otp-send'
+      path: '/api/auth/otp-send'
+      fullPath: '/api/auth/otp-send'
+      preLoaderRoute: typeof ApiAuthOtpSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/otp-verify': {
+      id: '/api/auth/otp-verify'
+      path: '/api/auth/otp-verify'
+      fullPath: '/api/auth/otp-verify'
+      preLoaderRoute: typeof ApiAuthOtpVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/password-reset': {
+      id: '/api/auth/password-reset'
+      path: '/api/auth/password-reset'
+      fullPath: '/api/auth/password-reset'
+      preLoaderRoute: typeof ApiAuthPasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/password-reset-send': {
+      id: '/api/auth/password-reset-send'
+      path: '/api/auth/password-reset-send'
+      fullPath: '/api/auth/password-reset-send'
+      preLoaderRoute: typeof ApiAuthPasswordResetSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signin': {
+      id: '/api/auth/signin'
+      path: '/api/auth/signin'
+      fullPath: '/api/auth/signin'
+      preLoaderRoute: typeof ApiAuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signout': {
+      id: '/api/auth/signout'
+      path: '/api/auth/signout'
+      fullPath: '/api/auth/signout'
+      preLoaderRoute: typeof ApiAuthSignoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signup': {
+      id: '/api/auth/signup'
+      path: '/api/auth/signup'
+      fullPath: '/api/auth/signup'
+      preLoaderRoute: typeof ApiAuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/cancel': {
+      id: '/api/orders/cancel'
+      path: '/api/orders/cancel'
+      fullPath: '/api/orders/cancel'
+      preLoaderRoute: typeof ApiOrdersCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/cod-order': {
+      id: '/api/payments/cod-order'
+      path: '/api/payments/cod-order'
+      fullPath: '/api/payments/cod-order'
+      preLoaderRoute: typeof ApiPaymentsCodOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/create-order': {
+      id: '/api/payments/create-order'
+      path: '/api/payments/create-order'
+      fullPath: '/api/payments/create-order'
+      preLoaderRoute: typeof ApiPaymentsCreateOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/mark-failed': {
+      id: '/api/payments/mark-failed'
+      path: '/api/payments/mark-failed'
+      fullPath: '/api/payments/mark-failed'
+      preLoaderRoute: typeof ApiPaymentsMarkFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/razorpay-key': {
+      id: '/api/payments/razorpay-key'
+      path: '/api/payments/razorpay-key'
+      fullPath: '/api/payments/razorpay-key'
+      preLoaderRoute: typeof ApiPaymentsRazorpayKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/verify': {
+      id: '/api/payments/verify'
+      path: '/api/payments/verify'
+      fullPath: '/api/payments/verify'
+      preLoaderRoute: typeof ApiPaymentsVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/webhook-update': {
+      id: '/api/public/webhook-update'
+      path: '/api/public/webhook-update'
+      fullPath: '/api/public/webhook-update'
+      preLoaderRoute: typeof ApiPublicWebhookUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/user/addresses': {
+      id: '/api/user/addresses'
+      path: '/api/user/addresses'
+      fullPath: '/api/user/addresses'
+      preLoaderRoute: typeof ApiUserAddressesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/user/orders': {
+      id: '/api/user/orders'
+      path: '/api/user/orders'
+      fullPath: '/api/user/orders'
+      preLoaderRoute: typeof ApiUserOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/user/profile': {
+      id: '/api/user/profile'
+      path: '/api/user/profile'
+      fullPath: '/api/user/profile'
+      preLoaderRoute: typeof ApiUserProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/razorpay/webhook': {
@@ -1696,6 +1757,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   OrdersRoute: OrdersRoute,
   PaymentFailedRoute: PaymentFailedRoute,
@@ -1741,6 +1803,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthMeRoute: ApiAuthMeRoute,
   ApiAuthOtpSendRoute: ApiAuthOtpSendRoute,
   ApiAuthOtpVerifyRoute: ApiAuthOtpVerifyRoute,
+  ApiAuthPasswordResetRoute: ApiAuthPasswordResetRoute,
+  ApiAuthPasswordResetSendRoute: ApiAuthPasswordResetSendRoute,
   ApiAuthSigninRoute: ApiAuthSigninRoute,
   ApiAuthSignoutRoute: ApiAuthSignoutRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
