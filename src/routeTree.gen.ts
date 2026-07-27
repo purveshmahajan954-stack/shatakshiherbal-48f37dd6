@@ -63,6 +63,8 @@ import { Route as ApiAdminMigrateRouteImport } from './routes/api/admin/migrate'
 import { Route as ApiAdminOrdersRouteImport } from './routes/api/admin/orders'
 import { Route as ApiAdminOtpSendRouteImport } from './routes/api/admin/otp-send'
 import { Route as ApiAdminOtpVerifyRouteImport } from './routes/api/admin/otp-verify'
+import { Route as ApiAdminPasswordResetRouteImport } from './routes/api/admin/password-reset'
+import { Route as ApiAdminPasswordResetSendRouteImport } from './routes/api/admin/password-reset-send'
 import { Route as ApiAdminProductsRouteImport } from './routes/api/admin/products'
 import { Route as ApiAdminReportsRouteImport } from './routes/api/admin/reports'
 import { Route as ApiAdminRetryNotificationsRouteImport } from './routes/api/admin/retry-notifications'
@@ -365,6 +367,17 @@ const ApiAdminOtpVerifyRoute = ApiAdminOtpVerifyRouteImport.update({
   path: '/api/admin/otp-verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminPasswordResetRoute = ApiAdminPasswordResetRouteImport.update({
+  id: '/api/admin/password-reset',
+  path: '/api/admin/password-reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminPasswordResetSendRoute =
+  ApiAdminPasswordResetSendRouteImport.update({
+    id: '/api/admin/password-reset-send',
+    path: '/api/admin/password-reset-send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAdminProductsRoute = ApiAdminProductsRouteImport.update({
   id: '/api/admin/products',
   path: '/api/admin/products',
@@ -575,6 +588,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/otp-send': typeof ApiAdminOtpSendRoute
   '/api/admin/otp-verify': typeof ApiAdminOtpVerifyRoute
+  '/api/admin/password-reset': typeof ApiAdminPasswordResetRoute
+  '/api/admin/password-reset-send': typeof ApiAdminPasswordResetSendRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
   '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
@@ -660,6 +675,8 @@ export interface FileRoutesByTo {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/otp-send': typeof ApiAdminOtpSendRoute
   '/api/admin/otp-verify': typeof ApiAdminOtpVerifyRoute
+  '/api/admin/password-reset': typeof ApiAdminPasswordResetRoute
+  '/api/admin/password-reset-send': typeof ApiAdminPasswordResetSendRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
   '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
@@ -747,6 +764,8 @@ export interface FileRoutesById {
   '/api/admin/orders': typeof ApiAdminOrdersRoute
   '/api/admin/otp-send': typeof ApiAdminOtpSendRoute
   '/api/admin/otp-verify': typeof ApiAdminOtpVerifyRoute
+  '/api/admin/password-reset': typeof ApiAdminPasswordResetRoute
+  '/api/admin/password-reset-send': typeof ApiAdminPasswordResetSendRoute
   '/api/admin/products': typeof ApiAdminProductsRoute
   '/api/admin/reports': typeof ApiAdminReportsRoute
   '/api/admin/retry-notifications': typeof ApiAdminRetryNotificationsRoute
@@ -835,6 +854,8 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/otp-send'
     | '/api/admin/otp-verify'
+    | '/api/admin/password-reset'
+    | '/api/admin/password-reset-send'
     | '/api/admin/products'
     | '/api/admin/reports'
     | '/api/admin/retry-notifications'
@@ -920,6 +941,8 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/otp-send'
     | '/api/admin/otp-verify'
+    | '/api/admin/password-reset'
+    | '/api/admin/password-reset-send'
     | '/api/admin/products'
     | '/api/admin/reports'
     | '/api/admin/retry-notifications'
@@ -1006,6 +1029,8 @@ export interface FileRouteTypes {
     | '/api/admin/orders'
     | '/api/admin/otp-send'
     | '/api/admin/otp-verify'
+    | '/api/admin/password-reset'
+    | '/api/admin/password-reset-send'
     | '/api/admin/products'
     | '/api/admin/reports'
     | '/api/admin/retry-notifications'
@@ -1081,6 +1106,8 @@ export interface RootRouteChildren {
   ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
   ApiAdminOtpSendRoute: typeof ApiAdminOtpSendRoute
   ApiAdminOtpVerifyRoute: typeof ApiAdminOtpVerifyRoute
+  ApiAdminPasswordResetRoute: typeof ApiAdminPasswordResetRoute
+  ApiAdminPasswordResetSendRoute: typeof ApiAdminPasswordResetSendRoute
   ApiAdminProductsRoute: typeof ApiAdminProductsRoute
   ApiAdminReportsRoute: typeof ApiAdminReportsRoute
   ApiAdminRetryNotificationsRoute: typeof ApiAdminRetryNotificationsRoute
@@ -1493,6 +1520,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminOtpVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/password-reset': {
+      id: '/api/admin/password-reset'
+      path: '/api/admin/password-reset'
+      fullPath: '/api/admin/password-reset'
+      preLoaderRoute: typeof ApiAdminPasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/password-reset-send': {
+      id: '/api/admin/password-reset-send'
+      path: '/api/admin/password-reset-send'
+      fullPath: '/api/admin/password-reset-send'
+      preLoaderRoute: typeof ApiAdminPasswordResetSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/products': {
       id: '/api/admin/products'
       path: '/api/admin/products'
@@ -1789,6 +1830,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminOrdersRoute: ApiAdminOrdersRoute,
   ApiAdminOtpSendRoute: ApiAdminOtpSendRoute,
   ApiAdminOtpVerifyRoute: ApiAdminOtpVerifyRoute,
+  ApiAdminPasswordResetRoute: ApiAdminPasswordResetRoute,
+  ApiAdminPasswordResetSendRoute: ApiAdminPasswordResetSendRoute,
   ApiAdminProductsRoute: ApiAdminProductsRoute,
   ApiAdminReportsRoute: ApiAdminReportsRoute,
   ApiAdminRetryNotificationsRoute: ApiAdminRetryNotificationsRoute,
