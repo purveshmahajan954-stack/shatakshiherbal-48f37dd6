@@ -94,25 +94,14 @@ export const Route = createFileRoute("/api/auth/password-reset-send")({
               ),
             );
 
+          const otp = generateOtp();
           await db.insert(otpCodes).values({
             phone: otpPhone,
-            code: generateOtp(),
+            code: otp,
             expiresAt: new Date(Date.now() + OTP_EXPIRY_MS),
           });
 
-          const otpRow = await db
-            .select({ code: otpCodes.code })
-            .from(otpCodes)
-            .where(
-              and(
-                eq(otpCodes.phone, otpPhone),
-                eq(otpCodes.used, false),
-              ),
-            )
-            .orderBy(otpCodes.createdAt)
-            .limit(1);
-
-          await sendVia2Factor(phone, otpRow[0].code);
+          await sendVia2Factor(phone, otp);
 
           return Response.json({
             ok: true,
