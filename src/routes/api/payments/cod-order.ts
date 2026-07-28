@@ -5,6 +5,7 @@ import { eq, and, gt, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { randomHex } from "@server/password";
 import { createCKShipShipment } from "@server/ckship";
+import { notifyPaymentSuccess } from "@server/notify";
 
 // Matches the shared computeTotals in src/lib/payments.functions.ts
 // COD_CHARGE = 220, PREPAID_CHARGE = 150, GST = 0 (inclusive in MRP)
@@ -147,20 +148,18 @@ export const Route = createFileRoute("/api/payments/cod-order")({
         })();
 
         // Notify admin of new COD order in background
-        import("@server/notify").then(({ notifyPaymentSuccess }) => {
-          notifyPaymentSuccess({
-            id: orderRow.id,
-            razorpayOrderId: null,
-            razorpayPaymentId: null,
-            shippingName: shipping.name,
-            shippingPhone: shipping.phone,
-            shippingAddress: shipping.address,
-            email: shipping.email,
-            total: totals.total,
-            items: trustedItems,
-            paymentMethod: "cod",
-          }).catch((err) => console.error("[cod-order] notify error:", err));
-        }).catch(() => {});
+        notifyPaymentSuccess({
+          id: orderRow.id,
+          razorpayOrderId: null,
+          razorpayPaymentId: null,
+          shippingName: shipping.name,
+          shippingPhone: shipping.phone,
+          shippingAddress: shipping.address,
+          email: shipping.email,
+          total: totals.total,
+          items: trustedItems,
+          paymentMethod: "cod",
+        }).catch((err) => console.error("[cod-order] notify error:", err));
 
         return Response.json({ orderId: orderRow.id, totals });
       },

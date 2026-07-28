@@ -313,12 +313,6 @@ function LoginPage() {
                   </button>
                 </form>
 
-                <div className="text-right">
-                  <Link to="/forgot-password" className="text-sm text-primary font-medium hover:underline">
-                    Forgot password?
-                  </Link>
-                </div>
-
                 <div className="relative flex items-center gap-3">
                   <div className="flex-1 h-px bg-border" />
                   <span className="text-xs text-muted-foreground">or</span>
@@ -346,12 +340,19 @@ function LoginPage() {
               </>
             )}
 
-            <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-primary font-medium hover:underline">
-                Create account
-              </Link>
-            </p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                <Link to="/forgot-password" className="text-primary font-medium hover:underline">
+                  Forgot password?
+                </Link>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Link to="/signup" className="text-primary font-medium hover:underline">
+                  Create account
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </main>

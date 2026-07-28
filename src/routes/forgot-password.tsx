@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
 import { ArrowLeft, Eye, EyeOff, KeyRound, Loader2, Phone } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/forgot-password")({
 
 function ForgotPasswordPage() {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
@@ -69,6 +71,7 @@ function ForgotPasswordPage() {
       if (!res.ok) throw new Error(data.error || "Password reset failed");
       localStorage.setItem("auth_token", data.token);
       document.cookie = `auth_token=${data.token}; path=/; max-age=${7 * 24 * 3600}; SameSite=Lax`;
+      await refreshUser();
       toast.success("Password updated. You are now logged in.");
       navigate({ to: "/" });
     } catch (err: any) {
