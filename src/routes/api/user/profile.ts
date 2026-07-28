@@ -43,12 +43,20 @@ export const Route = createFileRoute("/api/user/profile")({
           if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
           const body = await request.json() as any;
-          const { fullName, email, password, address } = body ?? {};
+          const { fullName, email, password, address, phone } = body ?? {};
 
           const updates: Record<string, any> = { updatedAt: new Date() };
 
           if (fullName !== undefined) {
             updates.fullName = String(fullName).trim().slice(0, 100) || null;
+          }
+
+          if (phone !== undefined) {
+            const digits = String(phone).replace(/\D/g, "").slice(-10);
+            if (digits.length > 0 && digits.length !== 10) {
+              return Response.json({ error: "Phone must be a 10-digit number" }, { status: 400 });
+            }
+            updates.phone = digits.length === 10 ? `+91${digits}` : null;
           }
 
           if (address !== undefined) {
@@ -85,6 +93,12 @@ export const Route = createFileRoute("/api/user/profile")({
           return Response.json({ ok: true });
         } catch (err: any) {
           console.error("[profile PATCH]", err);
+          // Unique constraint violation (e.g. phone already used by another account)
+          if (err?.code === "23505" || err?.message?.includes("unique")) {
+            const col = err?.constraint ?? err?.message ?? "";
+            if (col.includes("phone")) return Response.json({ error: "This phone number is already linked to another account" }, { status: 409 });
+            if (col.includes("email")) return Response.json({ error: "This email is already in use by another account" }, { status: 409 });
+          }
           return Response.json({ error: "Failed to update profile" }, { status: 500 });
         }
       },

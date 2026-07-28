@@ -47,6 +47,33 @@ async function apiPost(path: string, body: unknown, token: string) {
   return data;
 }
 
+/** Silently save the typed address to the user's saved addresses after a successful order. */
+async function trySaveNewAddress(
+  token: string,
+  fields: { flatHouse: string; areaStreet: string; landmark: string; pincode: string; district: string; city: string; state: string }
+) {
+  try {
+    if (!fields.flatHouse.trim() || fields.pincode.length !== 6) return;
+    await fetch("/api/user/addresses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        label: "Home",
+        flatHouse: fields.flatHouse.trim(),
+        areaStreet: fields.areaStreet.trim(),
+        landmark: fields.landmark.trim() || undefined,
+        pincode: fields.pincode.trim(),
+        district: fields.district.trim(),
+        city: fields.city.trim(),
+        state: fields.state.trim(),
+        isDefault: true,
+      }),
+    });
+  } catch {
+    // Silent — order already succeeded, don't surface address-save errors
+  }
+}
+
 function CheckoutPage() {
   const navigate = useNavigate();
   const { items, total, clear, setQty, remove, updatePrices } = useCart();
@@ -258,6 +285,8 @@ function CheckoutPage() {
         items: items.map((i) => ({ slug: i.slug, qty: i.qty, name: i.name, price: i.price, image: i.image })),
         shipping: { name, email, phone: effectivePhone, address: fullAddress },
       }, token) as { orderId: string; totals: any };
+      // Auto-save new address (fire-and-forget — don't block navigation)
+      if (!selectedAddrId) trySaveNewAddress(token, { flatHouse, areaStreet, landmark, pincode, district, city, state });
       clear();
       navigate({ to: "/payment-success", search: { o: res.orderId } });
     } catch (e: any) {
@@ -312,6 +341,8 @@ function CheckoutPage() {
               razorpay_payment_id: resp.razorpay_payment_id,
               razorpay_signature: resp.razorpay_signature,
             }, token);
+            // Auto-save new address (fire-and-forget — don't block navigation)
+            if (!selectedAddrId) trySaveNewAddress(token, { flatHouse, areaStreet, landmark, pincode, district, city, state });
             clear();
             navigate({ to: "/payment-success", search: { o: order.orderId } });
           } catch (e: any) {

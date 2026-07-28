@@ -77,7 +77,14 @@ function EditRow({
     }
     setFieldError(null);
     setBusy(true);
-    try { await onSave(val); setEditing(false); } finally { setBusy(false); }
+    try {
+      await onSave(val);
+      setEditing(false);
+    } catch (err: any) {
+      setFieldError(err?.message ?? "Failed to save. Please try again.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -484,16 +491,14 @@ function AccountPage() {
               onSave={save("fullName")}
             />
 
-            {/* Phone (read-only) */}
-            {user.phone && (
-              <div className="flex items-center gap-3 bg-accent/30 rounded-lg px-4 py-3">
-                <Phone className="w-4 h-4 text-primary shrink-0" />
-                <div>
-                  <div className="text-[11px] text-muted-foreground uppercase tracking-wide">Mobile</div>
-                  <div className="text-sm font-medium">{user.phone}</div>
-                </div>
-              </div>
-            )}
+            {/* Phone (editable) */}
+            <EditRow
+              label="Mobile Number" icon={<Phone className="w-4 h-4" />}
+              value={user.phone ? user.phone.replace(/^\+91/, "") : ""}
+              placeholder="Enter 10-digit mobile number"
+              onSave={save("phone")}
+              hint={!user.phone ? "Add your mobile number to pre-fill checkout" : undefined}
+            />
 
             {/* Email */}
             <EditRow
