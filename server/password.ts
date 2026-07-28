@@ -44,7 +44,9 @@ export async function verifyPassword(password: string, stored: string): Promise<
   if (!stored) return false;
 
   if (stored.startsWith("$2")) {
-    throw new Error("bcrypt hash detected — re-hash required");
+    // bcrypt hash from old app — verify with bcryptjs, then caller will rehash to PBKDF2
+    const bcrypt = await import("bcryptjs");
+    return bcrypt.compare(password, stored);
   }
 
   let iterations: number;
@@ -78,7 +80,8 @@ export async function verifyPassword(password: string, stored: string): Promise<
 }
 
 export function isLegacyHash(stored: string): boolean {
-  return !!stored && !stored.startsWith("v2:") && !stored.startsWith("$2");
+  // bcrypt ($2a/$2b) and old salt:hash format both need upgrading to PBKDF2 v2
+  return !!stored && !stored.startsWith("v2:");
 }
 
 export function generateToken(): string {
