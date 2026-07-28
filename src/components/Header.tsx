@@ -19,11 +19,23 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
 
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
   const { user, isAdmin, signOut, loading } = useAuth();
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    if (value.trim()) {
+      searchDebounceRef.current = setTimeout(() => {
+        navigate({ to: "/search", search: { q: value.trim() } });
+        setOpen(false);
+      }, 300);
+    }
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +89,7 @@ export function Header() {
                   <input
                     ref={searchInputRef}
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     placeholder="Search products…"
                     className="w-44 text-sm bg-transparent focus:outline-none"
                     onBlur={() => { if (!searchQuery) setSearchOpen(false); }}
@@ -175,14 +187,11 @@ export function Header() {
                 <Search className="w-4 h-4 text-muted-foreground shrink-0" />
                 <input
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   placeholder="Search products…"
                   className="flex-1 text-sm bg-transparent focus:outline-none"
                 />
               </div>
-              <button type="submit" className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold">
-                Go
-              </button>
             </form>
 
             {navItems.map((item) => (

@@ -32,8 +32,6 @@ function ShippingPage() {
 
       <h2>3. Shipping Charges</h2>
       <ul>
-        <li><strong>Free shipping</strong> on all prepaid orders above ₹999.</li>
-        <li>Orders below ₹999 may attract a nominal shipping fee shown at checkout.</li>
         <li>Cash on Delivery (where available) may include a small handling fee.</li>
       </ul>
 
@@ -47,7 +45,7 @@ function ShippingPage() {
       <p>Currently, we ship only within India. For bulk or international enquiries, please email <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a>.</p>
 
       <h2>7. Need Help?</h2>
-      <p>Email <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or WhatsApp +91 97544 68444 — we're happy to help.</p>
+      <p>Email <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or WhatsApp +91 92447 74344 — we're happy to help.</p>
     </PolicyLayout>
   );
 }

@@ -19,7 +19,7 @@ function RefundPage() {
       <h2>1. Order Cancellation</h2>
       <ul>
         <li>Orders can be cancelled within <strong>12 hours</strong> of placing them, provided they have not been dispatched.</li>
-        <li>To cancel, email <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or WhatsApp +91 97544 68444 with your order ID.</li>
+        <li>To cancel, email <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or WhatsApp +91 92447 74344 with your order ID.</li>
         <li>Once an order has been shipped, it cannot be cancelled.</li>
       </ul>
 
@@ -44,7 +44,7 @@ function RefundPage() {
       </ul>
 
       <h2>5. Contact Us</h2>
-      <p>For any cancellation, return, or refund query, reach us at <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or +91 97544 68444.</p>
+      <p>For any cancellation, return, or refund query, reach us at <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or +91 92447 74344.</p>
     </PolicyLayout>
   );
 }

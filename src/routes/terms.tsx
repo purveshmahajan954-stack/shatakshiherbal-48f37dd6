@@ -42,7 +42,7 @@ function TermsPage() {
       <p>These terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts of Gadarwara, Madhya Pradesh.</p>
 
       <h2>8. Contact</h2>
-      <p>For questions about these Terms, email <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or call +91 97544 68444.</p>
+      <p>For questions about these Terms, email <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a> or call +91 92447 74344.</p>
     </PolicyLayout>
   );
 }

@@ -46,7 +46,7 @@ function PrivacyPage() {
       <p>You may request access, correction, or deletion of your personal data by writing to us at <a href="mailto:sunil.katiya06@gmail.com">sunil.katiya06@gmail.com</a>.</p>
 
       <h2>7. Contact Us</h2>
-      <p>Shatakshi Herbal<br/>By-pass Road, near Chitragupt school, Shivaji Ward, Gadarwara, Madhya Pradesh 487551<br/>Email: sunil.katiya06@gmail.com<br/>Phone: +91 97544 68444</p>
+      <p>Shatakshi Herbal<br/>By-pass Road, near Chitragupt school, Shivaji Ward, Gadarwara, Madhya Pradesh 487551<br/>Email: sunil.katiya06@gmail.com<br/>Phone: +91 92447 74344</p>
     </PolicyLayout>
   );
 }

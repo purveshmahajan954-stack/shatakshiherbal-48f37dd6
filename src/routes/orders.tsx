@@ -555,7 +555,7 @@ function OrdersPage() {
                       </button>
                     )}
 
-                    {(o.payment_status === "paid" || o.payment_status === "confirmed" || o.paymentStatus === "paid" || o.paymentStatus === "confirmed") && o.status !== "cancelled" && (
+                    {(o.payment_status === "paid" || o.payment_status === "confirmed" || o.payment_status === "cod_pending" || o.paymentStatus === "paid" || o.paymentStatus === "confirmed" || o.paymentStatus === "cod_pending") && o.status !== "cancelled" && (
                       <>
                         <button
                           onClick={() => downloadInvoice(o)}
