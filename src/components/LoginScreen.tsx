@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Leaf, Loader2, Eye, EyeOff } from "lucide-react";
+import { Leaf, Loader2, Eye, EyeOff, Phone } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: string } = {}) {
@@ -119,6 +119,14 @@ export function LoginScreen({ title, subtitle }: { title?: string; subtitle?: st
             )}
             Continue with Google
           </button>
+
+          <a
+            href={`/login?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "/")}`}
+            className="w-full flex items-center justify-center gap-2 border border-primary/30 rounded-xl py-2.5 text-sm font-medium text-primary hover:bg-primary/5 transition"
+          >
+            <Phone className="w-4 h-4" />
+            Login with Phone OTP
+          </a>
 
           <p className="text-center text-xs text-muted-foreground pt-1">
             Don't have an account?{" "}
