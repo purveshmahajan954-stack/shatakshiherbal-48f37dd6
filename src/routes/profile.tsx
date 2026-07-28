@@ -160,9 +160,9 @@ function ProfilePage() {
             <Field
               label="Mobile Number"
               icon={<Phone className="w-4 h-4" />}
-              value={user.phone ? `+91 ${user.phone}` : ""}
-              placeholder="Phone not set"
-              readOnly
+              value={user.phone ? user.phone.replace(/^\+91/, "") : ""}
+              placeholder="Enter 10-digit mobile number"
+              onSave={patch("phone")}
             />
 
             <Field
