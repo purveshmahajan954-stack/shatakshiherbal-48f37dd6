@@ -29,4 +29,7 @@ Must be the weight value repeated as a string. e.g. `shipment_weight: 50` → `s
 ## dimension units
 Always `"cm"` as string.
 
-**How to apply:** Any change to `server/ckship.ts` or `shipping/server.js` shipment payload must follow these exact rules.
+## Token Auth
+CKShip uses short-lived JWTs (~30 days). `server/ckship.ts` now auto-refreshes via `CKSHIP_EMAIL` + `CKSHIP_PASSWORD` secrets — `token()` is async and caches for 25 days, with `invalidateToken()` called on 401 so the next retry gets a fresh JWT. Login endpoint: `POST /api/login` → response key is `data.token` (not `data.data.token`).
+
+**How to apply:** Any change to `server/ckship.ts` or `shipping/server.js` shipment payload must follow these exact rules. Never make `token()` or `ckHeaders()` synchronous — they must remain async.

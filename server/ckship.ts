@@ -1,14 +1,72 @@
 const CKSHIP_BASE = "https://www.ckship.in";
 
-function token(): string {
-  const t = process.env.CKSHIP_TOKEN ?? process.env.CKSHIP_AUTH_TOKEN;
-  if (!t) throw new Error("CKSHIP_TOKEN not configured");
-  return t;
+// ── Token cache ──────────────────────────────────────────────────────────────
+// Holds the active JWT and when it was fetched. We treat any token as valid for
+// 25 days (CKShip issues ~30-day JWTs) and refresh proactively before expiry.
+
+let _cachedToken: string | null = null;
+let _tokenFetchedAt: number = 0;
+const TOKEN_TTL_MS = 25 * 24 * 60 * 60 * 1000; // 25 days
+
+/** Return a valid JWT, refreshing via CKShip login if needed. */
+async function token(): Promise<string> {
+  const now = Date.now();
+  // If we have a cached token that's still within its TTL, use it.
+  if (_cachedToken && now - _tokenFetchedAt < TOKEN_TTL_MS) {
+    return _cachedToken;
+  }
+  // Try to fetch a fresh token via credentials.
+  const email = process.env.CKSHIP_EMAIL;
+  const password = process.env.CKSHIP_PASSWORD;
+  if (email && password) {
+    try {
+      const fresh = await loginCKShip(email, password);
+      _cachedToken = fresh;
+      _tokenFetchedAt = now;
+      console.log("[CKShip] Token refreshed via login.");
+      return fresh;
+    } catch (err) {
+      console.warn("[CKShip] Auto-login failed, falling back to env token:", err);
+    }
+  }
+  // Fall back to manually-configured env token.
+  const env = process.env.CKSHIP_TOKEN ?? process.env.CKSHIP_AUTH_TOKEN;
+  if (!env) throw new Error("CKSHIP_AUTH_TOKEN not configured and auto-login failed");
+  _cachedToken = env;
+  _tokenFetchedAt = now;
+  return env;
 }
 
-function ckHeaders() {
+/** Force-clear the cached token so the next call triggers a fresh login. */
+function invalidateToken() {
+  _cachedToken = null;
+  _tokenFetchedAt = 0;
+}
+
+/** Log in to CKShip and return a fresh JWT. */
+async function loginCKShip(email: string, password: string): Promise<string> {
+  const res = await fetch(`${CKSHIP_BASE}/api/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const body = await res.text();
+  let data: any;
+  try { data = JSON.parse(body); } catch {
+    throw new Error(`CKShip login: unexpected response (${res.status}): ${body.slice(0, 200)}`);
+  }
+  if (!res.ok || data?.status === false) {
+    throw new Error(`CKShip login failed: ${data?.message || data?.error || res.status}`);
+  }
+  const jwt = data?.data?.token ?? data?.token ?? data?.access_token;
+  if (!jwt) throw new Error(`CKShip login: no token in response: ${body.slice(0, 200)}`);
+  return jwt;
+}
+
+async function ckHeaders() {
+  const t = await token();
   return {
-    Authorization: `Bearer ${token()}`,
+    Authorization: `Bearer ${t}`,
     "Content-Type": "application/json",
     Accept: "application/json",
   };
@@ -158,7 +216,7 @@ export async function createCKShipShipment(order: {
 
     const res = await fetch(`${CKSHIP_BASE}/api/shipment/add-update`, {
       method: "POST",
-      headers: ckHeaders(),
+      headers: await ckHeaders(),
       body: JSON.stringify(payload),
     });
 
@@ -169,6 +227,8 @@ export async function createCKShipShipment(order: {
     try { data = JSON.parse(bodyText); } catch { throw new Error(`CKShip: Invalid response (${res.status}): ${bodyText.slice(0, 200)}`); }
 
     if (!res.ok) {
+      // On 401, invalidate cached token so the next retry fetches a fresh one.
+      if (res.status === 401) { invalidateToken(); }
       throw new Error(data?.message || data?.error || data?.msg || `CKShip error ${res.status}`);
     }
 
@@ -198,7 +258,7 @@ export async function createCKShipShipment(order: {
 export async function trackCKShipShipment(awbNumber: string): Promise<CKShipTrackResult> {
   return withRetry(async () => {
     const res = await fetch(`${CKSHIP_BASE}/api/shipment/track?awb=${encodeURIComponent(awbNumber)}`, {
-      headers: ckHeaders(),
+      headers: await ckHeaders(),
     });
 
     const bodyText = await res.text();
@@ -209,7 +269,9 @@ export async function trackCKShipShipment(awbNumber: string): Promise<CKShipTrac
 
     if (!res.ok) {
       const msg = data?.message || data?.error || data?.msg || `CKShip track error ${res.status}`;
-      // All 4xx = AWB not yet active or invalid — don't retry, they won't recover on retry
+      // On 401, invalidate cached token so the next retry fetches a fresh one.
+      if (res.status === 401) { invalidateToken(); throw new Error(msg); }
+      // Other 4xx = AWB not yet active or invalid — don't retry
       if (res.status >= 400 && res.status < 500) throw new NoRetryError(`Tracking not yet available (${res.status}): ${msg}`);
       throw new Error(msg);
     }
@@ -241,13 +303,14 @@ export async function trackCKShipShipment(awbNumber: string): Promise<CKShipTrac
 export async function getCKShipLabel(awbNumber: string): Promise<string | null> {
   return withRetry(async () => {
     const res = await fetch(`${CKSHIP_BASE}/api/shipment/label?awb=${encodeURIComponent(awbNumber)}`, {
-      headers: ckHeaders(),
+      headers: await ckHeaders(),
     });
 
     const bodyText = await res.text();
     let data: any;
     try { data = JSON.parse(bodyText); } catch { return null; }
 
+    if (res.status === 401) { invalidateToken(); throw new Error("Token expired, retrying"); }
     return data?.data?.label_url ?? data?.label_url ?? data?.label ?? data?.pdf_url ?? null;
   }, `getLabel(${awbNumber})`);
 }
@@ -258,7 +321,7 @@ export async function cancelCKShipShipment(awbNumber: string): Promise<{ success
     form.append("tracking_id", awbNumber);
     const res = await fetch(`${CKSHIP_BASE}/api/cancel-shipment`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token()}`, Accept: "application/json" },
+      headers: { Authorization: `Bearer ${await token()}`, Accept: "application/json" },
       body: form,
     });
 
@@ -268,7 +331,10 @@ export async function cancelCKShipShipment(awbNumber: string): Promise<{ success
     let data: any;
     try { data = JSON.parse(bodyText); } catch { return { success: false, message: `CKShip error: ${bodyText.slice(0, 100)}` }; }
 
-    if (!res.ok) return { success: false, message: data?.message || data?.error || `CKShip cancel error ${res.status}` };
+    if (!res.ok) {
+      if (res.status === 401) { invalidateToken(); }
+      return { success: false, message: data?.message || data?.error || `CKShip cancel error ${res.status}` };
+    }
     return { success: true, message: data?.message ?? "Shipment cancelled" };
   }, `cancelShipment(${awbNumber})`);
 }
