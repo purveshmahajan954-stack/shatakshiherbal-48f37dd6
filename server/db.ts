@@ -8,7 +8,17 @@ import * as schema from "@shared/schema";
 // go to the same database the live Cloudflare site reads from.
 // Falls back to local Replit PostgreSQL (DATABASE_URL) if Neon is not set.
 
-const neonUrl = process.env.NEON_DATABASE_URL;
+// Replit's secret form sometimes strips the "postgresql://" protocol prefix.
+// Restore it automatically so the Neon driver gets a valid URL.
+function normalizeDbUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  if (!url.startsWith("postgresql://") && !url.startsWith("postgres://")) {
+    return "postgresql://" + url;
+  }
+  return url;
+}
+
+const neonUrl = normalizeDbUrl(process.env.NEON_DATABASE_URL);
 const localUrl = process.env.DATABASE_URL;
 
 if (!neonUrl && !localUrl) {

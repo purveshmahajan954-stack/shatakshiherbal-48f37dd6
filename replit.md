@@ -69,8 +69,9 @@ Cloudflare secrets must be set via `wrangler secret put <KEY>` — they are not 
 - ✅ `cd shipping && npm install` — shipping panel dependencies installed (67 packages)
 - ✅ `npm run db:push` — schema pushed to Replit's built-in PostgreSQL (`DATABASE_URL`); all tables created
 - ✅ Both workflows running: **Start application** (port 5000) and **Shipping Panel** (port 3001)
+- ✅ Secrets configured: NEON_DATABASE_URL, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, FIREBASE_API_KEY, CKSHIP_AUTH_TOKEN, GOOGLE_API_KEY, GROQ_API_KEY
 - ⚠️ No product/admin data seeded yet — storefront is live but empty
-- ⚠️ Optional secrets (Razorpay, Google OAuth, Telegram, etc.) not yet configured
+- ⚠️ Notification secrets not yet configured: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, GMAIL_USER, GMAIL_APP_PASSWORD, IMGBB_API_KEY
 
 ## User preferences
 
