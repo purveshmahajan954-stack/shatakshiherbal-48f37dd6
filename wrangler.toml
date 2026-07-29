@@ -24,6 +24,10 @@ binding = "ASSETS"
 #   FIREBASE_API_KEY            (Firebase Web API key — for phone OTP)
 #   ADMIN_PHONE                 (Admin phone number for OTP login, e.g. 8485838126)
 #   CKSHIP_AUTH_TOKEN           (CKShip shipping API auth token)
+#   CKSHIP_EMAIL                (CKShip account email — for auto token refresh)
+#   CKSHIP_PASSWORD             (CKShip account password — for auto token refresh)
+#   GROQ_API_KEY                (Groq LLM API key)
+#   GOOGLE_API_KEY              (Google API key)
 # ─────────────────────────────────────────────
 
 [vars]

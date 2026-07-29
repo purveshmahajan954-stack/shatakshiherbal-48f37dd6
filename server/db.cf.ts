@@ -5,9 +5,17 @@ import * as schema from "@shared/schema";
 let _db: ReturnType<typeof drizzle> | null = null;
 let _warmedUp = false;
 
+function normalizeDbUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  if (!url.startsWith("postgresql://") && !url.startsWith("postgres://")) {
+    return "postgresql://" + url;
+  }
+  return url;
+}
+
 function getDb() {
   if (_db) return _db;
-  const connectionString = process.env.NEON_DATABASE_URL;
+  const connectionString = normalizeDbUrl(process.env.NEON_DATABASE_URL);
   if (!connectionString) {
     throw new Error("NEON_DATABASE_URL is not set.");
   }
