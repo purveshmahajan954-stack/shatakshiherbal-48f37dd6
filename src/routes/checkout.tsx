@@ -123,6 +123,7 @@ function CheckoutPage() {
       }
 
       // Check for reorder prefill data
+      let hasReorderPrefill = false;
       try {
         const prefillRaw = typeof window !== "undefined" ? localStorage.getItem("reorder_prefill") : null;
         if (prefillRaw) {
@@ -138,11 +139,11 @@ function CheckoutPage() {
           if (prefill.district) setDistrict(prefill.district);
           if (prefill.city) setCity(prefill.city);
           if (prefill.state) setState(prefill.state);
-          return;
+          hasReorderPrefill = true;
         }
       } catch {}
 
-      // Fetch fresh saved addresses directly from API
+      // Always fetch saved addresses so the user can change/add address even on reorder
       const token = localStorage.getItem("auth_token");
       if (token) {
         fetch("/api/user/addresses", { headers: { Authorization: `Bearer ${token}` } })
@@ -150,9 +151,11 @@ function CheckoutPage() {
           .then(data => {
             const addrs: SavedAddress[] = data.addresses ?? [];
             setSavedAddresses(addrs);
-            // Auto-fill default address
-            const def = addrs.find(a => a.isDefault) ?? addrs[0];
-            if (def) applyAddress(def);
+            // Only auto-fill default address if NOT a reorder (reorder already pre-filled)
+            if (!hasReorderPrefill) {
+              const def = addrs.find(a => a.isDefault) ?? addrs[0];
+              if (def) applyAddress(def);
+            }
           })
           .catch(() => {});
       }
